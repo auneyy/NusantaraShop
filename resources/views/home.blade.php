@@ -156,6 +156,142 @@
     transform: translateY(-2px);
   }
 
+  /* New Product Section Styles */
+  .product-section {
+    padding: 60px 0;
+    background-color: #fff;
+  }
+
+  .section-title {
+    text-align: center;
+    color: #422D1C;
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 50px;
+  }
+
+  .section-subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 50px;
+    margin-top: -30px;
+  }
+
+  .product-card {
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: white;
+    margin-bottom: 30px;
+  }
+
+  .product-card h5 {
+    font-size: 16px;
+  }
+
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .product-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .product-info {
+    padding: 20px;
+    text-align: center;
+  }
+
+  .product-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #422D1C;
+    margin-bottom: 10px;
+  }
+
+  .product-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #8B4513;
+    margin-bottom: 15px;
+  }
+
+  .btn-add-cart {
+    background-color: #422D1C;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: 100%;
+  }
+
+  .btn-add-cart:hover {
+    background-color: #8B4513;
+    transform: translateY(-2px);
+  }
+
+  .category-section {
+    padding: 60px 0;
+    background-color: #f8f9fa;
+  }
+
+  .category-card {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+
+  .category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  }
+
+  .category-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #422D1C;
+    margin-bottom: 20px;
+  }
+
+  .category-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+
+  .discount-banner {
+    background: linear-gradient(135deg, #422D1C 0%, #8B4513 100%);
+    color: white;
+    padding: 120px 0;
+    text-align: center;
+    margin: 60px 0;
+  }
+
+  .discount-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  .discount-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+  }
+
   @media (max-width: 768px) {
     .hero-content h1 {
       font-size: 2rem;
@@ -176,6 +312,14 @@
       margin-bottom: 10px;
       margin-right: 0;
     }
+
+    .product-image {
+      height: 200px;
+    }
+
+    .discount-title {
+      font-size: 2rem;
+    }
   }
 </style>
 
@@ -195,6 +339,192 @@
         <img src="{{ asset('storage/product_images/batik1.png') }}" alt="Batik Banner" class="img-fluid">
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Koleksi Terbaru Section -->
+<div class="product-section">
+  <div class="container">
+    <h2 class="section-title">Koleksi Terbaru Kami</h2>
+    <p class="section-subtitle">Temukan batik terbaru yang sesuai dengan gaya Anda</p>
+    
+    <div class="row">
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="product-card">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Pria" class="product-image">
+          <div class="product-info">
+            <h5 class="product-title">Batik Kemeja Pria</h5>
+            <p class="product-price">Rp 299.000</p>
+            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="product-card">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Lengan Panjang" class="product-image">
+          <div class="product-info">
+            <h5 class="product-title">Batik Kemeja Lengan Panjang</h5>
+            <p class="product-price">Rp 349.000</p>
+            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="product-card">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Casual" class="product-image">
+          <div class="product-info">
+            <h5 class="product-title">Batik Kemeja Casual</h5>
+            <p class="product-price">Rp 279.000</p>
+            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="product-card">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Formal" class="product-image">
+          <div class="product-info">
+            <h5 class="product-title">Batik Kemeja Formal</h5>
+            <p class="product-price">Rp 399.000</p>
+            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Category Section -->
+<div class="category-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-4 mb-4">
+        <div class="category-card">
+          <img src="{{ asset('storage/product_images/batik_pria.png') }}" alt="Batik Pria" class="category-image">
+          <h3 class="category-title">BATIK PRIA</h3>
+        </div>
+      </div>
+      <div class="col-lg-4 mb-4">
+        <div class="category-card">
+          <img src="{{ asset('storage/product_images/batik_wanita.png') }}" alt="Batik Wanita" class="category-image">
+          <h3 class="category-title">BATIK WANITA</h3>
+        </div>
+      </div>
+      <div class="col-lg-4 mb-4">
+        <div class="category-card">
+          <img src="{{ asset('storage/product_images/batik_pria.png') }}" alt="Batik Anak" class="category-image">
+          <h3 class="category-title">BATIK ANAK</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Semua Produk Section -->
+<div class="product-section">
+  <div class="container">
+    <h2 class="section-title">Semua Produk</h2>
+    
+    <!-- First Row -->
+    <div class="row">
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="product-card">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Pria" class="product-image">
+          <div class="product-info">
+            <h5 class="product-title">Batik Kemeja Pria</h5>
+            <p class="product-price">Rp 299.000</p>
+            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="product-card">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Lengan Panjang" class="product-image">
+          <div class="product-info">
+            <h5 class="product-title">Batik Kemeja Lengan Panjang</h5>
+            <p class="product-price">Rp 349.000</p>
+            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="product-card">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Casual" class="product-image">
+          <div class="product-info">
+            <h5 class="product-title">Batik Kemeja Casual</h5>
+            <p class="product-price">Rp 279.000</p>
+            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="product-card">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Formal" class="product-image">
+          <div class="product-info">
+            <h5 class="product-title">Batik Kemeja Formal</h5>
+            <p class="product-price">Rp 399.000</p>
+            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Second Row -->
+    <div class="row">
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="product-card">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Executive" class="product-image">
+          <div class="product-info">
+            <h5 class="product-title">Batik Kemeja Executive</h5>
+            <p class="product-price">Rp 429.000</p>
+            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="product-card">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Premium" class="product-image">
+          <div class="product-info">
+            <h5 class="product-title">Batik Kemeja Premium</h5>
+            <p class="product-price">Rp 459.000</p>
+            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="product-card">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Classic" class="product-image">
+          <div class="product-info">
+            <h5 class="product-title">Batik Kemeja Classic</h5>
+            <p class="product-price">Rp 319.000</p>
+            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="product-card">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Modern" class="product-image">
+          <div class="product-info">
+            <h5 class="product-title">Batik Kemeja Modern</h5>
+            <p class="product-price">Rp 369.000</p>
+            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load More Button -->
+    <div class="text-center mt-4">
+      <button class="btn btn-primary-custom btn-lg">Lihat Semua Produk</button>
+    </div>
+  </div>
+</div>
+
+<!-- Discount Banner -->
+<div class="discount-banner">
+  <div class="container">
+    <h2 class="discount-title">DISKON 30%</h2>
+    <p class="discount-subtitle">Dapatkan diskon hingga 30% untuk semua produk batik pilihan</p>
+    <a href="#" class="btn btn-light-custom btn-lg">Belanja Sekarang</a>
   </div>
 </div>
 
