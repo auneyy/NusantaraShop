@@ -9,6 +9,11 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
+        // Jika sudah login, redirect ke home
+        if (Auth::check()) {
+            return redirect('/home');
+        }
+        
         return view('auth.login');
     }
 
@@ -22,7 +27,9 @@ class AuthController extends Controller
         // Login hanya jika is_active = true
         if (Auth::attempt(['email' => $credentials['email'], 'password' => $credentials['password'], 'is_active' => 1])) {
             $request->session()->regenerate();
-            return redirect()->intended('/home');
+            
+            // Redirect ke home setelah login berhasil
+            return redirect('/home')->with('success', 'Selamat datang! Anda berhasil masuk.');
         }
 
         return back()->withErrors([
@@ -35,6 +42,8 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login');
+        
+        // Redirect ke halaman utama (/) setelah logout, bukan ke /login
+        return redirect('/')->with('success', 'Anda berhasil keluar.');
     }
 }

@@ -5,12 +5,18 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
 {
     public function showRegistrationForm()
     {
+        // Jika sudah login, redirect ke home
+        // if (Auth::check()) {
+        //     return redirect('/home');
+        // }
+        
         return view('auth.register');
     }
 
@@ -38,9 +44,10 @@ class RegisterController extends Controller
             'is_active'  => true,
         ]);
 
-        // Debug sementara (boleh dihapus setelah berhasil)
-        // dd($user); 
+        // Auto login setelah register
+        Auth::login($user);
 
-        return redirect()->route('login')->with('success', 'Registrasi berhasil!');
+        // Redirect ke home setelah register berhasil
+        return redirect('/home')->with('success', 'Selamat datang! Akun Anda berhasil dibuat.');
     }
 }

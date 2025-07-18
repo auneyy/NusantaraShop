@@ -57,6 +57,40 @@
       color: #8B4513;
     }
 
+    .btn-auth {
+      background-color: #422D1C;
+      border-color: #422D1C;
+      color: white;
+      padding: 0.375rem 1rem;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-auth:hover {
+      background-color: #8B4513;
+      border-color: #8B4513;
+      color: white;
+    }
+
+    .btn-auth-outline {
+      background-color: transparent;
+      border: 2px solid #422D1C;
+      color: #422D1C;
+      padding: 0.375rem 1rem;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      margin-left: 10px;
+    }
+
+    .btn-auth-outline:hover {
+      background-color: #422D1C;
+      color: white;
+    }
+
     .product-card img {
       height: 300px;
       object-fit: cover;
@@ -68,8 +102,22 @@
       padding: 2rem 0;
     }
 
-    .footer text-muted{
-      color: white;
+    .footer .text-muted {
+      color: #cccccc !important;
+    }
+
+    .footer .text-muted a {
+      color: #dddddd !important;
+      transition: color 0.3s ease;
+    }
+
+    .footer .text-muted a:hover {
+      color: #ffffff !important;
+    }
+
+    .footer h5, .footer h6 {
+      color: #ffffff;
+      font-weight: 600;
     }
 
     @media (max-width: 991px) {
@@ -85,7 +133,7 @@
 
   <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container">
-      <a class="navbar-brand" href="{{ url('/') }}">NusantaraShop</a>
+      <a class="navbar-brand" href="{{ auth()->check() ? url('/home') : url('/') }}">NusantaraShop</a>
 
       <!-- Tombol hamburger -->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -96,9 +144,15 @@
       <!-- Isi navbar -->
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mx-auto">
+          @auth
+          <li class="nav-item">
+            <a class="nav-link {{ Request::is('home') ? 'active' : '' }}" href="{{ url('/home') }}">Beranda</a>
+          </li>
+          @else
           <li class="nav-item">
             <a class="nav-link {{ Request::is('/') ? 'active' : '' }}" href="{{ url('/') }}">Beranda</a>
           </li>
+          @endauth
           <li class="nav-item">
             <a class="nav-link {{ Request::is('products') ? 'active' : '' }}" href="{{ url('/products') }}">Koleksi</a>
           </li>
@@ -115,6 +169,7 @@
 
         <div class="navbar-icons">
           @auth
+          <!-- User sudah login - tampilkan dropdown user dan logout -->
           <div class="dropdown">
             <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="bi bi-person-circle"></i>
@@ -130,11 +185,6 @@
               </li>
             </ul>
           </div>
-          @else
-          <a href="{{ route('login') }}">
-            <i class="bi bi-person-circle"></i>
-          </a>
-          @endauth
           
           <a href="{{ url('/cart') }}">
             <i class="bi bi-bag"></i>
@@ -143,6 +193,9 @@
           <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal">
             <i class="bi bi-search"></i>
           </a>
+          @else
+          <!-- User belum login - tampilkan tombol masuk dan daftar -->
+          @endauth
         </div>
       </div>
     </div>
@@ -182,7 +235,7 @@
         <div class="col-md-4">
           <h6 class="mb-3">Menu</h6>
           <ul class="list-unstyled">
-            <li><a href="{{ url('/') }}" class="text-muted text-decoration-none">Beranda</a></li>
+            <li><a href="{{ auth()->check() ? url('/home') : url('/') }}" class="text-muted text-decoration-none">Beranda</a></li>
             <li><a href="{{ url('/products') }}" class="text-muted text-decoration-none">Koleksi</a></li>
             <li><a href="{{ url('/contact') }}" class="text-muted text-decoration-none">Kontak</a></li>
           </ul>
