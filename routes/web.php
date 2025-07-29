@@ -1,50 +1,51 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth; // Tambahkan import ini
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AuthController;
 
-Route::get('test', function () {
+// 🔍 Route untuk testing (sementara)
+Route::get('/test', function () {
     return view('test');
 })->name('test');
 
-// Route utama - redirect berdasarkan status auth
+// 🏠 Route utama (landing page untuk tamu / redirect ke home jika sudah login)
 Route::get('/', function () {
     if (Auth::check()) {
         return redirect('/home');
     }
-    return view('home'); // Landing page untuk user yang belum login
+    return view('home'); // Landing page
+})->middleware(\App\Http\Middleware\PreventBackHistory::class);
+
+// 🛡️ Route khusus user yang sudah login
+Route::middleware(['auth', \App\Http\Middleware\PreventBackHistory::class])->group(function () {
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    
+    Route::get('/cart', function () {
+        return view('cart');
+    })->name('cart');
+    
+    // Tambahkan route lain yang hanya bisa diakses saat login di sini
 });
 
-// Home route (hanya untuk user yang sudah login)
-Route::get('/home', [HomeController::class, 'index'])->middleware('auth');
+// 🔐 Auth routes (Login & Register)
+Route::middleware(['guest', \App\Http\Middleware\PreventBackHistory::class])->group(function () {
+    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register']);
 
-// Auth routes
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [RegisterController::class, 'register']);
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-// Route untuk halaman lain (bisa diakses semua user)
-Route::get('/products', function () {
-    return view('products');
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
 });
 
-Route::get('/promo', function () {
-    return view('promo');
-});
+// 🚪 Logout route (dengan middleware prevent-back-history)
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->name('logout')
+    ->middleware(\App\Http\Middleware\PreventBackHistory::class);
 
-Route::get('/contact', function () {
-    return view('contact');
-});
-
-Route::get('/help', function () {
-    return view('help');
-});
-
-Route::get('/cart', function () {
-    return view('cart');
-})->middleware('auth'); // Cart hanya untuk user yang sudah login
+// 🌐 Halaman umum (bisa diakses siapa saja)
+Route::view('/products', 'products')->name('products')->middleware(\App\Http\Middleware\PreventBackHistory::class);
+Route::view('/promo', 'promo')->name('promo')->middleware(\App\Http\Middleware\PreventBackHistory::class);
+Route::view('/contact', 'contact')->name('contact')->middleware(\App\Http\Middleware\PreventBackHistory::class);
+Route::view('/help', 'help')->name('help')->middleware(\App\Http\Middleware\PreventBackHistory::class);

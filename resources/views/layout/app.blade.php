@@ -127,6 +127,64 @@
       }
     }
   </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mencegah back button setelah logout
+    if (window.history && window.history.pushState) {
+        window.addEventListener('load', function() {
+            window.history.pushState({}, '', window.location.href);
+        });
+
+        window.addEventListener('popstate', function() {
+            window.history.pushState({}, '', window.location.href);
+        });
+    }
+
+    // Deteksi jika user mencoba kembali setelah logout
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || 
+            (window.performance && window.performance.getEntriesByType("navigation")[0].type === "back_forward")) {
+            
+            // Cek apakah masih ada session dengan AJAX call
+            fetch('/check-auth', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.authenticated) {
+                    window.location.replace('/login');
+                }
+            })
+            .catch(() => {
+                window.location.replace('/login');
+            });
+        }
+    });
+
+    // Mencegah cache pada halaman sensitive
+    if (window.location.pathname.includes('/home') || 
+        window.location.pathname.includes('/cart') ||
+        window.location.pathname.includes('/profile')) {
+        
+        window.addEventListener('beforeunload', function() {
+            // Clear any cached data
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    names.forEach(function(name) {
+                        caches.delete(name);
+                    });
+                });
+            }
+        });
+    }
+});
+</script>
+
 </head>
 
 <body>

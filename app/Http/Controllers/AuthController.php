@@ -39,11 +39,29 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        // Hapus semua session data
         Auth::logout();
+        
+        // Invalidate session sepenuhnya
         $request->session()->invalidate();
+        
+        // Regenerate CSRF token untuk keamanan
         $request->session()->regenerateToken();
         
-        // Redirect ke halaman utama (/) setelah logout, bukan ke /login
-        return redirect('/')->with('success', 'Anda berhasil keluar.');
+        // Flush semua session data (tambahan untuk memastikan)
+        $request->session()->flush();
+        
+        // Hapus session cookie secara manual
+        if ($request->hasCookie(config('session.cookie'))) {
+            $cookie = cookie()->forget(config('session.cookie'));
+            return redirect('/')->with('success', 'Anda berhasil keluar.')->withCookie($cookie);
+        }
+        
+        // Response dengan header no-cache untuk mencegah back button
+        $response = redirect('/')->with('success', 'Anda berhasil keluar.');
+        
+        return $response->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
+                      ->header('Pragma', 'no-cache')
+                      ->header('Expires', 'Sat, 01 Jan 1990 00:00:00 GMT');
     }
 }

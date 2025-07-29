@@ -38,6 +38,7 @@
     background-color: #8B4513;
     border-color: #8B4513;
     transform: translateY(-2px);
+    color: white;
   }
 
   .btn-outline-custom {
@@ -236,6 +237,7 @@
   .btn-add-cart:hover {
     background-color: #8B4513;
     transform: translateY(-2px);
+    color: white;
   }
 
   .category-section {
