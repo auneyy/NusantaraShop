@@ -3,7 +3,7 @@
 @section('content')
 <style>
   .hero-section {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: linear-gradient(135deg, #f8f9fa 0%,rgb(239, 229, 209) 100%);
     padding: 80px 0;
     min-height: 500px;
   }
@@ -223,6 +223,13 @@
     margin-bottom: 15px;
   }
 
+  .product-price-original {
+    font-size: 1rem;
+    color: #999;
+    text-decoration: line-through;
+    margin-right: 10px;
+  }
+
   .btn-add-cart {
     background-color: #422D1C;
     color: white;
@@ -253,6 +260,7 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     height: 100%;
+    cursor: pointer;
   }
 
   .category-card:hover {
@@ -276,11 +284,11 @@
   }
 
   .discount-banner {
-    background: linear-gradient(135deg, #422D1C 0%, #8B4513 100%);
-    color: white;
     padding: 120px 0;
     text-align: center;
     margin: 60px 0;
+    color: white;
+    background: linear-gradient(135deg, var(--banner-color, #FFDD00) 0%, #8B4513 100%);
   }
 
   .discount-title {
@@ -331,7 +339,7 @@
     <div class="row align-items-center">
       <div class="col-lg-6 hero-content">
         <h1>Selamat Datang di <span style="color: #8B4513;">NusantaraShop</span></h1>
-        <p>Temukan koleksi batik pilihan terbaik untuk menunjang gaya hidup modern Anda dengan sentuhan budaya Indonesia yang autentik.</p>
+        <p>Temukan koleksi baju adat pilihan terbaik untuk menunjang gaya hidup modern Anda dengan sentuhan budaya Indonesia yang autentik.</p>
         @guest
         <a href="{{ route('register') }}" class="btn btn-primary-custom">Daftar Sekarang</a>
         <a href="{{ route('login') }}" class="btn btn-outline-custom">Masuk</a>
@@ -345,190 +353,107 @@
 </div>
 
 <!-- Koleksi Terbaru Section -->
+@if($latestProducts->count() > 0)
 <div class="product-section">
   <div class="container">
     <h2 class="section-title">Koleksi Terbaru Kami</h2>
     <p class="section-subtitle">Temukan batik terbaru yang sesuai dengan gaya Anda</p>
     
     <div class="row">
+      @foreach($latestProducts as $product)
       <div class="col-lg-3 col-md-6 mb-4">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Pria" class="product-image">
+          <img src="{{ asset('storage/product_images/' . $product->primary_image) }}" alt="{{ $product->name }}" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Pria</h5>
-            <p class="product-price">Rp 299.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+            <h5 class="product-title">{{ $product->name }}</h5>
+            <div class="product-price">
+              @if($product->harga_jual)
+                <span class="product-price-original">{{ $product->formatted_harga }}</span>
+                {{ 'Rp ' . number_format($product->harga_jual, 0, ',', '.') }}
+              @else
+                {{ $product->formatted_harga }}
+              @endif
+            </div>
+            @auth
+            <button class="btn btn-add-cart" data-id="{{ $product->id }}" onclick="addToCart(this)">
+                Tambah ke Keranjang
+            </button>
+            @else
+            <a href="{{ route('login') }}" class="btn btn-add-cart">Login untuk Belanja</a>
+            @endauth
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 mb-4">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Lengan Panjang" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Lengan Panjang</h5>
-            <p class="product-price">Rp 349.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-6 mb-4">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Casual" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Casual</h5>
-            <p class="product-price">Rp 279.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-6 mb-4">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Formal" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Formal</h5>
-            <p class="product-price">Rp 399.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
+      @endforeach
     </div>
   </div>
 </div>
+@endif
 
 <!-- Category Section -->
+@if($categories->count() > 0)
 <div class="category-section">
   <div class="container">
     <div class="row">
+      @foreach($categories as $category)
       <div class="col-lg-4 mb-4">
-        <div class="category-card">
-          <img src="{{ asset('storage/product_images/batik_pria.png') }}" alt="Batik Pria" class="category-image">
-          <h3 class="category-title">BATIK PRIA</h3>
+      <div class="category-card" data-link="{{ route('products') }}?category={{ $category->slug }}" onclick="goToCategory(this)">
+          <img src="{{ asset('storage/category_images/' . ($category->image_path ?? 'default-category.png')) }}" alt="{{ $category->name }}" class="category-image">
+          <h3 class="category-title">{{ strtoupper($category->name) }}</h3>
         </div>
       </div>
-      <div class="col-lg-4 mb-4">
-        <div class="category-card">
-          <img src="{{ asset('storage/product_images/batik_wanita.png') }}" alt="Batik Wanita" class="category-image">
-          <h3 class="category-title">BATIK WANITA</h3>
-        </div>
-      </div>
-      <div class="col-lg-4 mb-4">
-        <div class="category-card">
-          <img src="{{ asset('storage/product_images/batik_pria.png') }}" alt="Batik Anak" class="category-image">
-          <h3 class="category-title">BATIK ANAK</h3>
-        </div>
-      </div>
+      @endforeach
     </div>
   </div>
 </div>
+@endif
 
 <!-- Semua Produk Section -->
+@if($allProducts->count() > 0)
 <div class="product-section">
   <div class="container">
     <h2 class="section-title">Semua Produk</h2>
     
-    <!-- First Row -->
     <div class="row">
+      @foreach($allProducts as $product)
       <div class="col-lg-3 col-md-6 mb-4">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Pria" class="product-image">
+          <img src="{{ asset('storage/product_images/' . $product->primary_image) }}" alt="{{ $product->name }}" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Pria</h5>
-            <p class="product-price">Rp 299.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+            <h5 class="product-title">{{ $product->name }}</h5>
+            <div class="product-price">
+              @if($product->harga_jual)
+                <span class="product-price-original">{{ $product->formatted_harga }}</span>
+                {{ 'Rp ' . number_format($product->harga_jual, 0, ',', '.') }}
+              @else
+                {{ $product->formatted_harga }}
+              @endif
+            </div>
+            <button class="btn btn-add-cart" data-id="{{ $product->id }}" onclick="addToCart(this)">
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 mb-4">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Lengan Panjang" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Lengan Panjang</h5>
-            <p class="product-price">Rp 349.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-6 mb-4">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Casual" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Casual</h5>
-            <p class="product-price">Rp 279.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-6 mb-4">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Formal" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Formal</h5>
-            <p class="product-price">Rp 399.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Second Row -->
-    <div class="row">
-      <div class="col-lg-3 col-md-6 mb-4">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Executive" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Executive</h5>
-            <p class="product-price">Rp 429.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-6 mb-4">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Premium" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Premium</h5>
-            <p class="product-price">Rp 459.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-6 mb-4">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Classic" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Classic</h5>
-            <p class="product-price">Rp 319.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-6 mb-4">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Modern" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Modern</h5>
-            <p class="product-price">Rp 369.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
+      @endforeach
     </div>
 
     <!-- Load More Button -->
     <div class="text-center mt-4">
-      <button class="btn btn-primary-custom btn-lg">Lihat Semua Produk</button>
+      <a href="{{ route('products') }}" class="btn btn-primary-custom btn-lg">Lihat Semua Produk</a>
     </div>
   </div>
 </div>
+@endif
 
 <!-- Discount Banner -->
+@if($currentDiscount)
 <div class="discount-banner">
   <div class="container">
-    <h2 class="discount-title">DISKON 30%</h2>
-    <p class="discount-subtitle">Dapatkan diskon hingga 30% untuk semua produk batik pilihan</p>
-    <a href="#" class="btn btn-light-custom btn-lg">Belanja Sekarang</a>
+    <h2 class="discount-title">{{ $currentDiscount->title }}</h2>
+    <p class="discount-subtitle">{{ $currentDiscount->subtitle }}</p>
+    <a href="{{ route('products') }}" class="btn btn-light-custom btn-lg">Belanja Sekarang</a>
   </div>
 </div>
+@endif
 
 <!-- Features Section -->
 <div class="features-section">
@@ -581,5 +506,13 @@
     @endguest
   </div>
 </div>
+
+<script>
+function addToCart(productId) {
+    // Implementasi add to cart
+    alert('Produk berhasil ditambahkan ke keranjang! (ID: ' + productId + ')');
+    // Nanti bisa diintegrasikan dengan sistem cart yang sebenarnya
+}
+</script>
 
 @endsection
