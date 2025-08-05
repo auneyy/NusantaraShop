@@ -3,35 +3,45 @@
 @section('content')
 <style>
   .hero-section {
-    background: linear-gradient(135deg, #f8f9fa 0%,rgb(239, 229, 209) 100%);
-    padding: 80px 0;
-    min-height: 500px;
+    background: linear-gradient(135deg, #f8f9fa 0%, rgb(239, 229, 209) 100%);
+    padding: 0;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
   }
 
   .hero-content h1 {
     color: #422D1C;
     font-weight: 700;
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     line-height: 1.2;
     margin-bottom: 1.5rem;
   }
 
+  .hero-content h1 .highlight {
+    color: #8B4513;
+  }
+
   .hero-content p {
     color: #666;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     line-height: 1.6;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    max-width: 90%;
   }
 
   .btn-primary-custom {
     background-color: #422D1C;
     border-color: #422D1C;
     color: white;
-    padding: 12px 30px;
+    padding: 15px 35px;
     font-weight: 600;
     border-radius: 8px;
     transition: all 0.3s ease;
     margin-right: 15px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1rem;
   }
 
   .btn-primary-custom:hover {
@@ -45,11 +55,13 @@
     background-color: transparent;
     border: 2px solid #422D1C;
     color: #422D1C;
-    padding: 12px 30px;
+    padding: 13px 35px;
     font-weight: 600;
     border-radius: 8px;
     transition: all 0.3s ease;
     text-decoration: none;
+    display: inline-block;
+    font-size: 1rem;
   }
 
   .btn-outline-custom:hover {
@@ -66,10 +78,30 @@
   }
 
   .hero-image img {
-    max-height: 500px;
-    width: auto;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    max-height: 650px;
+    width: 100%;
+    height: 650px;
+    object-fit: cover;
+  }
+
+  .hero-section .row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 0;
+  }
+
+  .hero-section .hero-content {
+    flex: 1;
+    min-width: 400px;
+    padding: 60px 40px;
+  }
+
+  .hero-section .hero-image {
+    flex: 1;
+    min-width: 500px;
+    padding: 0;
   }
 
   .features-section {
@@ -304,7 +336,7 @@
 
   @media (max-width: 768px) {
     .hero-content h1 {
-      font-size: 2rem;
+      font-size: 2.2rem;
     }
 
     .hero-section {
@@ -319,8 +351,9 @@
     .btn-outline-custom {
       display: block;
       width: 100%;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       margin-right: 0;
+      text-align: center;
     }
 
     .product-image {
@@ -330,26 +363,49 @@
     .discount-title {
       font-size: 2rem;
     }
+
+    .hero-section .row {
+      flex-direction: column;
+      gap: 0;
+      text-align: center;
+      margin: 0;
+    }
+
+    .hero-content {
+      min-width: auto;
+      padding: 40px 20px !important;
+      order: 2;
+    }
+
+    .hero-image {
+      min-width: auto;
+      order: 1;
+      padding: 0 !important;
+    }
+
+    .hero-content p {
+      max-width: 100%;
+    }
   }
 </style>
 
 <!-- Hero Section -->
 <div class="hero-section">
-  <div class="container">
+    <div class="container-fluid p-0">
     <div class="row align-items-center">
-      <div class="col-lg-6 hero-content">
-        <h1>Selamat Datang di <span style="color: #8B4513;">NusantaraShop</span></h1>
-        <p>Temukan koleksi baju adat pilihan terbaik untuk menunjang gaya hidup modern Anda dengan sentuhan budaya Indonesia yang autentik.</p>
-        @guest
-        <a href="{{ route('register') }}" class="btn btn-primary-custom">Daftar Sekarang</a>
-        <a href="{{ route('login') }}" class="btn btn-outline-custom">Masuk</a>
-        @endguest
-      </div>
-      <div class="col-lg-6 hero-image">
-        <img src="{{ asset('storage/product_images/batik1.png') }}" alt="Batik Banner" class="img-fluid">
-      </div>
+        <div class="col-lg-6 hero-content">
+            <h1>Temukan baju adat yang cocok dengan dirimu di <span class="highlight">NusantaraShop</span></h1>
+            <p>Kami menghadirkan koleksi baju adat pilihan yang dirancang untuk membuatmu terhubung dengan budaya lewat kenyamanan</p>
+            @guest
+            <a href="{{ route('register') }}" class="btn-primary-custom">Daftar Sekarang</a>
+            <a href="{{ route('login') }}" class="btn-outline-custom">Masuk</a>
+            @endguest
+        </div>
+        <div class="col-lg-6 hero-image">
+            <img src="{{ asset('storage/product_images/heroadat.png') }}" alt="Traditional Indonesian Clothing" class="img-fluid">
+        </div>
     </div>
-  </div>
+    </div>
 </div>
 
 <!-- Koleksi Terbaru Section -->
@@ -429,7 +485,13 @@
                 {{ $product->formatted_harga }}
               @endif
             </div>
+            @auth
             <button class="btn btn-add-cart" data-id="{{ $product->id }}" onclick="addToCart(this)">
+                Tambah ke Keranjang
+            </button>
+            @else
+            <a href="{{ route('login') }}" class="btn btn-add-cart">Login untuk Belanja</a>
+            @endauth
           </div>
         </div>
       </div>
@@ -508,10 +570,17 @@
 </div>
 
 <script>
-function addToCart(productId) {
-    // Implementasi add to cart
+function addToCart(button) {
+    const productId = button.getAttribute('data-id');
     alert('Produk berhasil ditambahkan ke keranjang! (ID: ' + productId + ')');
     // Nanti bisa diintegrasikan dengan sistem cart yang sebenarnya
+}
+
+function goToCategory(element) {
+    const link = element.getAttribute('data-link');
+    if (link) {
+        window.location.href = link;
+    }
 }
 </script>
 
