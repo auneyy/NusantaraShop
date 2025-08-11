@@ -21,6 +21,7 @@ return new class extends Migration
             $table->integer('stock_kuantitas')->default(0);
             $table->decimal('berat', 8, 2)->nullable();
             $table->json('dimensi')->nullable();
+            $table->enum('ukuran', ['s', 'm', 'l', 'xl'])->nullable();
             $table->enum('status', ['active', 'inactive', 'out_of_stock'])->default('active');
             $table->boolean('is_featured')->default(false);
             $table->decimal('rating_rata', 3, 2)->default(0.00);

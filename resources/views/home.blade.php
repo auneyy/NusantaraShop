@@ -2,12 +2,14 @@
 
 @section('content')
 <style>
+
   .hero-section {
     background: linear-gradient(135deg, #f8f9fa 0%, rgb(239, 229, 209) 100%);
     padding: 0;
     min-height: 600px;
     display: flex;
     align-items: center;
+    margin-bottom: 50px;
   }
 
   .hero-content h1 {
@@ -78,9 +80,8 @@
   }
 
   .hero-image img {
-    max-height: 650px;
     width: 100%;
-    height: 650px;
+    height: auto;
     object-fit: cover;
   }
 
@@ -100,7 +101,6 @@
 
   .hero-section .hero-image {
     flex: 1;
-    min-width: 500px;
     padding: 0;
   }
 
@@ -189,10 +189,10 @@
     transform: translateY(-2px);
   }
 
-  /* New Product Section Styles */
-  .product-section {
-    padding: 60px 0;
-    background-color: #fff;
+  /* Improved Product Section Styles */
+  .products-section {
+    padding: 20px 0;
+    background-color: #ffffff;
   }
 
   .section-title {
@@ -211,29 +211,50 @@
     margin-top: -30px;
   }
 
+  /* Product Cards Container with better spacing */
+  .products-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .product-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -15px; /* Negative margin to offset column padding */
+    justify-content: center;
+  }
+
+  .product-col {
+    flex: 0 0 25%;
+    max-width: 25%;
+    padding: 15px; /* Consistent spacing around each product */
+  }
+
   .product-card {
     border: 1px solid #e9ecef;
-    border-radius: 10px;
     overflow: hidden;
     transition: all 0.3s ease;
     background: white;
-    margin-bottom: 30px;
-  }
-
-  .product-card h5 {
-    font-size: 16px;
+    height: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   }
 
   .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    border-color: #422D1C;
   }
 
   .product-image {
     width: 100%;
-    height: 250px;
+    height: 280px;
     object-fit: cover;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid #f0f0f0;
+    transition: transform 0.3s ease;
+  }
+
+  .product-card:hover .product-image {
+    transform: scale(1.05);
   }
 
   .product-info {
@@ -242,10 +263,11 @@
   }
 
   .product-title {
-    font-size: 1.1rem;
+    font-size: 14px;
     font-weight: 600;
     color: #422D1C;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    line-height: 1.4;
   }
 
   .product-price {
@@ -263,75 +285,42 @@
   }
 
   .btn-add-cart {
-    background-color: #422D1C;
-    color: white;
-    border: none;
+    background-color: #f8f9fa;
+    color: #422D1C;
+    border: 2px solid #422D1C;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: 6px;
     font-weight: 600;
     transition: all 0.3s ease;
     width: 100%;
+    font-size: 0.9rem;
   }
 
   .btn-add-cart:hover {
-    background-color: #8B4513;
+    background-color: #422D1C;
+    color: white;
     transform: translateY(-2px);
-    color: white;
   }
 
-  .category-section {
-    padding: 60px 0;
-    background-color: #f8f9fa;
-  }
-
-  .category-card {
-    background: white;
-    border-radius: 15px;
-    padding: 40px;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    height: 100%;
-    cursor: pointer;
-  }
-
-  .category-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-  }
-
-  .category-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #422D1C;
-    margin-bottom: 20px;
-  }
-
-  .category-image {
+  .banner-discount {
     width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 10px;
-    margin-bottom: 20px;
+    height: 100%;
+    margin: 50px auto;
+    display: block;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   }
 
-  .discount-banner {
-    padding: 120px 0;
+  .load-more-section {
     text-align: center;
-    margin: 60px 0;
-    color: white;
-    background: linear-gradient(135deg, var(--banner-color,rgb(72, 44, 24)) 0%, #8B4513 100%);
+    margin: 50px 0;
   }
 
-  .discount-title {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 20px;
-  }
-
-  .discount-subtitle {
-    font-size: 1.2rem;
-    opacity: 0.9;
+  /* Responsive Design */
+  @media (max-width: 1200px) {
+    .product-col {
+      flex: 0 0 33.333333%;
+      max-width: 33.333333%;
+    }
   }
 
   @media (max-width: 768px) {
@@ -347,6 +336,28 @@
       padding: 60px 0;
     }
 
+    .products-container {
+      padding: 0 10px;
+    }
+
+    .product-row {
+      margin: -10px;
+    }
+
+    .product-col {
+      flex: 0 0 50%;
+      max-width: 50%;
+      padding: 10px;
+    }
+
+    .product-image {
+      height: 220px;
+    }
+
+    .product-info {
+      padding: 15px;
+    }
+
     .btn-primary-custom,
     .btn-outline-custom {
       display: block;
@@ -354,14 +365,6 @@
       margin-bottom: 15px;
       margin-right: 0;
       text-align: center;
-    }
-
-    .product-image {
-      height: 200px;
-    }
-
-    .discount-title {
-      font-size: 2rem;
     }
 
     .hero-section .row {
@@ -373,17 +376,24 @@
 
     .hero-content {
       min-width: auto;
-      padding: 40px 20px !important;
+      padding: 20px 20px !important;
       order: 2;
     }
 
     .hero-image {
       min-width: auto;
-      order: 1;
+      order: 1; 
       padding: 0 !important;
     }
 
     .hero-content p {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .product-col {
+      flex: 0 0 100%;
       max-width: 100%;
     }
   }
@@ -408,189 +418,162 @@
     </div>
 </div>
 
-<!-- Koleksi Terbaru Section -->
-<div class="product-section">
-  <div class="container">
+<!-- Products Section -->
+<div class="products-section">
+  <div class="products-container">
     <h2 class="section-title">Koleksi Terbaru Kami</h2>
-    <p class="section-subtitle">Temukan batik terbaru yang sesuai dengan gaya Anda</p>
     
-    <div class="row">
-      <div class="col-lg-3 col-md-6 mb-4">
+    <!-- Featured Products Row -->
+    <div class="product-row">
+      <div class="product-col">
         <div class="product-card">
           <img src="{{ asset('storage/product_images/1.png') }}" alt="Batik Kemeja Pria" class="product-image">
           <div class="product-info">
             <h5 class="product-title">Batik Kemeja Pria</h5>
             <p class="product-price">Rp 299.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+            <button class="btn btn-add-cart" onclick="addToCart(1)">Tambah ke Keranjang</button>
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 mb-4">
+      
+      <div class="product-col">
         <div class="product-card">
           <img src="{{ asset('storage/product_images/2.png') }}" alt="Batik Kemeja Lengan Panjang" class="product-image">
           <div class="product-info">
             <h5 class="product-title">Batik Kemeja Lengan Panjang</h5>
             <p class="product-price">Rp 349.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+            <button class="btn btn-add-cart" onclick="addToCart(2)">Tambah ke Keranjang</button>
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 mb-4">
+      
+      <div class="product-col">
         <div class="product-card">
           <img src="{{ asset('storage/product_images/3.png') }}" alt="Batik Kemeja Casual" class="product-image">
           <div class="product-info">
             <h5 class="product-title">Batik Kemeja Casual</h5>
             <p class="product-price">Rp 279.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+            <button class="btn btn-add-cart" onclick="addToCart(3)">Tambah ke Keranjang</button>
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 mb-4">
+      
+      <div class="product-col">
         <div class="product-card">
           <img src="{{ asset('storage/product_images/4.png') }}" alt="Batik Kemeja Formal" class="product-image">
           <div class="product-info">
             <h5 class="product-title">Batik Kemeja Formal</h5>
             <p class="product-price">Rp 399.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+            <button class="btn btn-add-cart" onclick="addToCart(4)">Tambah ke Keranjang</button>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- Category Section -->
-<div class="category-section">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-4 mb-4">
-        <div class="category-card">
-          <img src="{{ asset('storage/product_images/batik_pria.png') }}" alt="Batik Pria" class="category-image">
-          <h3 class="category-title">PRIA</h3>
-        </div>
-      </div>
-      <div class="col-lg-4 mb-4">
-        <div class="category-card">
-          <img src="{{ asset('storage/product_images/batik_wanita.png') }}" alt="Batik Wanita" class="category-image">
-          <h3 class="category-title">WANITA</h3>
-        </div>
-      </div>
-      <div class="col-lg-4 mb-4">
-        <div class="category-card">
-          <img src="{{ asset('storage/product_images/batik_pria.png') }}" alt="Batik Anak" class="category-image">
-          <h3 class="category-title">ANAK-ANAK</h3>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+    <!-- Banner Discount -->
+    <img src="{{ asset('storage/product_images/30.png') }}" alt="Discount Banner" class="banner-discount">
 
-<!-- Semua Produk Section -->
-<div class="product-section">
-  <div class="container">
-    <h2 class="section-title">Semua Produk</h2>
+    <!-- All Products Section -->
+    <h2 class="section-title" style="margin-top: 80px;">Semua Produk</h2>
     
     <!-- First Row -->
-    <div class="row">
-      <div class="col-lg-3 col-md-6 mb-4">
+    <div class="product-row">
+      <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/5.png') }}" alt="Batik Kemeja Pria" class="product-image">
+          <img src="{{ asset('storage/product_images/5.png') }}" alt="Batik Kemeja Executive" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Pria</h5>
-            <p class="product-price">Rp 299.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+            <h5 class="product-title">Batik Kemeja Executive</h5>
+            <p class="product-price">Rp 429.000</p>
+            <button class="btn btn-add-cart" onclick="addToCart(5)">Tambah ke Keranjang</button>
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 mb-4">
+      
+      <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/6.png') }}" alt="Batik Kemeja Lengan Panjang" class="product-image">
+          <img src="{{ asset('storage/product_images/6.png') }}" alt="Batik Kemeja Premium" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Lengan Panjang</h5>
-            <p class="product-price">Rp 349.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+            <h5 class="product-title">Batik Kemeja Premium</h5>
+            <p class="product-price">Rp 459.000</p>
+            <button class="btn btn-add-cart" onclick="addToCart(6)">Tambah ke Keranjang</button>
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 mb-4">
+      
+      <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/1.png') }}" alt="Batik Kemeja Casual" class="product-image">
+          <img src="{{ asset('storage/product_images/1.png') }}" alt="Batik Kemeja Classic" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Casual</h5>
-            <p class="product-price">Rp 279.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+            <h5 class="product-title">Batik Kemeja Classic</h5>
+            <p class="product-price">Rp 319.000</p>
+            <button class="btn btn-add-cart" onclick="addToCart(7)">Tambah ke Keranjang</button>
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 mb-4">
+      
+      <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/3.png') }}" alt="Batik Kemeja Formal" class="product-image">
+          <img src="{{ asset('storage/product_images/3.png') }}" alt="Batik Kemeja Modern" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Formal</h5>
-            <p class="product-price">Rp 399.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+            <h5 class="product-title">Batik Kemeja Modern</h5>
+            <p class="product-price">Rp 369.000</p>
+            <button class="btn btn-add-cart" onclick="addToCart(8)">Tambah ke Keranjang</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Second Row -->
-    <div class="row">
-      <div class="col-lg-3 col-md-6 mb-4">
+    <div class="product-row">
+      <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/4.png') }}" alt="Batik Kemeja Executive" class="product-image">
+          <img src="{{ asset('storage/product_images/4.png') }}" alt="Batik Kemeja Elegant" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Executive</h5>
-            <p class="product-price">Rp 429.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+            <h5 class="product-title">Batik Kemeja Elegant</h5>
+            <p class="product-price">Rp 389.000</p>
+            <button class="btn btn-add-cart" onclick="addToCart(9)">Tambah ke Keranjang</button>
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 mb-4">
+      
+      <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/2.png') }}" alt="Batik Kemeja Premium" class="product-image">
+          <img src="{{ asset('storage/product_images/2.png') }}" alt="Batik Kemeja Traditional" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Premium</h5>
-            <p class="product-price">Rp 459.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+            <h5 class="product-title">Batik Kemeja Traditional</h5>
+            <p class="product-price">Rp 329.000</p>
+            <button class="btn btn-add-cart" onclick="addToCart(10)">Tambah ke Keranjang</button>
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-6 mb-4">
+      
+      <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/3.png') }}" alt="Batik Kemeja Classic" class="product-image">
+          <img src="{{ asset('storage/product_images/3.png') }}" alt="Batik Kemeja Stylish" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Classic</h5>
-            <p class="product-price">Rp 319.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+            <h5 class="product-title">Batik Kemeja Stylish</h5>
+            <p class="product-price">Rp 349.000</p>
+            <button class="btn btn-add-cart" onclick="addToCart(11)">Tambah ke Keranjang</button>
           </div>
-        </div> 
+        </div>
       </div>
-      <div class="col-lg-3 col-md-6 mb-4">
+      
+      <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/6.png') }}" alt="Batik Kemeja Modern" class="product-image">
+          <img src="{{ asset('storage/product_images/6.png') }}" alt="Batik Kemeja Luxury" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Modern</h5>
-            <p class="product-price">Rp 369.000</p>
-            <button class="btn btn-add-cart">Tambah ke Keranjang</button>
+            <h5 class="product-title">Batik Kemeja Luxury</h5>
+            <p class="product-price">Rp 499.000</p>
+            <button class="btn btn-add-cart" onclick="addToCart(12)">Tambah ke Keranjang</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Load More Button -->
-    <div class="text-center mt-4">
+    <div class="load-more-section">
       <button class="btn btn-primary-custom btn-lg">Lihat Semua Produk</button>
     </div>
-  </div>
-</div>
-
-<!-- Discount Banner -->
-<div class="discount-banner">
-  <div class="container">
-    <h2 class="discount-title">DISKON 30%</h2>
-    <p class="discount-subtitle">Dapatkan diskon hingga 30% untuk semua produk batik pilihan</p>
-    <a href="#" class="btn btn-light-custom btn-lg">Belanja Sekarang</a>
   </div>
 </div>
 
@@ -645,5 +628,107 @@
     @endguest
   </div>
 </div>
+
+<!-- JavaScript -->
+<script>
+// Data produk - sesuaikan dengan produk yang ada di halaman Anda
+const products = {
+    1: { id: 1, name: "Batik Kemeja Pria", price: 299000, image: "{{ asset('storage/product_images/1.png') }}" },
+    2: { id: 2, name: "Batik Kemeja Lengan Panjang", price: 349000, image: "{{ asset('storage/product_images/2.png') }}" },
+    3: { id: 3, name: "Batik Kemeja Casual", price: 279000, image: "{{ asset('storage/product_images/3.png') }}" },
+    4: { id: 4, name: "Batik Kemeja Formal", price: 399000, image: "{{ asset('storage/product_images/4.png') }}" },
+    5: { id: 5, name: "Batik Kemeja Executive", price: 429000, image: "{{ asset('storage/product_images/5.png') }}" },
+    6: { id: 6, name: "Batik Kemeja Premium", price: 459000, image: "{{ asset('storage/product_images/6.png') }}" },
+    7: { id: 7, name: "Batik Kemeja Classic", price: 319000, image: "{{ asset('storage/product_images/1.png') }}" },
+    8: { id: 8, name: "Batik Kemeja Modern", price: 369000, image: "{{ asset('storage/product_images/3.png') }}" },
+    9: { id: 9, name: "Batik Kemeja Elegant", price: 389000, image: "{{ asset('storage/product_images/4.png') }}" },
+    10: { id: 10, name: "Batik Kemeja Traditional", price: 329000, image: "{{ asset('storage/product_images/2.png') }}" },
+    11: { id: 11, name: "Batik Kemeja Stylish", price: 349000, image: "{{ asset('storage/product_images/3.png') }}" },
+    12: { id: 12, name: "Batik Kemeja Luxury", price: 499000, image: "{{ asset('storage/product_images/6.png') }}" }
+};
+
+// Function untuk menambahkan produk ke keranjang
+function addToCart(productId) {
+    // Dapatkan data produk berdasarkan ID
+    const product = products[productId];
+    if (!product) {
+        console.error('Produk tidak ditemukan');
+        return;
+    }
+    
+    // Ambil keranjang dari localStorage atau buat array kosong
+    let cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
+    
+    // Cek apakah produk sudah ada di keranjang
+    const existingItemIndex = cart.findIndex(item => item.id === productId);
+    
+    if (existingItemIndex > -1) {
+        // Jika sudah ada, tambah quantity
+        cart[existingItemIndex].quantity += 1;
+    } else {
+        // Jika belum ada, tambahkan produk baru dengan quantity 1
+        cart.push({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            quantity: 1
+        });
+    }
+    
+    // Simpan kembali ke localStorage
+    localStorage.setItem('nusantara_cart', JSON.stringify(cart));
+    
+    // Show success message
+    showAddToCartMessage(product.name);
+    
+    // Update cart badge
+    updateCartBadge();
+}
+
+// Function untuk show success message
+function showAddToCartMessage(productName) {
+    // Create temporary message element
+    const message = document.createElement('div');
+    message.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        z-index: 9999;
+        font-weight: 600;
+    `;
+    message.textContent = `${productName} berhasil ditambahkan ke keranjang!`;
+    
+    document.body.appendChild(message);
+    
+    // Remove message after 3 seconds
+    setTimeout(() => {
+        document.body.removeChild(message);
+    }, 3000);
+}
+
+// Function untuk mendapatkan total item di keranjang (untuk badge di navbar)
+function getCartItemCount() {
+    const cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
+    return cart.reduce((total, item) => total + item.quantity, 0);
+}
+
+// Function untuk update badge keranjang (jika ada di navbar)
+function updateCartBadge() {
+    const badge = document.getElementById('cartBadge');
+    if (badge) {
+        badge.textContent = getCartItemCount();
+    }
+}
+
+// Jalankan saat halaman dimuat
+document.addEventListener('DOMContentLoaded', function() {
+    updateCartBadge();
+});
+</script>
 
 @endsection
