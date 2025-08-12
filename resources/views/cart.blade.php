@@ -2,294 +2,471 @@
 @section('content')
 <style>
   .cart-section {
-    padding: 80px 0;
-    background-color: #f8f9fa;
+    padding: 40px 0;
+    background-color: #f5f5f5;
     min-height: 100vh;
   }
+  
+  .cart-wrapper {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
 
-  .cart-container {
+  .cart-main {
     background: white;
-    border-radius: 15px;
-    padding: 40px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   }
 
   .cart-header {
-    color: #422D1C;
-    font-weight: 700;
-    font-size: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 30px;
-    text-align: center;
-    border-bottom: 3px solid #422D1C;
     padding-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .cart-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+
+  .cart-count {
+    color: #666;
+    font-size: 1rem;
+  }
+
+  .cart-items-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 20px;
+    padding: 15px 0;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 20px;
+  }
+
+  .cart-items-header span {
+    font-weight: 600;
+    color: #666;
+    font-size: 0.9rem;
+    text-transform: uppercase;
   }
 
   .cart-item {
-    border-bottom: 1px solid #e9ecef;
-    padding: 25px 0;
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
     gap: 20px;
-    transition: all 0.3s ease;
-  }
-
-  .cart-item:hover {
-    background-color: #f8f9fa;
-    padding-left: 10px;
-    border-radius: 10px;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #f0f0f0;
   }
 
   .cart-item:last-child {
     border-bottom: none;
   }
 
-  .cart-item-image {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-
-  .cart-item-info {
-    flex: 1;
-  }
-
-  .cart-item-title {
-    font-weight: 600;
-    color: #422D1C;
-    font-size: 1.2rem;
-    margin-bottom: 8px;
-  }
-
-  .cart-item-price {
-    color: #8B4513;
-    font-weight: 600;
-    font-size: 1.1rem;
-  }
-
-  .quantity-controls {
+  .product-info {
     display: flex;
     align-items: center;
     gap: 15px;
-    background: #f8f9fa;
-    padding: 10px;
-    border-radius: 10px;
+  }
+
+  .product-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  .product-details h4 {
+    margin: 0 0 5px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .product-details p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  /* Size Selection Styles */
+  .size-selection {
+    margin: 10px 0;
+  }
+
+  .size-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  .size-select {
+    padding: 5px 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    background: white;
+    cursor: pointer;
+    min-width: 80px;
+  }
+
+  .size-select:focus {
+    outline: none;
+    border-color: #6c5ce7;
+  }
+
+  .current-size {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 5px;
+  }
+
+  .size-badge {
+    display: inline-block;
+    background: #f0f0f0;
+    color: #666;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 3px;
+  }
+
+  .quantity-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   .quantity-btn {
-    background-color: #422D1C;
-    color: white;
+    background: #f0f0f0;
     border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    color: #666;
+    transition: all 0.2s ease;
   }
 
   .quantity-btn:hover {
-    background-color: #8B4513;
-    transform: scale(1.1);
+    background: #e0e0e0;
   }
 
   .quantity-input {
-    width: 60px;
+    width: 50px;
     text-align: center;
-    border: 2px solid #422D1C;
-    border-radius: 8px;
-    padding: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 8px 5px;
     font-weight: 600;
-    color: #422D1C;
   }
 
-  .remove-btn {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 8px;
+  .price {
+    font-weight: 600;
+    color: #333;
+    font-size: 1.1rem;
+  }
+
+  .total-price {
+    font-weight: 700;
+    color: #333;
+    font-size: 1.1rem;
+  }
+
+  .remove-link {
+    color: #666;
+    text-decoration: underline;
+    font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 600;
+    margin-top: 5px;
+    display: block;
   }
 
-  .remove-btn:hover {
-    background-color: #c82333;
-    transform: translateY(-2px);
+  .remove-link:hover {
+    color: #333;
   }
 
-  .cart-summary {
-    background: linear-gradient(135deg, #422D1C 0%, #8B4513 100%);
-    color: white;
-    border-radius: 15px;
+  .continue-shopping {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-top: 20px;
+  }
+
+  .continue-shopping:hover {
+    color: #333;
+  }
+
+  /* Order Summary */
+  .order-summary {
+    background: white;
+    border-radius: 8px;
     padding: 30px;
-    margin-top: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    height: fit-content;
   }
 
   .summary-title {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
     margin-bottom: 25px;
-    text-align: center;
   }
 
   .summary-row {
     display: flex;
     justify-content: space-between;
     margin-bottom: 15px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-    font-size: 1.1rem;
+    font-size: 0.95rem;
   }
 
-  .summary-row:last-child {
-    border-bottom: 2px solid white;
+  .summary-row.shipping {
+    margin-bottom: 20px;
+  }
+
+  .shipping-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    margin-top: 5px;
+  }
+
+  .promo-section {
+    margin: 25px 0;
+  }
+
+  .promo-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  .promo-input-group {
+    display: flex;
+    gap: 10px;
+  }
+
+  .promo-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+
+  .apply-btn {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .apply-btn:hover {
+    background: #ff5252;
+  }
+
+  .total-section {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 20px;
+    margin-top: 25px;
+  }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
     font-weight: 700;
-    font-size: 1.3rem;
+    color: #333;
     margin-bottom: 25px;
   }
 
   .checkout-btn {
-    background-color: white;
-    color: #422D1C;
+    width: 100%;
+    background: #6c5ce7;
+    color: white;
     border: none;
     padding: 15px;
-    width: 100%;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 1.2rem;
-    transition: all 0.3s ease;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
     text-transform: uppercase;
+    transition: all 0.3s ease;
   }
 
   .checkout-btn:hover {
-    background-color: #f8f9fa;
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    background: #5f4fcf;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
   }
 
   .empty-cart {
+    grid-column: 1 / -1;
     text-align: center;
     padding: 80px 20px;
-    color: #666;
+    background: white;
+    border-radius: 8px;
   }
 
   .empty-cart i {
-    font-size: 5rem;
-    margin-bottom: 30px;
-    color: #422D1C;
+    font-size: 4rem;
+    color: #ddd;
+    margin-bottom: 20px;
   }
 
   .empty-cart h3 {
-    color: #422D1C;
-    font-weight: 700;
-    margin-bottom: 20px;
+    color: #666;
+    margin-bottom: 15px;
   }
 
-  .continue-shopping-btn {
-    background-color:rgb(232, 232, 232);
-    color: black;
-    border: none;
-    padding: 15px 30px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
+  .empty-cart p {
+    color: #999;
+    margin-bottom: 30px;
   }
 
-  .continue-shopping-btn:hover {
-    background-color: #8B4513;
-    transform: translateY(-2px);
+  .start-shopping-btn {
+    background: #6c5ce7;
     color: white;
-  }
-
-  .back-btn {
-    background-color: transparent;
-    color: #422D1C;
-    border: 2px solid #422D1C;
-    padding: 12px 25px;
-    border-radius: 8px;
-    font-weight: 600;
+    padding: 12px 30px;
     text-decoration: none;
-    transition: all 0.3s ease;
+    border-radius: 6px;
+    font-weight: 600;
     display: inline-block;
-    margin-bottom: 20px;
+    transition: all 0.3s ease;
   }
 
-  .back-btn:hover {
-    background-color: #422D1C;
-    color: white;
+  .start-shopping-btn:hover {
+    background: #5f4fcf;
     transform: translateY(-2px);
   }
 
-  .icon {
-    font-size: 1.2rem;
-  }
+  @media (max-width: 968px) {
+    .cart-wrapper {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
 
-  @media (max-width: 768px) {
     .cart-item {
+      grid-template-columns: 1fr;
+      gap: 15px;
+      text-align: center;
+    }
+
+    .cart-items-header {
+      display: none;
+    }
+
+    .product-info {
       flex-direction: column;
       text-align: center;
-      gap: 15px;
     }
 
-    .cart-item-image {
-      width: 80px;
-      height: 80px;
-    }
-
-    .quantity-controls {
+    .quantity-container {
       justify-content: center;
     }
   }
 </style>
 
 <div class="cart-section">
-  <div class="container">
-    <a href="{{ url()->previous() }}" class="back-btn">
-      <i class="bi bi-arrow-left"></i> Kembali Berbelanja
-    </a>
-    
-    <div class="cart-container">
-      <h2 class="cart-header">Keranjang Belanja</h2>
-      
-      <div id="cartItems">
-        <!-- Cart items akan diisi oleh JavaScript -->
+  <div class="cart-wrapper">
+    <div class="cart-main">
+      <div class="cart-header">
+        <h2 class="cart-title">Shopping Cart</h2>
+        <span class="cart-count" id="itemCount">0 Items</span>
       </div>
       
-      <div id="cartSummary" style="display: none;">
-        <div class="cart-summary">
-          <h4 class="summary-title">Ringkasan Pesanan</h4>
-          <div class="summary-row">
-            <span>Subtotal:</span>
-            <span id="subtotal">Rp 0</span>
-          </div>
-          <div class="summary-row">
-            <span>Ongkos Kirim:</span>
-            <span id="shipping">Rp 15.000</span>
-          </div>
-          <div class="summary-row">
-            <span>Total:</span>
-            <span id="total">Rp 15.000</span>
-          </div>
-          <button class="checkout-btn" onclick="checkout()">
-            <i class="bi bi-credit-card me-2"></i>
-            Lanjutkan Pembayaran
-          </button>
+      <div id="cartContent">
+        <div class="cart-items-header">
+          <span>Product Details</span>
+          <span>Quantity</span>
+          <span>Price</span>
+          <span>Total</span>
         </div>
+        
+        <div id="cartItems">
+          <!-- Cart items akan diisi oleh JavaScript -->
+        </div>
+      </div>
+      
+      <a href="{{ url('/') }}" class="continue-shopping">
+        <i class="bi bi-arrow-left"></i>
+        Continue Shopping
+      </a>
+    </div>
+
+    <div class="order-summary">
+      <h3 class="summary-title">Order Summary</h3>
+      
+      <div class="summary-row">
+        <span>Items <span id="summaryItemCount">0</span></span>
+        <span id="summarySubtotal">Rp 0</span>
+      </div>
+      
+      <div class="summary-row shipping">
+        <div style="width: 100%;">
+          <span>Shipping</span>
+          <select class="shipping-select" id="shippingSelect">
+            <option value="15000">Standard Delivery - Rp 15.000</option>
+            <option value="25000">Express Delivery - Rp 25.000</option>
+            <option value="0">Free Shipping - Rp 0</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="promo-section">
+        <div class="promo-title">Promo Code</div>
+        <div class="promo-input-group">
+          <input type="text" class="promo-input" placeholder="Enter your code" id="promoInput">
+          <button class="apply-btn" onclick="applyPromo()">Apply</button>
+        </div>
+      </div>
+      
+      <div class="total-section">
+        <div class="total-row">
+          <span>Total Cost</span>
+          <span id="totalCost">Rp 0</span>
+        </div>
+        
+        <button class="checkout-btn" onclick="checkout()">
+          Checkout
+        </button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
+// Available sizes untuk baju
+const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
 // Format rupiah
 function formatRupiah(number) {
     return new Intl.NumberFormat('id-ID', {
@@ -299,61 +476,113 @@ function formatRupiah(number) {
     }).format(number);
 }
 
+// Generate unique cart item key berdasarkan id dan size
+function getCartItemKey(productId, size) {
+    return `${productId}_${size}`;
+}
+
 // Load dan render cart items
 function loadCartItems() {
     const cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
     const container = document.getElementById('cartItems');
-    const summaryContainer = document.getElementById('cartSummary');
+    const itemCount = document.getElementById('itemCount');
+    const summaryItemCount = document.getElementById('summaryItemCount');
     
     if (cart.length === 0) {
-        container.innerHTML = `
+        document.querySelector('.cart-wrapper').innerHTML = `
             <div class="empty-cart">
                 <i class="bi bi-cart-x"></i>
-                <h3>Keranjang Belanja Kosong</h3>
-                <p>Belum ada produk yang ditambahkan ke keranjang</p>
-                <a href="{{ url('/') }}" class="continue-shopping-btn">
-                    Mulai Berbelanja
+                <h3>Your cart is empty</h3>
+                <p>Looks like you haven't added anything to your cart yet</p>
+                <a href="{{ url('/') }}" class="start-shopping-btn">
+                    Start Shopping
                 </a>
             </div>
         `;
-        summaryContainer.style.display = 'none';
         return;
     }
     
-    summaryContainer.style.display = 'block';
+    // Update item counts
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    itemCount.textContent = `${totalItems} Items`;
+    summaryItemCount.textContent = totalItems;
+    
     container.innerHTML = '';
     
-    cart.forEach(item => {
+    cart.forEach((item, index) => {
+        // Pastikan item memiliki size, jika tidak set default
+        if (!item.size) {
+            item.size = 'M';
+        }
+        
+        const sizeOptions = availableSizes.map(size => 
+            `<option value="${size}" ${item.size === size ? 'selected' : ''}>${size}</option>`
+        ).join('');
+        
         const cartItem = `
             <div class="cart-item">
-                <img src="${item.image}" alt="${item.name}" class="cart-item-image">
-                <div class="cart-item-info">
-                    <div class="cart-item-title">${item.name}</div>
-                    <div class="cart-item-price">${formatRupiah(item.price)}</div>
+                <div class="product-info">
+                    <img src="${item.image}" alt="${item.name}" class="product-image">
+                    <div class="product-details">
+                        <h4>${item.name}</h4>
+                        <p>Premium Quality</p>
+                        <div class="size-selection">
+                            <label class="size-label">Size:</label>
+                            <select class="size-select" onchange="changeSizeInCart(${index}, this.value)">
+                                ${sizeOptions}
+                            </select>
+                        </div>
+                        <span class="remove-link" onclick="removeFromCart(${index})">Remove</span>
+                    </div>
                 </div>
-                <div class="quantity-controls">
-                    <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                <div class="quantity-container">
+                    <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">−</button>
                     <input type="number" value="${item.quantity}" class="quantity-input" readonly>
-                    <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                    <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
                 </div>
-                <div class="cart-item-price">${formatRupiah(item.price * item.quantity)}</div>
-                <button class="remove-btn" onclick="removeFromCart(${item.id})">
-                    <i class="bi bi-trash me-1"></i>Hapus
-                </button>
+                <div class="price">${formatRupiah(item.price)}</div>
+                <div class="total-price">${formatRupiah(item.price * item.quantity)}</div>
             </div>
         `;
         container.innerHTML += cartItem;
     });
     
-    updateCartSummary();
+    updateOrderSummary();
 }
 
-// Update quantity
-function updateQuantity(productId, change) {
+// Change size dalam cart
+function changeSizeInCart(itemIndex, newSize) {
     let cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
-    const itemIndex = cart.findIndex(item => item.id === productId);
     
-    if (itemIndex > -1) {
+    if (itemIndex >= 0 && itemIndex < cart.length) {
+        const item = cart[itemIndex];
+        
+        // Cek apakah sudah ada item dengan produk yang sama dan size yang baru
+        const existingItemIndex = cart.findIndex((cartItem, index) => 
+            index !== itemIndex && 
+            cartItem.id === item.id && 
+            cartItem.size === newSize
+        );
+        
+        if (existingItemIndex !== -1) {
+            // Jika sudah ada, gabungkan quantity
+            cart[existingItemIndex].quantity += item.quantity;
+            cart.splice(itemIndex, 1);
+        } else {
+            // Jika belum ada, update size
+            cart[itemIndex].size = newSize;
+        }
+        
+        localStorage.setItem('nusantara_cart', JSON.stringify(cart));
+        loadCartItems();
+    }
+}
+
+// Update quantity menggunakan index
+function updateQuantity(itemIndex, change) {
+    let cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
+    
+    if (itemIndex >= 0 && itemIndex < cart.length) {
         cart[itemIndex].quantity += change;
         
         if (cart[itemIndex].quantity <= 0) {
@@ -365,24 +594,44 @@ function updateQuantity(productId, change) {
     }
 }
 
-// Remove from cart
-function removeFromCart(productId) {
+// Remove from cart menggunakan index
+function removeFromCart(itemIndex) {
     let cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
-    cart = cart.filter(item => item.id !== productId);
-    localStorage.setItem('nusantara_cart', JSON.stringify(cart));
-    loadCartItems();
+    
+    if (itemIndex >= 0 && itemIndex < cart.length) {
+        cart.splice(itemIndex, 1);
+        localStorage.setItem('nusantara_cart', JSON.stringify(cart));
+        loadCartItems();
+    }
 }
 
-// Update cart summary
-function updateCartSummary() {
+// Update order summary
+function updateOrderSummary() {
     const cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shipping = subtotal > 0 ? 15000 : 0;
+    const shippingSelect = document.getElementById('shippingSelect');
+    const shipping = parseInt(shippingSelect.value) || 0;
     const total = subtotal + shipping;
     
-    document.getElementById('subtotal').textContent = formatRupiah(subtotal);
-    document.getElementById('shipping').textContent = formatRupiah(shipping);
-    document.getElementById('total').textContent = formatRupiah(total);
+    document.getElementById('summarySubtotal').textContent = formatRupiah(subtotal);
+    document.getElementById('totalCost').textContent = formatRupiah(total);
+}
+
+// Apply promo code
+function applyPromo() {
+    const promoInput = document.getElementById('promoInput');
+    const promoCode = promoInput.value.trim().toUpperCase();
+    
+    if (promoCode === 'DISKON10') {
+        alert('Promo code applied! 10% discount');
+        // Implementasi diskon bisa ditambahkan di sini
+    } else if (promoCode === '') {
+        alert('Please enter a promo code');
+    } else {
+        alert('Invalid promo code');
+    }
+    
+    promoInput.value = '';
 }
 
 // Checkout function
@@ -390,25 +639,52 @@ function checkout() {
     const cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
     
     if (cart.length === 0) {
-        alert('Keranjang belanja masih kosong!');
+        alert('Your cart is empty!');
         return;
     }
     
-    // Simulasi proses checkout
-    const total = document.getElementById('total').textContent;
+    const total = document.getElementById('totalCost').textContent;
     const orderDetails = cart.map(item => 
-        `${item.name} (${item.quantity}x) - ${formatRupiah(item.price * item.quantity)}`
+        `${item.name} - Size: ${item.size} (${item.quantity}x) - ${formatRupiah(item.price * item.quantity)}`
     ).join('\n');
     
-    alert(`Terima kasih atas pesanan Anda!\n\nDetail Pesanan:\n${orderDetails}\n\nTotal: ${total}\n\nAnda akan diarahkan ke halaman pembayaran...`);
+    alert(`Thank you for your order!\n\nOrder Details:\n${orderDetails}\n\nTotal: ${total}\n\nRedirecting to payment...`);
     
     // Dalam implementasi nyata, redirect ke payment gateway
     // window.location.href = '/payment';
 }
 
-// Load cart saat halaman dimuat
+// Function helper untuk add to cart dari halaman lain (dengan size)
+function addToCart(product, selectedSize = 'M') {
+    let cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
+    
+    // Cari item yang sudah ada dengan id dan size yang sama
+    const existingItemIndex = cart.findIndex(item => 
+        item.id === product.id && item.size === selectedSize
+    );
+    
+    if (existingItemIndex !== -1) {
+        // Jika sudah ada, tambah quantity
+        cart[existingItemIndex].quantity += 1;
+    } else {
+        // Jika belum ada, tambah item baru dengan size
+        const newItem = {
+            ...product,
+            size: selectedSize,
+            quantity: 1
+        };
+        cart.push(newItem);
+    }
+    
+    localStorage.setItem('nusantara_cart', JSON.stringify(cart));
+}
+
+// Event listeners
 document.addEventListener('DOMContentLoaded', function() {
     loadCartItems();
+    
+    // Update total when shipping changes
+    document.getElementById('shippingSelect').addEventListener('change', updateOrderSummary);
 });
 </script>
 

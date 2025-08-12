@@ -259,7 +259,6 @@
 
   .product-info {
     padding: 20px;
-    text-align: center;
   }
 
   .product-title {
@@ -429,8 +428,8 @@
         <div class="product-card">
           <img src="{{ asset('storage/product_images/1.png') }}" alt="Batik Kemeja Pria" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Pria</h5>
-            <p class="product-price">Rp 299.000</p>
+            <h5 class="product-title">Baju Adat.... Wanita</h5>
+            <p class="product-price">Rp 699.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(1)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -440,8 +439,8 @@
         <div class="product-card">
           <img src="{{ asset('storage/product_images/2.png') }}" alt="Batik Kemeja Lengan Panjang" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Lengan Panjang</h5>
-            <p class="product-price">Rp 349.000</p>
+            <h5 class="product-title">Baju Adat.... Wanita</h5>
+            <p class="product-price">Rp 549.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(2)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -451,8 +450,8 @@
         <div class="product-card">
           <img src="{{ asset('storage/product_images/3.png') }}" alt="Batik Kemeja Casual" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Casual</h5>
-            <p class="product-price">Rp 279.000</p>
+            <h5 class="product-title">Baju Adat.... Wanita</h5>
+            <p class="product-price">Rp 779.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(3)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -462,8 +461,8 @@
         <div class="product-card">
           <img src="{{ asset('storage/product_images/4.png') }}" alt="Batik Kemeja Formal" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Formal</h5>
-            <p class="product-price">Rp 399.000</p>
+            <h5 class="product-title">Baju Adat.... Wanita</h5>
+            <p class="product-price">Rp 599.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(4)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -482,8 +481,8 @@
         <div class="product-card">
           <img src="{{ asset('storage/product_images/5.png') }}" alt="Batik Kemeja Executive" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Executive</h5>
-            <p class="product-price">Rp 429.000</p>
+            <h5 class="product-title">Baju Adat.... Wanita</h5>
+            <p class="product-price">Rp 729.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(5)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -493,8 +492,8 @@
         <div class="product-card">
           <img src="{{ asset('storage/product_images/6.png') }}" alt="Batik Kemeja Premium" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Premium</h5>
-            <p class="product-price">Rp 459.000</p>
+            <h5 class="product-title">Baju Adat.... Wanita</h5>
+            <p class="product-price">Rp 659.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(6)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -504,7 +503,7 @@
         <div class="product-card">
           <img src="{{ asset('storage/product_images/1.png') }}" alt="Batik Kemeja Classic" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Classic</h5>
+            <h5 class="product-title">Baju Adat Jawa Pria</h5>
             <p class="product-price">Rp 319.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(7)">Tambah ke Keranjang</button>
           </div>
@@ -515,8 +514,8 @@
         <div class="product-card">
           <img src="{{ asset('storage/product_images/3.png') }}" alt="Batik Kemeja Modern" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Modern</h5>
-            <p class="product-price">Rp 369.000</p>
+            <h5 class="product-title">Baju Adat Jawa Wanita</h5>
+            <p class="product-price">Rp 469.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(8)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -529,7 +528,7 @@
         <div class="product-card">
           <img src="{{ asset('storage/product_images/4.png') }}" alt="Batik Kemeja Elegant" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Elegant</h5>
+            <h5 class="product-title">Baju Adat.... Pria</h5>
             <p class="product-price">Rp 389.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(9)">Tambah ke Keranjang</button>
           </div>
@@ -540,7 +539,7 @@
         <div class="product-card">
           <img src="{{ asset('storage/product_images/2.png') }}" alt="Batik Kemeja Traditional" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Traditional</h5>
+            <h5 class="product-title">Baju Adat.... Pria</h5>
             <p class="product-price">Rp 329.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(10)">Tambah ke Keranjang</button>
           </div>
@@ -551,7 +550,7 @@
         <div class="product-card">
           <img src="{{ asset('storage/product_images/3.png') }}" alt="Batik Kemeja Stylish" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Stylish</h5>
+            <h5 class="product-title">Baju Adat.... Pria</h5>
             <p class="product-price">Rp 349.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(11)">Tambah ke Keranjang</button>
           </div>
@@ -562,8 +561,8 @@
         <div class="product-card">
           <img src="{{ asset('storage/product_images/6.png') }}" alt="Batik Kemeja Luxury" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Batik Kemeja Luxury</h5>
-            <p class="product-price">Rp 499.000</p>
+            <h5 class="product-title">Baju Adat.... Wanita</h5>
+            <p class="product-price">Rp 599.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(12)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -633,18 +632,18 @@
 <script>
 // Data produk - sesuaikan dengan produk yang ada di halaman Anda
 const products = {
-    1: { id: 1, name: "Batik Kemeja Pria", price: 299000, image: "{{ asset('storage/product_images/1.png') }}" },
-    2: { id: 2, name: "Batik Kemeja Lengan Panjang", price: 349000, image: "{{ asset('storage/product_images/2.png') }}" },
-    3: { id: 3, name: "Batik Kemeja Casual", price: 279000, image: "{{ asset('storage/product_images/3.png') }}" },
-    4: { id: 4, name: "Batik Kemeja Formal", price: 399000, image: "{{ asset('storage/product_images/4.png') }}" },
-    5: { id: 5, name: "Batik Kemeja Executive", price: 429000, image: "{{ asset('storage/product_images/5.png') }}" },
-    6: { id: 6, name: "Batik Kemeja Premium", price: 459000, image: "{{ asset('storage/product_images/6.png') }}" },
-    7: { id: 7, name: "Batik Kemeja Classic", price: 319000, image: "{{ asset('storage/product_images/1.png') }}" },
-    8: { id: 8, name: "Batik Kemeja Modern", price: 369000, image: "{{ asset('storage/product_images/3.png') }}" },
-    9: { id: 9, name: "Batik Kemeja Elegant", price: 389000, image: "{{ asset('storage/product_images/4.png') }}" },
-    10: { id: 10, name: "Batik Kemeja Traditional", price: 329000, image: "{{ asset('storage/product_images/2.png') }}" },
-    11: { id: 11, name: "Batik Kemeja Stylish", price: 349000, image: "{{ asset('storage/product_images/3.png') }}" },
-    12: { id: 12, name: "Batik Kemeja Luxury", price: 499000, image: "{{ asset('storage/product_images/6.png') }}" }
+    1: { id: 1, name: "Baju Adat.... Wanita", price: 699000, image: "{{ asset('storage/product_images/1.png') }}" },
+    2: { id: 2, name: "Baju Adat.... Wanita", price: 549000, image: "{{ asset('storage/product_images/2.png') }}" },
+    3: { id: 3, name: "Baju Adat.... Wanita", price: 779000, image: "{{ asset('storage/product_images/3.png') }}" },
+    4: { id: 4, name: "Baju Adat Kalimantan Wanita", price: 599000, image: "{{ asset('storage/product_images/4.png') }}" },
+    5: { id: 5, name: "Baju Adat.... Wanita", price: 729000, image: "{{ asset('storage/product_images/5.png') }}" },
+    6: { id: 6, name: "Baju Adat.... Wanita", price: 659000, image: "{{ asset('storage/product_images/6.png') }}" },
+    7: { id: 7, name: "Baju Adat Jawa Pria", price: 319000, image: "{{ asset('storage/product_images/1.png') }}" },
+    8: { id: 8, name: "Baju Adat Jawa Wanita", price: 469000, image: "{{ asset('storage/product_images/3.png') }}" },
+    9: { id: 9, name: "Baju Adat.... Pria", price: 389000, image: "{{ asset('storage/product_images/4.png') }}" },
+    10: { id: 10, name: "Baju Adat.... Pria", price: 329000, image: "{{ asset('storage/product_images/2.png') }}" },
+    11: { id: 11, name: "Baju Adat.... Pria", price: 349000, image: "{{ asset('storage/product_images/3.png') }}" },
+    12: { id: 12, name: "Baju Adat.... Wanita", price: 599000, image: "{{ asset('storage/product_images/6.png') }}" }
 };
 
 // Function untuk menambahkan produk ke keranjang

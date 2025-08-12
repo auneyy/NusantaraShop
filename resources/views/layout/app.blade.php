@@ -21,10 +21,10 @@
       padding: 1rem 0;
     }
 
-    .navbar-brand {
-      color: #422D1C !important;
-      font-weight: 700;
-      font-size: 1.5rem;
+    .logonusantara {
+      height: 50px;
+      width: auto;
+      margin-right: 20px;
     }
 
     .navbar-nav .nav-link {
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container">
-      <a class="navbar-brand" href="{{ auth()->check() ? url('/home') : url('/') }}">NusantaraShop</a>
+      <a href="{{ auth()->check() ? url('/home') : url('/') }}"><img src="{{ asset('storage/product_images/Nusantara.png') }}" alt="logo" class="logonusantara"></a>
 
       <!-- Tombol hamburger -->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
