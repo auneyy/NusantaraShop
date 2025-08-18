@@ -426,10 +426,10 @@
     <div class="product-row">
       <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/1.png') }}" alt="Batik Kemeja Pria" class="product-image">
+          <img src="{{ asset('storage/product_images/batik1.png') }}" alt="Batik Kemeja Pria" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Baju Adat.... Wanita</h5>
-            <p class="product-price">Rp 699.000</p>
+            <h5 class="product-title">Batik Malang Pria</h5>
+            <p class="product-price">Rp 399.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(1)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -437,10 +437,10 @@
       
       <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/2.png') }}" alt="Batik Kemeja Lengan Panjang" class="product-image">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Lengan Panjang" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Baju Adat.... Wanita</h5>
-            <p class="product-price">Rp 549.000</p>
+            <h5 class="product-title">Batik Malang Wanita</h5>
+            <p class="product-price">Rp 349.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(2)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -448,10 +448,10 @@
       
       <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/3.png') }}" alt="Batik Kemeja Casual" class="product-image">
+          <img src="{{ asset('storage/product_images/batik1.png') }}" alt="Batik Kemeja Casual" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Baju Adat.... Wanita</h5>
-            <p class="product-price">Rp 779.000</p>
+            <h5 class="product-title">Batik Pekalongan Pria</h5>
+            <p class="product-price">Rp 379.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(3)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -459,10 +459,10 @@
       
       <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/4.png') }}" alt="Batik Kemeja Formal" class="product-image">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Formal" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Baju Adat.... Wanita</h5>
-            <p class="product-price">Rp 599.000</p>
+            <h5 class="product-title">Batik Pekalongan Wanita</h5>
+            <p class="product-price">Rp 399.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(4)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -470,7 +470,7 @@
     </div>
 
     <!-- Banner Discount -->
-    <img src="{{ asset('storage/product_images/30.png') }}" alt="Discount Banner" class="banner-discount">
+    <img src="{{ asset('storage/product_images/discount.png') }}" alt="Discount Banner" class="banner-discount">
 
     <!-- All Products Section -->
     <h2 class="section-title" style="margin-top: 80px;">Semua Produk</h2>
@@ -479,10 +479,10 @@
     <div class="product-row">
       <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/5.png') }}" alt="Batik Kemeja Executive" class="product-image">
+          <img src="{{ asset('storage/product_images/batik1.png') }}" alt="Batik Kemeja Executive" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Baju Adat.... Wanita</h5>
-            <p class="product-price">Rp 729.000</p>
+            <h5 class="product-title">Batik Yogyakarta Pria</h5>
+            <p class="product-price">Rp 229.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(5)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -490,10 +490,10 @@
       
       <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/6.png') }}" alt="Batik Kemeja Premium" class="product-image">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Premium" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Baju Adat.... Wanita</h5>
-            <p class="product-price">Rp 659.000</p>
+            <h5 class="product-title">Batik Yogyakarta Wanita</h5>
+            <p class="product-price">Rp 259.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(6)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -501,9 +501,9 @@
       
       <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/1.png') }}" alt="Batik Kemeja Classic" class="product-image">
+          <img src="{{ asset('storage/product_images/batik1.png') }}" alt="Batik Kemeja Classic" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Baju Adat Jawa Pria</h5>
+            <h5 class="product-title">Batik Madura Pria</h5>
             <p class="product-price">Rp 319.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(7)">Tambah ke Keranjang</button>
           </div>
@@ -512,10 +512,10 @@
       
       <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/3.png') }}" alt="Batik Kemeja Modern" class="product-image">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Modern" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Baju Adat Jawa Wanita</h5>
-            <p class="product-price">Rp 469.000</p>
+            <h5 class="product-title">Batik Madura Wanita</h5>
+            <p class="product-price">Rp 269.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(8)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -526,9 +526,9 @@
     <div class="product-row">
       <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/4.png') }}" alt="Batik Kemeja Elegant" class="product-image">
+          <img src="{{ asset('storage/product_images/batik1.png') }}" alt="Batik Kemeja Elegant" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Baju Adat.... Pria</h5>
+            <h5 class="product-title">Batik Cirebon Pria</h5>
             <p class="product-price">Rp 389.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(9)">Tambah ke Keranjang</button>
           </div>
@@ -537,9 +537,9 @@
       
       <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/2.png') }}" alt="Batik Kemeja Traditional" class="product-image">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Traditional" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Baju Adat.... Pria</h5>
+            <h5 class="product-title">Batik Cirenbon Wanita</h5>
             <p class="product-price">Rp 329.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(10)">Tambah ke Keranjang</button>
           </div>
@@ -548,9 +548,9 @@
       
       <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/3.png') }}" alt="Batik Kemeja Stylish" class="product-image">
+          <img src="{{ asset('storage/product_images/batik1.png') }}" alt="Batik Kemeja Stylish" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Baju Adat.... Pria</h5>
+            <h5 class="product-title">Batik Bali Pria</h5>
             <p class="product-price">Rp 349.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(11)">Tambah ke Keranjang</button>
           </div>
@@ -559,10 +559,10 @@
       
       <div class="product-col">
         <div class="product-card">
-          <img src="{{ asset('storage/product_images/6.png') }}" alt="Batik Kemeja Luxury" class="product-image">
+          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Luxury" class="product-image">
           <div class="product-info">
-            <h5 class="product-title">Baju Adat.... Wanita</h5>
-            <p class="product-price">Rp 599.000</p>
+            <h5 class="product-title">Batik Bali Wanita</h5>
+            <p class="product-price">Rp 299.000</p>
             <button class="btn btn-add-cart" onclick="addToCart(12)">Tambah ke Keranjang</button>
           </div>
         </div>
@@ -632,62 +632,57 @@
 <script>
 // Data produk - sesuaikan dengan produk yang ada di halaman Anda
 const products = {
-    1: { id: 1, name: "Baju Adat.... Wanita", price: 699000, image: "{{ asset('storage/product_images/1.png') }}" },
-    2: { id: 2, name: "Baju Adat.... Wanita", price: 549000, image: "{{ asset('storage/product_images/2.png') }}" },
-    3: { id: 3, name: "Baju Adat.... Wanita", price: 779000, image: "{{ asset('storage/product_images/3.png') }}" },
-    4: { id: 4, name: "Baju Adat Kalimantan Wanita", price: 599000, image: "{{ asset('storage/product_images/4.png') }}" },
-    5: { id: 5, name: "Baju Adat.... Wanita", price: 729000, image: "{{ asset('storage/product_images/5.png') }}" },
-    6: { id: 6, name: "Baju Adat.... Wanita", price: 659000, image: "{{ asset('storage/product_images/6.png') }}" },
-    7: { id: 7, name: "Baju Adat Jawa Pria", price: 319000, image: "{{ asset('storage/product_images/1.png') }}" },
-    8: { id: 8, name: "Baju Adat Jawa Wanita", price: 469000, image: "{{ asset('storage/product_images/3.png') }}" },
-    9: { id: 9, name: "Baju Adat.... Pria", price: 389000, image: "{{ asset('storage/product_images/4.png') }}" },
-    10: { id: 10, name: "Baju Adat.... Pria", price: 329000, image: "{{ asset('storage/product_images/2.png') }}" },
-    11: { id: 11, name: "Baju Adat.... Pria", price: 349000, image: "{{ asset('storage/product_images/3.png') }}" },
-    12: { id: 12, name: "Baju Adat.... Wanita", price: 599000, image: "{{ asset('storage/product_images/6.png') }}" }
+    1: { id: 1, name: "Batik Malang Pria", price: 399000, image: "{{ asset('storage/product_images/batik1.png') }}" },
+    2: { id: 2, name: "Baju Malang Wanita", price: 349000, image: "{{ asset('storage/product_images/batik2.png') }}" },
+    3: { id: 3, name: "Batik Pekalongan Pria", price: 379000, image: "{{ asset('storage/product_images/batik1.png') }}" },
+    4: { id: 4, name: "Baju Pekalongan Wanita", price: 399000, image: "{{ asset('storage/product_images/batik2.png') }}" },
+    5: { id: 5, name: "Batik Yogyakarta Pria", price: 229000, image: "{{ asset('storage/product_images/batik1.png') }}" },
+    6: { id: 6, name: "Batik Yogyakarta Wanita", price: 259000, image: "{{ asset('storage/product_images/batik2.png') }}" },
+    7: { id: 7, name: "Batik Madura Pria", price: 319000, image: "{{ asset('storage/product_images/batik1.png') }}" },
+    8: { id: 8, name: "Batik Madura Wanita", price: 269000, image: "{{ asset('storage/product_images/batik2.png') }}" },
+    9: { id: 9, name: "Batik Cirebon Pria", price: 389000, image: "{{ asset('storage/product_images/batik1.png') }}" },
+    10: { id: 10, name: "Batik Cirebon Wanita", price: 329000, image: "{{ asset('storage/product_images/batik2.png') }}" },
+    11: { id: 11, name: "Batik Bali Pria", price: 349000, image: "{{ asset('storage/product_images/batik1.png') }}" },
+    12: { id: 12, name: "Batik Bali Wanita", price: 299000, image: "{{ asset('storage/product_images/batik2.png') }}" }
 };
 
 // Function untuk menambahkan produk ke keranjang
 function addToCart(productId) {
-    // Dapatkan data produk berdasarkan ID
     const product = products[productId];
     if (!product) {
         console.error('Produk tidak ditemukan');
         return;
     }
     
-    // Ambil keranjang dari localStorage atau buat array kosong
     let cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
-    
-    // Cek apakah produk sudah ada di keranjang
     const existingItemIndex = cart.findIndex(item => item.id === productId);
     
     if (existingItemIndex > -1) {
-        // Jika sudah ada, tambah quantity
         cart[existingItemIndex].quantity += 1;
     } else {
-        // Jika belum ada, tambahkan produk baru dengan quantity 1
         cart.push({
             id: product.id,
             name: product.name,
             price: product.price,
             image: product.image,
-            quantity: 1
+            quantity: 1,
+            size: 'M',
+            color: 'default'
         });
     }
     
-    // Simpan kembali ke localStorage
     localStorage.setItem('nusantara_cart', JSON.stringify(cart));
-    
-    // Show success message
     showAddToCartMessage(product.name);
-    
-    // Update cart badge
     updateCartBadge();
+}
+
+// Function untuk navigasi ke detail produk
+function goToProductDetail(productId) {
+    window.location.href = `/product/${productId}`;
 }
 
 // Function untuk show success message
 function showAddToCartMessage(productName) {
-    // Create temporary message element
     const message = document.createElement('div');
     message.style.cssText = `
         position: fixed;
@@ -704,19 +699,19 @@ function showAddToCartMessage(productName) {
     
     document.body.appendChild(message);
     
-    // Remove message after 3 seconds
     setTimeout(() => {
-        document.body.removeChild(message);
+        if (message.parentNode) {
+            document.body.removeChild(message);
+        }
     }, 3000);
 }
 
-// Function untuk mendapatkan total item di keranjang (untuk badge di navbar)
+// Function untuk update cart badge
 function getCartItemCount() {
     const cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
     return cart.reduce((total, item) => total + item.quantity, 0);
 }
 
-// Function untuk update badge keranjang (jika ada di navbar)
 function updateCartBadge() {
     const badge = document.getElementById('cartBadge');
     if (badge) {
@@ -724,10 +719,30 @@ function updateCartBadge() {
     }
 }
 
-// Jalankan saat halaman dimuat
+// Initialize saat halaman dimuat
 document.addEventListener('DOMContentLoaded', function() {
     updateCartBadge();
+    
+    // Tambahkan event listener ke semua product cards
+    document.querySelectorAll('.product-card').forEach((card, index) => {
+        // Tambahkan cursor pointer
+        card.style.cursor = 'pointer';
+        
+        // Event listener untuk klik card
+        card.addEventListener('click', function(e) {
+            // Jangan redirect jika yang diklik adalah tombol add to cart
+            if (e.target.closest('.btn-add-cart')) {
+                e.stopPropagation();
+                return;
+            }
+            
+            // Redirect ke halaman detail (index + 1 karena ID mulai dari 1)
+            const productId = index + 1;
+            goToProductDetail(productId);
+        });
+    });
 });
+
 </script>
 
 @endsection

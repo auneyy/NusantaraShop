@@ -7,6 +7,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\ProductController;
 
 // ==========================
 // 🏠 PUBLIC ROUTES
@@ -23,7 +24,20 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
     Route::view('/promo', 'promo')->name('promo');
     Route::view('/contact', 'contact')->name('contact');
     Route::view('/help', 'help')->name('help');
+    Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.detail');
 });
+
+// Route untuk pencarian produk
+Route::get('/search', [ProductController::class, 'search'])->name('product.search');
+
+// API Routes untuk AJAX
+Route::get('/api/product/{id}', [ProductController::class, 'getProduct'])->name('api.product');
+Route::get('/api/products', [ProductController::class, 'getAllProducts'])->name('api.products');
+
+// Route untuk filter kategori
+Route::get('/category/{category}', [ProductController::class, 'filterByCategory'])->name('product.category');
+
+
 
 // ==========================
 // 🔐 AUTHENTICATION ROUTES
