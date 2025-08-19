@@ -279,7 +279,7 @@
 <!-- Hero Section -->
 <div class="contact-hero">
   <div class="container">
-    <h1>Hubungi Kami</h1>
+    <h1>Hubungi</h1>
     <p>Kami siap membantu Anda dengan pertanyaan apapun tentang produk batik tradisional Indonesia kami</p>
   </div>
 </div>
