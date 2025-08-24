@@ -97,14 +97,18 @@ class DiscountController extends Controller
         return redirect()->route('admin.discounts.index')->with('success', 'Diskon berhasil dihapus!');
     }
 
-    public function toggleStatus(Discount $discount)
-    {
-        $discount->update(['is_active' => !$discount->is_active]);
-        
-        $status = $discount->is_active ? 'diaktifkan' : 'dinonaktifkan';
-        return response()->json([
-            'success' => true,
-            'message' => "Diskon berhasil {$status}!"
-        ]);
-    }
+  public function toggleStatus(Discount $discount)
+{
+    $discount->update(['is_active' => !$discount->is_active]);
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'Status diskon berhasil diubah',
+        'data' => [
+            'is_active' => $discount->fresh()->is_active,
+            'is_valid' => $discount->fresh()->is_valid
+        ]
+    ]);
+}
+
 }

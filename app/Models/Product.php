@@ -15,23 +15,20 @@ class Product extends Model
         'name',
         'slug',
         'deskripsi',
-        'deskripsi_singkat',
         'harga',
         'harga_jual',
         'sku',
         'stock_kuantitas',
         'berat',
-        'dimensi',
         'status',
         'is_featured',
         'rating_rata',
         'total_reviews',
         'total_penjualan',
-        'meta_data'
+        'meta_data',
     ];
 
     protected $casts = [
-        'dimensi' => 'array',
         'meta_data' => 'array',
         'is_featured' => 'boolean',
         'harga' => 'decimal:2',

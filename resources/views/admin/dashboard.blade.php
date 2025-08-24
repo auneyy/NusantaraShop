@@ -121,7 +121,6 @@
         font-size: 1rem;
     }
 
-    /* Data Section */
     .data-section {
         background: #fff;
         border-radius: 12px;
@@ -174,7 +173,6 @@
         border-color: #e2e8f0;
     }
 
-    /* Table */
     .table th {
         background: #f8fafc;
         font-weight: 600;
@@ -296,7 +294,6 @@
     </div>
 </div>
 
-<!-- Chart -->
 <div class="chart-container mb-4 fade-in">
     <div class="chart-header">
         <div class="chart-title">Grafik Penjualan</div>
@@ -314,7 +311,6 @@
     </div>
 </div>
 
-<!-- Recent Orders -->
 <div class="data-section fade-in">
     <div class="section-header">
         <div class="section-title">Pesanan Terbaru</div>
@@ -372,20 +368,14 @@
 
 @push('scripts')
 <script>
-    // Chart filter buttons functionality
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            // Remove active class from all buttons
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            // Add active class to clicked button
             this.classList.add('active');
-            
-            // Here you can add logic to update the chart based on the selected filter
             console.log('Filter selected:', this.textContent);
         });
     });
 
-    // Add some interactivity to stat cards
     document.querySelectorAll('.stat-card').forEach(card => {
         card.addEventListener('mouseenter', function() {
             this.style.transform = 'translateY(-4px)';

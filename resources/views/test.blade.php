@@ -11,4 +11,4 @@
         <a href="{{ route('login') }}" class="btn btn-outline-secondary">Masuk</a>
     </div>
 </body>
-</html>
+</html> 

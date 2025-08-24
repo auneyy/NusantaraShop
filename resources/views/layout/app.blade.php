@@ -7,12 +7,13 @@
   <title>NusantaraShop</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #f8f9fa;
+      font-family: 'Manrope', sans-serif;
+      background-color: #fff;
     }
 
     .navbar {
@@ -126,11 +127,111 @@
         justify-content: center;
       }
     }
-  </style>
+
+.navbar-nav .nav-link {
+    color: #422D1C !important;
+    font-weight: 500;
+    margin: 0 10px;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background-color: #8B4513;
+    transition: width 0.3s ease-in-out;
+  }
+
+  .navbar-nav .nav-link:hover::after {
+    width: 100%;
+  }
+
+  .navbar-nav .nav-link:hover,
+  .navbar-nav .nav-link.active {
+    color: #8B4513 !important;
+    font-weight: 600;
+  }
+
+.mega-menu {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 100%;
+    z-index: 1000;
+    width: 250px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.mega-menu-wrapper:hover .mega-menu {
+    opacity: 1;
+    visibility: visible;
+}
+
+.category-list-5 {
+    display: flex;
+    flex-direction: column;
+}
+
+.category-list-5 .category-item {
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    color: #422D1C;
+    text-decoration: none;
+    transition: background-color 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.category-list-5 .category-item:hover {
+    background-color: #f5f5f5;
+}
+
+.category-list-5 .category-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-color: #8c7b6c;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+.category-list-5 .category-item:hover::before {
+    transform: translateX(0);
+}
+
+
+.view-more-container {
+    padding: 1rem 1.5rem 0;
+    border-top: 1px solid #eeeeee;
+    margin-top: 1rem;
+}
+
+.view-more-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    color: #8c7b6c;
+    font-weight: 600;
+}
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Mencegah back button setelah logout
     if (window.history && window.history.pushState) {
         window.addEventListener('load', function() {
             window.history.pushState({}, '', window.location.href);
@@ -141,12 +242,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Deteksi jika user mencoba kembali setelah logout
     window.addEventListener('pageshow', function(event) {
         if (event.persisted || 
             (window.performance && window.performance.getEntriesByType("navigation")[0].type === "back_forward")) {
             
-            // Cek apakah masih ada session dengan AJAX call
             fetch('/check-auth', {
                 method: 'GET',
                 headers: {
@@ -165,14 +264,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
-
-    // Mencegah cache pada halaman sensitive
+    
     if (window.location.pathname.includes('/home') || 
         window.location.pathname.includes('/cart') ||
         window.location.pathname.includes('/profile')) {
         
         window.addEventListener('beforeunload', function() {
-            // Clear any cached data
             if ('caches' in window) {
                 caches.keys().then(function(names) {
                     names.forEach(function(name) {
@@ -193,13 +290,11 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="container">
       <a href="{{ auth()->check() ? url('/home') : url('/') }}"><img src="{{ asset('storage/product_images/Nusantara.png') }}" alt="logo" class="logonusantara"></a>
 
-      <!-- Tombol hamburger -->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <!-- Isi navbar -->
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mx-auto">
           @auth
@@ -211,9 +306,34 @@ document.addEventListener('DOMContentLoaded', function() {
             <a class="nav-link {{ Request::is('/') ? 'active' : '' }}" href="{{ url('/') }}">Beranda</a>
           </li>
           @endauth
-          <li class="nav-item">
-            <a class="nav-link {{ Request::is('products') ? 'active' : '' }}" href="{{ url('/products') }}">Koleksi</a>
-          </li>
+
+<li class="nav-item mega-menu-wrapper">
+    <a class="nav-link {{ Request::is('products') ? 'active' : '' }}" href="{{ url('/products') }}">Koleksi</a>
+    <div class="mega-menu">
+        <div class="category-list-5">
+            @foreach(App\Models\Category::withCount('products')
+                ->orderBy('products_count', 'desc')
+                ->take(5)
+                ->get() as $category)
+            <a href="{{ url('/products?category='.$category->slug) }}" class="category-item">
+                <span class="category-name">{{ $category->name }}</span>
+            </a>
+            @endforeach
+        </div>
+
+        {{-- Tampilkan tombol 'Lihat Semua Kategori' jika ada lebih dari 5 kategori --}}
+        @if(App\Models\Category::count() > 5)
+            <div class="view-more-container">
+                <a href="{{ url('/products') }}" class="view-more-link">
+                    Lihat Semua Kategori
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 18L15 12L9 6" stroke="#422D1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+            </div>
+        @endif
+    </div>
+</li>
           <li class="nav-item">
             <a class="nav-link {{ Request::is('promo') ? 'active' : '' }}" href="{{ url('/promo') }}">Promo</a>
           </li>
@@ -227,7 +347,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <div class="navbar-icons">
           @auth
-          <!-- User sudah login - tampilkan dropdown user dan logout -->
           <div class="dropdown">
             <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="bi bi-person-circle"></i>
@@ -252,14 +371,12 @@ document.addEventListener('DOMContentLoaded', function() {
             <i class="bi bi-search"></i>
           </a>
           @else
-          <!-- User belum login - tampilkan tombol masuk dan daftar -->
           @endauth
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- Search Modal -->
   <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">

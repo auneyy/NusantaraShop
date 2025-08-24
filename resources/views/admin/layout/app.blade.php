@@ -8,6 +8,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <style>
         :root {
             --primary-color: #422D1C;
@@ -393,13 +395,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link {{ request()->routeIs('admin.koleksi') ? 'active' : '' }}">
+                        <a href="{{ route('admin.products.index') }}" class="nav-link {{ request()->routeIs('admin.products.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-box"></i>
                             Koleksi
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link {{ request()->routeIs('admin.promo') ? 'active' : '' }}">
+                        <a href="{{ route('admin.discounts.index') }}" class="nav-link {{ request()->routeIs('admin.discounts.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-tags"></i>
                             Promo
                         </a>
@@ -483,12 +485,12 @@
                                                 <i class="fas fa-question-circle"></i>
                                                 Bantuan
                                             </a>
-<a href="#" 
-   class="dropdown-item logout">
-    <i class="fas fa-sign-out-alt"></i>
-    Keluar
+<a href="#" class="dropdown-item"
+   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+   <i class="fas fa-sign-out-alt"></i> Keluar
 </a>
-<form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
+
+<form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display:none;">
     @csrf
 </form>
 
@@ -510,7 +512,10 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Sidebar Toggle for Mobile
         const sidebarToggle = document.getElementById('sidebarToggle');

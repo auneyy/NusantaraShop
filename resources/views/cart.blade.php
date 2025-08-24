@@ -464,10 +464,8 @@
 </div>
 
 <script>
-// Available sizes untuk baju
 const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
-// Format rupiah
 function formatRupiah(number) {
     return new Intl.NumberFormat('id-ID', {
         style: 'currency',
@@ -476,12 +474,10 @@ function formatRupiah(number) {
     }).format(number);
 }
 
-// Generate unique cart item key berdasarkan id dan size
 function getCartItemKey(productId, size) {
     return `${productId}_${size}`;
 }
 
-// Load dan render cart items
 function loadCartItems() {
     const cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
     const container = document.getElementById('cartItems');
@@ -502,7 +498,6 @@ function loadCartItems() {
         return;
     }
     
-    // Update item counts
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     itemCount.textContent = `${totalItems} Items`;
     summaryItemCount.textContent = totalItems;
@@ -510,7 +505,6 @@ function loadCartItems() {
     container.innerHTML = '';
     
     cart.forEach((item, index) => {
-        // Pastikan item memiliki size, jika tidak set default
         if (!item.size) {
             item.size = 'M';
         }
@@ -550,14 +544,12 @@ function loadCartItems() {
     updateOrderSummary();
 }
 
-// Change size dalam cart
 function changeSizeInCart(itemIndex, newSize) {
     let cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
     
     if (itemIndex >= 0 && itemIndex < cart.length) {
         const item = cart[itemIndex];
         
-        // Cek apakah sudah ada item dengan produk yang sama dan size yang baru
         const existingItemIndex = cart.findIndex((cartItem, index) => 
             index !== itemIndex && 
             cartItem.id === item.id && 
@@ -565,11 +557,9 @@ function changeSizeInCart(itemIndex, newSize) {
         );
         
         if (existingItemIndex !== -1) {
-            // Jika sudah ada, gabungkan quantity
             cart[existingItemIndex].quantity += item.quantity;
             cart.splice(itemIndex, 1);
         } else {
-            // Jika belum ada, update size
             cart[itemIndex].size = newSize;
         }
         
@@ -578,7 +568,6 @@ function changeSizeInCart(itemIndex, newSize) {
     }
 }
 
-// Update quantity menggunakan index
 function updateQuantity(itemIndex, change) {
     let cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
     

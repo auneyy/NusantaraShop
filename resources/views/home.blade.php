@@ -14,8 +14,8 @@
 
   .hero-content h1 {
     color: #422D1C;
-    font-weight: 700;
-    font-size: 2.8rem;
+    font-weight: 800;
+    font-size: 40px;
     line-height: 1.2;
     margin-bottom: 1.5rem;
   }
@@ -26,9 +26,10 @@
 
   .hero-content p {
     color: #666;
-    font-size: 1.2rem;
+    font-weight: 600;
+    font-size: 20px;
     line-height: 1.6;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1rem;
     max-width: 90%;
   }
 
@@ -403,8 +404,8 @@
     <div class="container-fluid p-0">
     <div class="row align-items-center">
         <div class="col-lg-6 hero-content">
-            <h1>Temukan baju adat yang cocok dengan dirimu di <span class="highlight">NusantaraShop</span></h1>
-            <p>Kami menghadirkan koleksi baju adat pilihan yang dirancang untuk membuatmu terhubung dengan budaya lewat kenyamanan</p>
+            <h1>Temukan baju batik yang cocok dengan dirimu di <span class="highlight">NusantaraShop</span></h1>
+            <p>Kami menghadirkan koleksi baju batik pilihan yang dirancang untuk membuatmu terhubung dengan budaya lewat kenyamanan</p>
             @guest
             <a href="{{ route('register') }}" class="btn-primary-custom">Daftar Sekarang</a>
             <a href="{{ route('login') }}" class="btn-outline-custom">Masuk</a>
