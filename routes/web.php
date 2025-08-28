@@ -20,12 +20,13 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
     // ==========================
 
     // Route utama (landing page)
-    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/', function () {return redirect('/home');});
 
     // Halaman umum (dapat diakses semua orang)
     Route::view('/promo', 'promo')->name('promo');
     Route::view('/contact', 'contact')->name('contact');
     Route::view('/help', 'help')->name('help');
+
     
     // Products Resource (menggunakan controller publik yang benar)
     // Gunakan .except('show') untuk mengecualikan rute show

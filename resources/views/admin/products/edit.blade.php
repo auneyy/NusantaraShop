@@ -120,7 +120,7 @@
                                     <div class="row" id="existing-images-container">
                                         @forelse($product->images as $image)
                                         <div class="col-md-3 col-sm-6 mb-3 image-item" id="image-{{ $image->id }}">
-                                            <img src="{{ Storage::url('product_images/' . $image->image_path) }}" class="img-thumbnail mb-2" style="height: 100px; width: auto;">
+                                            <img src="{{ $image->image_path }}" class="img-thumbnail mb-2" style="height: 100px; width: auto;">
                                             <div class="custom-control custom-radio">
                                                 <input type="radio" id="primary-radio-{{ $image->id }}" name="primary_image" value="{{ $image->id }}" class="custom-control-input" {{ $image->is_primary ? 'checked' : '' }}>
                                                 <label class="custom-control-label" for="primary-radio-{{ $image->id }}">Utama</label>

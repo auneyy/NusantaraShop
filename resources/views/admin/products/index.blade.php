@@ -30,23 +30,27 @@
                         @foreach($products as $product)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>
-                                @if($product->images->where('is_primary', true)->first())
-                                <img src="{{ asset('storage/product_images/'.$product->images->where('is_primary', true)->first()->image_path) }}" 
-                                     width="50" class="img-thumbnail">
-                                @else
-                                <span class="text-muted">No image</span>
-                                @endif
-                            </td>
+                           <td>
+    @php
+        $primaryImage = $product->images->where('is_primary', true)->first();
+    @endphp
+
+    @if($primaryImage)
+        <img src="{{ $primaryImage->thumbnail_url ?? $primaryImage->image_path }}" 
+             alt="{{ $product->name }}" width="50" class="img-thumbnail">
+    @else
+        <span class="text-muted">No image</span>
+    @endif
+</td>
                             <td>{{ $product->name }}</td>
                             <td>{{ $product->category->name }}</td>
                             <td>Rp {{ number_format($product->harga, 0, ',', '.') }}</td>
                             <td>{{ $product->stock_kuantitas }}</td>
-                         <td style="color:
-    {{ $product->status == 'active' ? 'green' : ($product->status == 'inactive' ? 'gray' : 'red') }};
-    font-weight: bold;">
-    {{ ucfirst(str_replace('_', ' ', $product->status)) }}
-</td>
+                           <td style="color:
+                                {{ $product->status == 'tersedia' ? 'green' : ($product->status == 'habis' ? 'gray' : 'red') }};
+                                font-weight: bold;">
+                                {{ ucfirst(str_replace(['tersedia', 'habis', 'pre-order'], ['Tersedia', 'Habis', 'Pre-Order'], $product->status)) }}
+                            </td>
                             <td>
                                 <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-sm btn-info">
                                     <i class="fas fa-eye"></i>

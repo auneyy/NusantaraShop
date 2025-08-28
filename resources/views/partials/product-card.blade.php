@@ -90,13 +90,13 @@
                 @endphp
                 
                 @if($displayImage)
-                    <img src="{{ $displayImage->image_url }}" alt="{{ $product->name }}"
-                        class="product-image-primary"
-                    >
+                    <img src="{{ $displayImage->image_path }}" 
+                         alt="{{ $product->name }}"
+                         class="product-image-primary">
                     @if($secondaryImage)
-                        <img src="{{ $secondaryImage->image_url }}" alt="{{ $product->name }}"
-                            class="product-image-secondary"
-                        >
+                        <img src="{{ $secondaryImage->image_path }}" 
+                             alt="{{ $product->name }}"
+                             class="product-image-secondary">
                     @endif
                 @else
                     <div class="d-flex align-items-center justify-content-center bg-light" style="width: 100%; height: 100%;">

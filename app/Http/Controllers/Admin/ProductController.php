@@ -7,13 +7,21 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Services\ImageKitService; // Tambahkan ini
 
 class ProductController extends Controller
 {
+    protected $imageKitService;
+
+    // Inject ImageKitService melalui constructor
+    public function __construct(ImageKitService $imageKitService)
+    {
+        $this->imageKitService = $imageKitService;
+    }
+
     public function index()
     {
         $products = Product::with(['category', 'images' => function($query) {
@@ -49,10 +57,10 @@ class ProductController extends Controller
 
         try {
             DB::beginTransaction();
-            
+
             // Generate slug
             $slug = Str::slug($validated['name']);
-            
+
             $product = Product::create([
                 'category_id' => $validated['category_id'],
                 'name' => $validated['name'],
@@ -67,30 +75,47 @@ class ProductController extends Controller
                 'is_featured' => $validated['is_featured'] ?? false,
                 'meta_data' => null
             ]);
-
-            // Upload gambar
+            
+            // GANTI KODE UNGGAH IMGBB DENGAN IMAGEKIT
             foreach ($request->file('images') as $index => $image) {
-                $imageName = Str::random(20) . '.' . $image->getClientOriginalExtension();
-                $image->storeAs('product_images', $imageName, 'public');
+                try {
+                    // Generate nama file yang unik
+                    $fileName = 'product_' . $product->id . '_' . time() . '_' . $index . '.' . $image->getClientOriginalExtension();
+                    
+                    // Upload ke ImageKit
+                    $uploadResult = $this->imageKitService->upload($image, $fileName);
+                    
+                    if (!$uploadResult['success']) {
+                        throw new \Exception($uploadResult['error']);
+                    }
+                    
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'image_path' => $uploadResult['url'], // URL dari ImageKit
+                        'thumbnail_url' => $uploadResult['thumbnailUrl'], // Thumbnail URL dari ImageKit
+                        'file_id' => $uploadResult['fileId'], // Simpan fileId untuk keperluan delete
+                        'is_primary' => $index == $request->primary_image,
+                        'sort_order' => $index
+                    ]);
 
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $imageName,
-                    'is_primary' => $index == $request->primary_image,
-                    'sort_order' => $index
-                ]);
+                } catch (\Exception $e) {
+                    Log::error('ImageKit Upload Error: ' . $e->getMessage());
+                    // Rollback transaksi jika ada error pada unggahan gambar
+                    DB::rollBack();
+                    return back()->withInput()->with('error', 'Gagal mengunggah gambar ke ImageKit. Silakan coba lagi.');
+                }
             }
             
             DB::commit();
-            
+
             return redirect()->route('admin.products.index')
-                           ->with('success', 'Produk berhasil ditambahkan!');
-                           
+                             ->with('success', 'Produk berhasil ditambahkan!');
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error creating product: '.$e->getMessage());
             return back()->withInput()
-                        ->with('error', 'Gagal menambahkan produk. Silakan coba lagi.');
+                         ->with('error', 'Gagal menambahkan produk. Silakan coba lagi.');
         }
     }
 
@@ -112,25 +137,32 @@ class ProductController extends Controller
     }
 
     public function deleteImage($id)
-{
-    $image = ProductImage::find($id);
-    if (!$image) {
-        return response()->json(['success' => false, 'message' => 'Gambar tidak ditemukan'], 404);
-    }
-
-    try {
-        if (Storage::disk('public')->exists('product_images/' . $image->image_path)) {
-            Storage::disk('public')->delete('product_images/' . $image->image_path);
+    {
+        $image = ProductImage::find($id);
+        if (!$image) {
+            return response()->json(['success' => false, 'message' => 'Gambar tidak ditemukan'], 404);
         }
-        $image->delete();
-        return response()->json(['success' => true, 'message' => 'Gambar berhasil dihapus']);
-    } catch (\Exception $e) {
-        Log::error('Error deleting product image: '.$e->getMessage());
-        return response()->json(['success' => false, 'message' => 'Gagal menghapus gambar'], 500);
-    }
-}
 
-public function update(Request $request, Product $product)
+        try {
+            // Hapus dari ImageKit jika ada file_id
+            if ($image->file_id) {
+                $deleteResult = $this->imageKitService->delete($image->file_id);
+                if (!$deleteResult['success']) {
+                    Log::error('ImageKit Delete Error: ' . ($deleteResult['error'] ?? 'Unknown error'));
+                }
+            }
+            
+            // Hapus dari database
+            $image->delete();
+            
+            return response()->json(['success' => true, 'message' => 'Gambar berhasil dihapus']);
+        } catch (\Exception $e) {
+            Log::error('Error deleting product image: '.$e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Gagal menghapus gambar'], 500);
+        }
+    }
+
+    public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
@@ -145,19 +177,19 @@ public function update(Request $request, Product $product)
             'is_featured' => 'nullable|boolean',
             'images' => 'nullable|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'primary_image' => 'nullable|string', // Ubah validasi agar bisa menerima string
+            'primary_image' => 'nullable|string',
             'delete_images' => 'nullable|array',
         ]);
 
         try {
             DB::beginTransaction();
-            
+
             // Update slug jika nama berubah
             $slug = $product->slug;
             if ($product->name !== $validated['name']) {
                 $slug = Str::slug($validated['name']);
             }
-            
+
             $product->update([
                 'category_id' => $validated['category_id'],
                 'name' => $validated['name'],
@@ -178,32 +210,53 @@ public function update(Request $request, Product $product)
                 foreach ($validated['delete_images'] as $imageId) {
                     $image = ProductImage::find($imageId);
                     if ($image && $image->product_id == $product->id) {
-                        Storage::disk('public')->delete('product_images/'.$image->image_path);
+                        // Hapus dari ImageKit jika ada file_id
+                        if ($image->file_id) {
+                            $deleteResult = $this->imageKitService->delete($image->file_id);
+                            if (!$deleteResult['success']) {
+                                Log::error('ImageKit Delete Error: ' . ($deleteResult['error'] ?? 'Unknown error'));
+                            }
+                        }
                         $image->delete();
                     }
                 }
             }
 
-            // Upload gambar baru dan kumpulkan path-nya
             $newImagePaths = [];
             if ($request->hasFile('images')) {
                 $maxSort = $product->images()->max('sort_order') ?? 0;
+                
+                foreach ($request->file('images') as $index => $image) {
+                    try {
+                        // Generate nama file yang unik
+                        $fileName = 'product_' . $product->id . '_' . time() . '_' . $index . '.' . $image->getClientOriginalExtension();
+                        
+                        // Upload ke ImageKit
+                        $uploadResult = $this->imageKitService->upload($image, $fileName);
+                        
+                        if (!$uploadResult['success']) {
+                            throw new \Exception($uploadResult['error']);
+                        }
+                        
+                        $newImagePaths[] = $uploadResult['url']; // Simpan URL baru
 
-                foreach ($request->file('images') as $image) {
-                    $imageName = Str::random(20) . '.' . $image->getClientOriginalExtension();
-                    $image->storeAs('product_images', $imageName, 'public');
+                        ProductImage::create([
+                            'product_id' => $product->id,
+                            'image_path' => $uploadResult['url'], // URL dari ImageKit
+                            'thumbnail_url' => $uploadResult['thumbnailUrl'], // Thumbnail URL dari ImageKit
+                            'file_id' => $uploadResult['fileId'], // Simpan fileId untuk keperluan delete
+                            'is_primary' => false,
+                            'sort_order' => ++$maxSort
+                        ]);
 
-                    $newImagePaths[] = $imageName; // Simpan nama file baru
-                    
-                    ProductImage::create([
-                        'product_id' => $product->id,
-                        'image_path' => $imageName,
-                        'is_primary' => false,
-                        'sort_order' => ++$maxSort
-                    ]);
+                    } catch (\Exception $e) {
+                        Log::error('ImageKit Upload Error: ' . $e->getMessage());
+                        DB::rollBack();
+                        return back()->withInput()->with('error', 'Gagal mengunggah gambar baru ke ImageKit. Silakan coba lagi.');
+                    }
                 }
             }
-            
+
             // Update primary image
             if ($request->has('primary_image')) {
                 // Non-aktifkan semua gambar utama yang ada
@@ -229,7 +282,7 @@ public function update(Request $request, Product $product)
             }
             
             DB::commit();
-            
+
             return redirect()->route('admin.products.index')->with('success', 'Produk berhasil diperbarui!');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -243,11 +296,16 @@ public function update(Request $request, Product $product)
         try {
             DB::beginTransaction();
             
-            // Hapus semua gambar produk
+            // Hapus semua gambar produk dari ImageKit dan database
             foreach ($product->images as $image) {
-                if (Storage::disk('public')->exists('product_images/' . $image->image_path)) {
-                    Storage::disk('public')->delete('product_images/' . $image->image_path);
+                // Hapus dari ImageKit jika ada file_id
+                if ($image->file_id) {
+                    $deleteResult = $this->imageKitService->delete($image->file_id);
+                    if (!$deleteResult['success']) {
+                        Log::error('ImageKit Delete Error: ' . ($deleteResult['error'] ?? 'Unknown error'));
+                    }
                 }
+                // Hapus dari database
                 $image->delete();
             }
 
@@ -257,8 +315,8 @@ public function update(Request $request, Product $product)
             DB::commit();
             
             return redirect()->route('admin.products.index')
-                           ->with('success', 'Produk berhasil dihapus!');
-                           
+                             ->with('success', 'Produk berhasil dihapus!');
+                             
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error deleting product: '.$e->getMessage());

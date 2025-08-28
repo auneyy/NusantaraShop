@@ -302,13 +302,15 @@
     transform: translateY(-2px);
   }
 
-  .banner-discount {
+.banner-discount {
     width: 100%;
-    height: 100%;
+    height: auto;
     margin: 50px auto;
     display: block;
+    max-width: 1200px;
+    border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  }
+}
 
   .load-more-section {
     text-align: center;
@@ -417,165 +419,52 @@
     </div>
     </div>
 </div>
-
+    
 <!-- Products Section -->
 <div class="products-section">
   <div class="products-container">
     <h2 class="section-title">Koleksi Terbaru Kami</h2>
     
-    <!-- Featured Products Row -->
-    <div class="product-row">
-      <div class="product-col">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik1.png') }}" alt="Batik Kemeja Pria" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Malang Pria</h5>
-            <p class="product-price">Rp 399.000</p>
-            <button class="btn btn-add-cart" onclick="addToCart(1)">Tambah ke Keranjang</button>
-          </div>
+    <div class="row g-3">
+      @foreach($products->take(4) as $product)
+        <div class="col-6 col-md-3 mb-2">
+          @include('partials.product-card', ['product' => $product])
         </div>
-      </div>
-      
-      <div class="product-col">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Lengan Panjang" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Malang Wanita</h5>
-            <p class="product-price">Rp 349.000</p>
-            <button class="btn btn-add-cart" onclick="addToCart(2)">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="product-col">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik1.png') }}" alt="Batik Kemeja Casual" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Pekalongan Pria</h5>
-            <p class="product-price">Rp 379.000</p>
-            <button class="btn btn-add-cart" onclick="addToCart(3)">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="product-col">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Formal" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Pekalongan Wanita</h5>
-            <p class="product-price">Rp 399.000</p>
-            <button class="btn btn-add-cart" onclick="addToCart(4)">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Banner Discount -->
-    <img src="{{ asset('storage/product_images/discount.png') }}" alt="Discount Banner" class="banner-discount">
-
-    <!-- All Products Section -->
-    <h2 class="section-title" style="margin-top: 80px;">Semua Produk</h2>
-    
-    <!-- First Row -->
-    <div class="product-row">
-      <div class="product-col">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik1.png') }}" alt="Batik Kemeja Executive" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Yogyakarta Pria</h5>
-            <p class="product-price">Rp 229.000</p>
-            <button class="btn btn-add-cart" onclick="addToCart(5)">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="product-col">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Premium" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Yogyakarta Wanita</h5>
-            <p class="product-price">Rp 259.000</p>
-            <button class="btn btn-add-cart" onclick="addToCart(6)">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="product-col">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik1.png') }}" alt="Batik Kemeja Classic" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Madura Pria</h5>
-            <p class="product-price">Rp 319.000</p>
-            <button class="btn btn-add-cart" onclick="addToCart(7)">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="product-col">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Modern" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Madura Wanita</h5>
-            <p class="product-price">Rp 269.000</p>
-            <button class="btn btn-add-cart" onclick="addToCart(8)">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Second Row -->
-    <div class="product-row">
-      <div class="product-col">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik1.png') }}" alt="Batik Kemeja Elegant" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Cirebon Pria</h5>
-            <p class="product-price">Rp 389.000</p>
-            <button class="btn btn-add-cart" onclick="addToCart(9)">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="product-col">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Traditional" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Cirenbon Wanita</h5>
-            <p class="product-price">Rp 329.000</p>
-            <button class="btn btn-add-cart" onclick="addToCart(10)">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="product-col">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik1.png') }}" alt="Batik Kemeja Stylish" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Bali Pria</h5>
-            <p class="product-price">Rp 349.000</p>
-            <button class="btn btn-add-cart" onclick="addToCart(11)">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="product-col">
-        <div class="product-card">
-          <img src="{{ asset('storage/product_images/batik2.png') }}" alt="Batik Kemeja Luxury" class="product-image">
-          <div class="product-info">
-            <h5 class="product-title">Batik Bali Wanita</h5>
-            <p class="product-price">Rp 299.000</p>
-            <button class="btn btn-add-cart" onclick="addToCart(12)">Tambah ke Keranjang</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Load More Button -->
-    <div class="load-more-section">
-      <button class="btn btn-primary-custom btn-lg">Lihat Semua Produk</button>
+      @endforeach
     </div>
   </div>
 </div>
+
+<!-- Banner Discount -->
+<div class="banner-container text-center">
+  <img src="{{ asset('storage/product_images/discount.png') }}" 
+       alt="Discount Banner" 
+       class="banner-discount">
+</div>
+
+   <!-- Products Section -->
+<div class="products-section">
+  <div class="products-container">
+    <h2 class="section-title">Semua Produk</h2>
+    
+    <div class="row g-3">
+      @foreach($products->take(8) as $product)
+        <div class="col-6 col-md-3 mb-2">
+          @include('partials.product-card', ['product' => $product])
+        </div>
+      @endforeach
+    </div>
+  </div>
+</div>
+
+
+<div class="load-more-section">
+  <button onclick="window.location.href='{{ route('products.index') }}'"
+          class="btn btn-primary-custom btn-lg">
+    Lihat Semua Produk
+  </button>
+</div>
+
 
 <!-- Features Section -->
 <div class="features-section">

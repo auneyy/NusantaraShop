@@ -14,7 +14,6 @@
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold text-primary">{{ $product->name }}</h6>
             <div>
-                {{-- Menggunakan status yang konsisten dengan controller: 'tersedia', 'habis', 'pre-order' --}}
                 @php
                     $statusClass = [
                         'tersedia' => 'success',
@@ -40,7 +39,10 @@
                             @foreach($product->images as $image)
                             <div class="col-md-6 mb-3">
                                 <div class="card">
-                                    <img src="{{ Storage::url('product_images/'.$image->image_path) }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                                  <img src="{{ $image->thumbnail_url ?? $image->image_path }}" 
+     class="card-img-top" 
+     style="height: 200px; object-fit: cover;"
+     onerror="this.src='{{ $image->image_path }}'">
                                     <div class="card-body text-center">
                                         @if($image->is_primary)
                                         <span class="badge badge-success">Gambar Utama</span>
