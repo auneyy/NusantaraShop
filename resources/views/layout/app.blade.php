@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container">
-      <a href="{{ auth()->check() ? url('/home') : url('/') }}"><img src="{{ asset('storage/product_images/Nusantara.png') }}" alt="logo" class="logonusantara"></a>
+      <a href="{{ auth()->check() ? url('/home') : url('/') }}"><img src="{{ asset('storage/product_images/logobrand.png') }}" alt="logo" class="logonusantara"></a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

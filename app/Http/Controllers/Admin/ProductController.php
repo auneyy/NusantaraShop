@@ -51,7 +51,7 @@ class ProductController extends Controller
             'status' => 'required|in:tersedia,habis,pre-order',
             'is_featured' => 'nullable|boolean',
             'images' => 'required|array|min:1',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'primary_image' => 'required|integer|min:0'
         ]);
 

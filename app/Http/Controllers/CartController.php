@@ -3,152 +3,203 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
+use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class CartController extends Controller
 {
-    /**
-     * Tampilkan halaman keranjang
-     */
-    public function index()
+    public function __construct()
     {
-        return view('cart');
+        $this->middleware('auth');
     }
 
-    /**
-     * Tambah produk ke keranjang (untuk AJAX - opsional)
-     */
-    public function add(Request $request): JsonResponse
+    public function index()
+    {
+        $cartItems = $this->getCartItems();
+        $total = $this->getCartTotal();
+        
+        return view('cart.index', compact('cartItems', 'total'));
+    }
+
+    public function add(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|integer',
-            'name' => 'required|string',
-            'price' => 'required|numeric',
-            'image' => 'required|string',
-            'quantity' => 'integer|min:1'
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+            'size' => 'required|string',
         ]);
 
-        $cart = session()->get('cart', []);
-        $productId = $request->product_id;
-        $quantity = $request->quantity ?? 1;
+        $product = Product::findOrFail($request->product_id);
+        
+        // Check stock
+        if ($product->stock_kuantitas < $request->quantity) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Stok produk tidak mencukupi!'
+            ]);
+        }
 
-        if (isset($cart[$productId])) {
-            $cart[$productId]['quantity'] += $quantity;
+        // Get current cart from session
+        $cart = Session::get('cart', []);
+        $cartKey = $product->id . '_' . $request->size;
+
+        // If item already exists in cart, update quantity
+        if (isset($cart[$cartKey])) {
+            $newQuantity = $cart[$cartKey]['quantity'] + $request->quantity;
+            
+            // Check if new quantity exceeds stock
+            if ($newQuantity > $product->stock_kuantitas) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Total quantity melebihi stok yang tersedia!'
+                ]);
+            }
+            
+            $cart[$cartKey]['quantity'] = $newQuantity;
+            $cart[$cartKey]['subtotal'] = $newQuantity * $product->harga;
         } else {
-            $cart[$productId] = [
-                'id' => $productId,
-                'name' => $request->name,
-                'price' => $request->price,
-                'image' => $request->image,
-                'quantity' => $quantity
+            // Add new item to cart
+            $cart[$cartKey] = [
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'product_price' => $product->harga,
+                'product_image' => $product->images->first()->image_path ?? '',
+                'size' => $request->size,
+                'quantity' => $request->quantity,
+                'subtotal' => $request->quantity * $product->harga,
             ];
         }
 
-        session()->put('cart', $cart);
+        // Save cart to session
+        Session::put('cart', $cart);
 
         return response()->json([
             'success' => true,
-            'message' => 'Produk berhasil ditambahkan ke keranjang',
+            'message' => 'Produk berhasil ditambahkan ke keranjang!',
             'cart_count' => $this->getCartCount()
         ]);
     }
 
-    /**
-     * Update quantity produk di keranjang
-     */
-    public function update(Request $request): JsonResponse
+    public function update(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|integer',
-            'quantity' => 'required|integer|min:0'
+            'cart_key' => 'required|string',
+            'quantity' => 'required|integer|min:1',
         ]);
 
-        $cart = session()->get('cart', []);
-        $productId = $request->product_id;
-        $quantity = $request->quantity;
+        $cart = Session::get('cart', []);
+        $cartKey = $request->cart_key;
 
-        if (isset($cart[$productId])) {
-            if ($quantity > 0) {
-                $cart[$productId]['quantity'] = $quantity;
-            } else {
-                unset($cart[$productId]);
+        if (!isset($cart[$cartKey])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Item tidak ditemukan di keranjang!'
+            ]);
+        }
+
+        $product = Product::find($cart[$cartKey]['product_id']);
+        
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Produk tidak ditemukan!'
+            ]);
+        }
+
+        // Check stock
+        if ($product->stock_kuantitas < $request->quantity) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Quantity melebihi stok yang tersedia!'
+            ]);
+        }
+
+        // Update cart item
+        $cart[$cartKey]['quantity'] = $request->quantity;
+        $cart[$cartKey]['subtotal'] = $request->quantity * $cart[$cartKey]['product_price'];
+
+        Session::put('cart', $cart);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Keranjang berhasil diupdate!',
+            'cart_total' => $this->getCartTotal(),
+            'item_subtotal' => $cart[$cartKey]['subtotal']
+        ]);
+    }
+
+    public function remove(Request $request)
+    {
+        $request->validate([
+            'cart_key' => 'required|string',
+        ]);
+
+        $cart = Session::get('cart', []);
+        $cartKey = $request->cart_key;
+
+        if (isset($cart[$cartKey])) {
+            unset($cart[$cartKey]);
+            Session::put('cart', $cart);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Item berhasil dihapus dari keranjang!',
+            'cart_count' => $this->getCartCount(),
+            'cart_total' => $this->getCartTotal()
+        ]);
+    }
+
+    public function clear()
+    {
+        Session::forget('cart');
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Keranjang berhasil dikosongkan!'
+        ]);
+    }
+
+    public function getCart()
+    {
+        return response()->json([
+            'cart_items' => $this->getCartItems(),
+            'cart_count' => $this->getCartCount(),
+            'cart_total' => $this->getCartTotal()
+        ]);
+    }
+
+    // Private helper methods
+    private function getCartItems()
+    {
+        $cart = Session::get('cart', []);
+        $cartItems = [];
+
+        foreach ($cart as $key => $item) {
+            $product = Product::with('images')->find($item['product_id']);
+            if ($product) {
+                $cartItems[$key] = [
+                    'product' => $product,
+                    'size' => $item['size'],
+                    'quantity' => $item['quantity'],
+                    'subtotal' => $item['subtotal'],
+                ];
             }
-            
-            session()->put('cart', $cart);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Keranjang berhasil diperbarui',
-            'cart_count' => $this->getCartCount()
-        ]);
+        return $cartItems;
     }
 
-    /**
-     * Hapus produk dari keranjang
-     */
-    public function remove(Request $request): JsonResponse
+    private function getCartCount()
     {
-        $request->validate([
-            'product_id' => 'required|integer'
-        ]);
-
-        $cart = session()->get('cart', []);
-        $productId = $request->product_id;
-
-        if (isset($cart[$productId])) {
-            unset($cart[$productId]);
-            session()->put('cart', $cart);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Produk berhasil dihapus dari keranjang',
-            'cart_count' => $this->getCartCount()
-        ]);
-    }
-
-    /**
-     * Kosongkan keranjang
-     */
-    public function clear(): JsonResponse
-    {
-        session()->forget('cart');
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Keranjang berhasil dikosongkan',
-            'cart_count' => 0
-        ]);
-    }
-
-    /**
-     * Hitung total item di keranjang
-     */
-    private function getCartCount(): int
-    {
-        $cart = session()->get('cart', []);
+        $cart = Session::get('cart', []);
         return array_sum(array_column($cart, 'quantity'));
     }
 
-    /**
-     * Dapatkan data keranjang
-     */
-    public function getCart(): JsonResponse
+    private function getCartTotal()
     {
-        $cart = session()->get('cart', []);
-        $total = 0;
-
-        foreach ($cart as $item) {
-            $total += $item['price'] * $item['quantity'];
-        }
-
-        return response()->json([
-            'cart' => array_values($cart),
-            'total_items' => $this->getCartCount(),
-            'subtotal' => $total,
-            'shipping' => $total > 0 ? 15000 : 0,
-            'total' => $total + ($total > 0 ? 15000 : 0)
-        ]);
+        $cart = Session::get('cart', []);
+        return array_sum(array_column($cart, 'subtotal'));
     }
 }

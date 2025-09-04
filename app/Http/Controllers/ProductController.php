@@ -33,7 +33,7 @@ class ProductController extends Controller
     ->inRandomOrder()
     ->limit(4)
     ->get();
-        return view('product_show', compact('product', 'recommendedProducts'));
+        return view('products.show', compact('product', 'recommendedProducts'));
     }
 
     public function search()

@@ -12,10 +12,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->string('product_name'); // Simpan nama produk untuk riwayat
+            $table->decimal('product_price', 12, 2); // Simpan harga saat pembelian
             $table->integer('kuantitas');
-            $table->decimal('harga', 12, 2);
-            $table->decimal('total', 12, 2);
-            $table->json('product_snapshot')->nullable();
+            $table->string('size')->nullable();
+            $table->decimal('subtotal', 12, 2);
             $table->timestamps();
         });
     }

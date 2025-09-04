@@ -11,6 +11,7 @@ use App\Http\Controllers\ProductController as PublicProductController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\DiscountController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\CheckoutController;
 
 // Middleware untuk mencegah back history di seluruh aplikasi
 Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(function () {
@@ -27,17 +28,15 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
     Route::view('/contact', 'contact')->name('contact');
     Route::view('/help', 'help')->name('help');
 
-    
     // Products Resource (menggunakan controller publik yang benar)
-    // Gunakan .except('show') untuk mengecualikan rute show
-    Route::resource('products', PublicProductController::class)->except('show');
+    // Gunakan .except(['show', 'create', 'store', 'edit', 'update', 'destroy']) untuk hanya index
+    Route::get('/products', [PublicProductController::class, 'index'])->name('products.index');
 
     // Rute kustom untuk show agar bisa menggunakan slug
-    Route::get('/products/{product:slug}', [PublicProductController::class, 'show'])->name('products_show');
+    Route::get('/products/{product:slug}', [PublicProductController::class, 'show'])->name('products.show');
     
     // Route untuk pencarian dan filter produk
     Route::get('/search', [PublicProductController::class, 'search'])->name('product.search');
-    Route::get('/category/{category}', [PublicProductController::class, 'filterByCategory'])->name('product.category');
 
     // API Routes untuk AJAX (jika ada)
     Route::prefix('api')->group(function () {
@@ -79,7 +78,14 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::post('/update', [CartController::class, 'update'])->name('update');
             Route::post('/remove', [CartController::class, 'remove'])->name('remove');
             Route::post('/clear', [CartController::class, 'clear'])->name('clear');
-            Route::get('/count', [CartController::class, 'getCart'])->name('get');
+            Route::get('/count', [CartController::class, 'getCart'])->name('count'); // Fixed: renamed from 'get' to 'count'
+        });
+        
+        // Checkout Routes
+        Route::prefix('checkout')->name('checkout.')->group(function () {
+            Route::get('/', [CheckoutController::class, 'index'])->name('index');
+            Route::post('/process', [CheckoutController::class, 'process'])->name('process');
+            Route::get('/success', [CheckoutController::class, 'success'])->name('success');
         });
         
         // User Logout
@@ -108,8 +114,8 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::resource('discounts', DiscountController::class);
             Route::patch('/discounts/{discount}/toggle-status', [DiscountController::class, 'toggleStatus'])
                 ->name('discounts.toggle-status');
+                
+            // Admin Logout (pindahkan ke dalam middleware admin)
+            Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
         });
-
-    // Admin Logout
-    Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 });

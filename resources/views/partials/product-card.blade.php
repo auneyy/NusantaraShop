@@ -79,7 +79,7 @@
 }
 </style>
 
-<a href="{{ route('products_show', $product->slug) }}" class="product-card-link">
+<a href="{{ route('products.show', $product->slug) }}" class="product-card-link">
     <div class="product-card-wrapper">
         <div class="minimalist-product-card">
             <div class="product-image-container">
