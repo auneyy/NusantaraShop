@@ -8,6 +8,7 @@
         align-items: center;
         justify-content: center;
         padding: 2rem 0;
+        background-color:rgb(232, 232, 232);
     }
 
     .login-card {

@@ -459,10 +459,9 @@
 
 
 <div class="load-more-section">
-  <button onclick="window.location.href='{{ route('products.index') }}'"
-          class="btn btn-primary-custom btn-lg">
+  <a href="{{ route('products.index') }}" class="btn btn-primary-custom btn-lg">
     Lihat Semua Produk
-  </button>
+  </a>
 </div>
 
 
@@ -517,122 +516,5 @@
     @endguest
   </div>
 </div>
-
-<!-- JavaScript -->
-<script>
-// Data produk - sesuaikan dengan produk yang ada di halaman Anda
-const products = {
-    1: { id: 1, name: "Batik Malang Pria", price: 399000, image: "{{ asset('storage/product_images/batik1.png') }}" },
-    2: { id: 2, name: "Baju Malang Wanita", price: 349000, image: "{{ asset('storage/product_images/batik2.png') }}" },
-    3: { id: 3, name: "Batik Pekalongan Pria", price: 379000, image: "{{ asset('storage/product_images/batik1.png') }}" },
-    4: { id: 4, name: "Baju Pekalongan Wanita", price: 399000, image: "{{ asset('storage/product_images/batik2.png') }}" },
-    5: { id: 5, name: "Batik Yogyakarta Pria", price: 229000, image: "{{ asset('storage/product_images/batik1.png') }}" },
-    6: { id: 6, name: "Batik Yogyakarta Wanita", price: 259000, image: "{{ asset('storage/product_images/batik2.png') }}" },
-    7: { id: 7, name: "Batik Madura Pria", price: 319000, image: "{{ asset('storage/product_images/batik1.png') }}" },
-    8: { id: 8, name: "Batik Madura Wanita", price: 269000, image: "{{ asset('storage/product_images/batik2.png') }}" },
-    9: { id: 9, name: "Batik Cirebon Pria", price: 389000, image: "{{ asset('storage/product_images/batik1.png') }}" },
-    10: { id: 10, name: "Batik Cirebon Wanita", price: 329000, image: "{{ asset('storage/product_images/batik2.png') }}" },
-    11: { id: 11, name: "Batik Bali Pria", price: 349000, image: "{{ asset('storage/product_images/batik1.png') }}" },
-    12: { id: 12, name: "Batik Bali Wanita", price: 299000, image: "{{ asset('storage/product_images/batik2.png') }}" }
-};
-
-// Function untuk menambahkan produk ke keranjang
-function addToCart(productId) {
-    const product = products[productId];
-    if (!product) {
-        console.error('Produk tidak ditemukan');
-        return;
-    }
-    
-    let cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
-    const existingItemIndex = cart.findIndex(item => item.id === productId);
-    
-    if (existingItemIndex > -1) {
-        cart[existingItemIndex].quantity += 1;
-    } else {
-        cart.push({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            image: product.image,
-            quantity: 1,
-            size: 'M',
-            color: 'default'
-        });
-    }
-    
-    localStorage.setItem('nusantara_cart', JSON.stringify(cart));
-    showAddToCartMessage(product.name);
-    updateCartBadge();
-}
-
-// Function untuk navigasi ke detail produk
-function goToProductDetail(productId) {
-    window.location.href = `/product/${productId}`;
-}
-
-// Function untuk show success message
-function showAddToCartMessage(productName) {
-    const message = document.createElement('div');
-    message.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #28a745;
-        color: white;
-        padding: 15px 20px;
-        border-radius: 5px;
-        z-index: 9999;
-        font-weight: 600;
-    `;
-    message.textContent = `${productName} berhasil ditambahkan ke keranjang!`;
-    
-    document.body.appendChild(message);
-    
-    setTimeout(() => {
-        if (message.parentNode) {
-            document.body.removeChild(message);
-        }
-    }, 3000);
-}
-
-// Function untuk update cart badge
-function getCartItemCount() {
-    const cart = JSON.parse(localStorage.getItem('nusantara_cart')) || [];
-    return cart.reduce((total, item) => total + item.quantity, 0);
-}
-
-function updateCartBadge() {
-    const badge = document.getElementById('cartBadge');
-    if (badge) {
-        badge.textContent = getCartItemCount();
-    }
-}
-
-// Initialize saat halaman dimuat
-document.addEventListener('DOMContentLoaded', function() {
-    updateCartBadge();
-    
-    // Tambahkan event listener ke semua product cards
-    document.querySelectorAll('.product-card').forEach((card, index) => {
-        // Tambahkan cursor pointer
-        card.style.cursor = 'pointer';
-        
-        // Event listener untuk klik card
-        card.addEventListener('click', function(e) {
-            // Jangan redirect jika yang diklik adalah tombol add to cart
-            if (e.target.closest('.btn-add-cart')) {
-                e.stopPropagation();
-                return;
-            }
-            
-            // Redirect ke halaman detail (index + 1 karena ID mulai dari 1)
-            const productId = index + 1;
-            goToProductDetail(productId);
-        });
-    });
-});
-
-</script>
 
 @endsection
