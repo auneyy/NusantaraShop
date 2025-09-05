@@ -10,7 +10,6 @@
         padding-bottom: 3rem;
     }
 
-    /* CSS product card yang digabungkan dan diperkuat dengan !important */
     .product-card-wrapper {
         max-width: 250px;
         margin: 0 auto;

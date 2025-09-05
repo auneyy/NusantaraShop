@@ -11,7 +11,6 @@
         background-color: #fff;
     }
 
-    /* Bagian gambar produk */
     .product-image-section {
         display: flex;
         gap: 20px;
@@ -19,7 +18,6 @@
         flex-wrap: wrap;
     }
 
-    /* Thumbnail */
   .thumbnail-gallery { display: flex; flex-direction: column; gap: 15px; overflow-y: auto; height: 100%; max-height: 500px; top: 8rem; padding-right: 10px; } 
   .thumbnail-gallery img { width: 80px; height: 80px; cursor: pointer; object-fit: cover; border: 1px solid transparent; transition: border-color 0.2s ease, transform 0.2s ease; margin-top: 2px; }
 
@@ -29,7 +27,6 @@
         transform: translateY(-2px);
     }
 
-    /* Main image */
     .main-image-display {
         flex: 1;
         min-height: 500px;
@@ -52,7 +49,6 @@
         cursor: zoom-in;
     }
 
-    /* Informasi produk */
     .product-info-wrapper {
         padding-left: 2rem;
         flex: 1;
@@ -68,7 +64,6 @@
         margin-bottom: 2rem;
     }
 
-    /* Tombol tambah ke keranjang */
     .add-to-cart-btn {
         background: #422D1C;
         border: none;
@@ -85,7 +80,6 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
 
-    /* Pilihan ukuran */
     .size-option {
         display: inline-block;
         padding: 8px 15px;
@@ -103,7 +97,6 @@
         border-color: #422D1C;
     }
 
-    /* Kuantitas */
     .quantity-control {
         display: flex;
         align-items: center;
@@ -140,7 +133,6 @@
         margin: 0;
     }
 
-    /* Zoomed image modal */
     .zoomed-image-container {
         position: fixed;
         top: 0;
@@ -175,7 +167,6 @@
         opacity: 1;
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
         .product-image-section {
             flex-direction: column;
@@ -200,11 +191,9 @@
 <div class="product-detail-container">
     <div class="container">
         <div class="row">
-            <!-- Gambar produk -->
             <div class="col-md-6">
                 <div class="product-image-section">
 
-                    <!-- Thumbnail -->
                     @if($product->images->count() > 1)
                     <div class="thumbnail-gallery">
                         @foreach($product->images as $thumb)
@@ -213,7 +202,6 @@
                     </div>
                     @endif
 
-                    <!-- Main image -->
                     <div class="main-image-display">
                         <img id="main-product-image" 
                              src="{{ $product->images->first()->image_path ?? 'path/to/placeholder.jpg' }}" 
@@ -224,7 +212,6 @@
                 </div>
             </div>
 
-            <!-- Info produk -->
             <div class="col-md-6">
                 <div class="product-info-wrapper">
                     <h1 class="product-title-detail">{{ $product->name }}</h1>
@@ -257,7 +244,6 @@
             </div>
         </div>
 
-        <!-- Produk Rekomendasi -->
         @if($recommendedProducts->count() > 0)
         <div class="mt-5">
             <hr class="my-5">
@@ -275,7 +261,6 @@
     </div>
 </div>
 
-<!-- Zoom modal -->
 <div id="zoomed-image-container" class="zoomed-image-container">
     <span class="close-btn">&times;</span>
     <img id="zoomed-image" class="zoomed-image" src="" alt="Zoomed Product Image">
@@ -294,7 +279,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const zoomedImage = document.getElementById('zoomed-image');
     const closeBtn = document.querySelector('.close-btn');
 
-    // Thumbnail click
     thumbnails.forEach(thumbnail => {
         thumbnail.addEventListener('click', function() {
             mainImage.src = this.src;
@@ -303,7 +287,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Size select
     sizeOptions.forEach(option => {
         option.addEventListener('click', function() {
             sizeOptions.forEach(o => o.classList.remove('active'));
@@ -312,7 +295,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     if(sizeOptions.length > 0) sizeOptions[0].classList.add('active');
 
-    // Quantity control
     decreaseBtn.addEventListener('click', function() {
         let currentQty = parseInt(quantityInput.value);
         if(currentQty > 1) quantityInput.value = currentQty - 1;
@@ -322,7 +304,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if(currentQty < stockValue) quantityInput.value = currentQty + 1;
     });
 
-    // Zoom
     mainImage.addEventListener('click', function() {
         zoomedImage.src = this.src;
         zoomedImageContainer.style.display = 'flex';
