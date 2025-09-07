@@ -10,8 +10,9 @@
         padding-bottom: 3rem;
     }
 
-    .product-card-wrapper {
-        max-width: 250px;
+     .product-card-wrapper {
+        width: 100%;
+        max-width: none;
         margin: 0 auto;
     }
 
@@ -93,30 +94,42 @@
 @section('content')
 <div class="content-wrapper">
     <div class="container">
-        <div class="row mb-4">
-            <div class="col-12">
-            </div>
-        </div>
-    
-        <div class="row g-3">
-            <div class="col-md-3 d-none d-md-block">
-                @include('partials.sidebar-categories')
-            </div>
-    
-            <div class="col-md-9">
-                <div class="row g-3">
-                    @foreach($products as $product)
-                        <div class="col-6 col-md-3 mb-2">
-                            @include('partials.product-card', ['product' => $product])
-                        </div>
-                    @endforeach
-                </div>
-                
-                <div class="mt-4">
-                    {{ $products->links() }}
+        <!-- Tombol Filter -->
+        <button class="btn btn-outline-dark mb-3" data-bs-toggle="offcanvas" data-bs-target="#filterSidebar">
+            <i class="bi bi-sliders"></i> Filter
+        </button>
+
+        <div class="row">
+
+          <!-- Produk -->
+<div class="col-md-12">
+    <div class="row g-3">
+        @foreach($products as $product)
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="product-card-wrapper">
+                    @include('partials.product-card', ['product' => $product])
                 </div>
             </div>
+        @endforeach
+    </div>
+
+    <div class="mt-4">
+        {{ $products->links() }}
+    </div>
+</div>
+
         </div>
+    </div>
+</div>
+
+<!-- Offcanvas untuk mobile -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="filterSidebar">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Filter Kategori</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        @include('partials.sidebar-categories')
     </div>
 </div>
 @endsection

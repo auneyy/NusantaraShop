@@ -77,7 +77,44 @@
     color: #8B4513;
     margin-bottom: 0;
 }
+
+.original-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 12px;
+    margin-right: 8px;
+}
+
+.discount-price {
+    color: #e53935;
+    font-weight: 600;
+}
+
+.discount-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #e53935;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+    z-index: 10;
+}
+
+.price-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5px;
+}
 </style>
+
+@php
+// Pastikan Anda mengirimkan data diskon dari controller
+// Contoh: $activeDiscounts = $discountController->getActiveDiscountsForProducts($products);
+@endphp
 
 <a href="{{ route('products.show', $product->slug) }}" class="product-card-link">
     <div class="product-card-wrapper">
@@ -87,7 +124,27 @@
                     $primaryImage = $product->images->firstWhere('is_primary', true);
                     $secondaryImage = $product->images->firstWhere('is_primary', false);
                     $displayImage = $primaryImage ?? $product->images->first();
+                    
+                    // Cek apakah produk memiliki diskon aktif
+                    $hasActiveDiscount = false;
+                    $discountPercentage = 0;
+                    $discountedPrice = $product->harga;
+                    
+                    if (isset($activeDiscounts)) {
+                        foreach ($activeDiscounts as $discount) {
+                            if ($discount->products->contains('id', $product->id)) {
+                                $hasActiveDiscount = true;
+                                $discountPercentage = $discount->percentage;
+                                $discountedPrice = $product->harga - ($product->harga * $discount->percentage / 100);
+                                break;
+                            }
+                        }
+                    }
                 @endphp
+                
+                @if($hasActiveDiscount)
+                    <div class="discount-badge">-{{ $discountPercentage }}%</div>
+                @endif
                 
                 @if($displayImage)
                     <img src="{{ $displayImage->image_path }}" 
@@ -107,9 +164,14 @@
 
             <div class="card-body-clean">
                 <h5 class="product-title">{{ $product->name }}</h5>
-                <p class="product-price">
-                    Rp {{ number_format($product->harga, 0, ',', '.') }}
-                </p>
+                <div class="price-container">
+                    @if($hasActiveDiscount)
+                        <span class="original-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
+                        <span class="discount-price">Rp {{ number_format($discountedPrice, 0, ',', '.') }}</span>
+                    @else
+                        <span class="product-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
