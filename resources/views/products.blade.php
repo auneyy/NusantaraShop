@@ -10,15 +10,9 @@
         padding-bottom: 3rem;
     }
 
-    /* Container dengan padding yang responsif */
-    .container {
-        padding-left: 20px !important;
-        padding-right: 20px !important;
-    }
-
-    /* CSS product card yang digabungkan dan diperkuat dengan !important */
-    .product-card-wrapper {
-        max-width: 250px;
+     .product-card-wrapper {
+        width: 100%;
+        max-width: none;
         margin: 0 auto;
     }
 
@@ -95,105 +89,47 @@
         color: #8B4513;
         margin-bottom: 0;
     }
-
-    /* Responsive margin fixes */
-    @media (max-width: 1200px) {
-        .container {
-            padding-left: 25px !important;
-            padding-right: 25px !important;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .container {
-            padding-left: 20px !important;
-            padding-right: 20px !important;
-        }
-        
-        /* Mengurangi gap pada mobile untuk memberikan ruang margin */
-        .row.g-3 {
-            --bs-gutter-x: 1rem !important;
-        }
-        
-        .col-6 {
-            padding-left: 8px !important;
-            padding-right: 8px !important;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .container {
-            padding-left: 15px !important;
-            padding-right: 15px !important;
-        }
-        
-        .row.g-3 {
-            --bs-gutter-x: 0.75rem !important;
-        }
-        
-        .col-6 {
-            padding-left: 6px !important;
-            padding-right: 6px !important;
-        }
-        
-        .content-wrapper {
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .container {
-            padding-left: 12px !important;
-            padding-right: 12px !important;
-        }
-        
-        .row.g-3 {
-            --bs-gutter-x: 0.5rem !important;
-        }
-        
-        .col-6 {
-            padding-left: 4px !important;
-            padding-right: 4px !important;
-        }
-    }
-
-    /* Perbaikan untuk sidebar agar tidak mengganggu margin */
-    @media (max-width: 768px) {
-        .col-md-9 {
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-    }
 </style>
 
 @section('content')
 <div class="content-wrapper">
     <div class="container">
-        <div class="row mb-4">
-            <div class="col-12">
-            </div>
-        </div>
-    
-        <div class="row g-3">
-            <div class="col-md-3 d-none d-md-block">
-                @include('partials.sidebar-categories')
-            </div>
-    
-            <div class="col-md-9">
-                <div class="row g-3">
-                    @foreach($products as $product)
-                        <div class="col-6 col-md-3 mb-2">
-                            @include('partials.product-card', ['product' => $product])
-                        </div>
-                    @endforeach
-                </div>
-                
-                <div class="mt-4">
-                    {{ $products->links() }}
+        <!-- Tombol Filter -->
+        <button class="btn btn-outline-dark mb-3" data-bs-toggle="offcanvas" data-bs-target="#filterSidebar">
+            <i class="bi bi-sliders"></i> Filter
+        </button>
+
+        <div class="row">
+
+          <!-- Produk -->
+<div class="col-md-12">
+    <div class="row g-3">
+        @foreach($products as $product)
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="product-card-wrapper">
+                    @include('partials.product-card', ['product' => $product])
                 </div>
             </div>
+        @endforeach
+    </div>
+
+    <div class="mt-4">
+        {{ $products->links() }}
+    </div>
+</div>
+
         </div>
+    </div>
+</div>
+
+<!-- Offcanvas untuk mobile -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="filterSidebar">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Filter Kategori</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        @include('partials.sidebar-categories')
     </div>
 </div>
 @endsection

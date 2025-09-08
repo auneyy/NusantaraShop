@@ -6,7 +6,7 @@
   .hero-section {
     background: linear-gradient(135deg, #f8f9fa 0%, rgb(239, 229, 209) 100%);
     padding: 0;
-    min-height: 650px;
+    min-height: 600px;
     display: flex;
     align-items: center;
     margin-bottom: 50px;
@@ -82,7 +82,7 @@
 
   .hero-image img {
     width: 100%;
-    height: 650px;
+    height: auto;
     object-fit: cover;
   }
 
@@ -96,7 +96,7 @@
 
   .hero-section .hero-content {
     flex: 1;
-    min-width: 300px;
+    min-width: 400px;
     padding: 60px 40px;
   }
 
@@ -308,7 +308,6 @@
     margin: 50px auto;
     display: block;
     max-width: 1200px;
-    border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
@@ -436,11 +435,27 @@
 </div>
 
 <!-- Banner Discount -->
-<div class="banner-container text-center">
-  <img src="{{ asset('storage/product_images/banner-home.png') }}" 
-       alt="Discount Banner" 
-       class="banner-discount">
-</div>
+@if(isset($discountBanner) && $discountBanner->banner_image)
+    <div class="banner-container text-center">
+        <a href="{{ route('promo') }}">
+            <img src="{{ $discountBanner->banner_image }}" 
+                 alt="Discount Banner - {{ $discountBanner->title }}" 
+                 class="banner-discount img-fluid"
+                 style="width: 100%; object-fit: cover;">
+        </a>
+    </div>
+@else
+    <!-- Fallback jika tidak ada diskon -->
+    <div class="banner-container text-center">
+        <a href="{{ route('promo') }}">
+            <img src="{{ asset('storage/product_images/discount.png') }}" 
+                 alt="Special Discounts" 
+                 class="banner-discount img-fluid"
+                 style="max-height: 300px; width: 100%; object-fit: cover;">
+        </a>
+    </div>
+@endif
+
 
    <!-- Products Section -->
 <div class="products-section">

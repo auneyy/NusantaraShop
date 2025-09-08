@@ -6,12 +6,12 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AuthController;
-// Import dan beri alias yang jelas untuk controller publik dan admin
 use App\Http\Controllers\ProductController as PublicProductController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\DiscountController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\PromoController;
 
 // Middleware untuk mencegah back history di seluruh aplikasi
 Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(function () {
@@ -24,7 +24,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
     Route::get('/', function () {return redirect('/home');});
 
     // Halaman umum (dapat diakses semua orang)
-    Route::view('/promo', 'promo')->name('promo');
+    Route::get('/promo', [PromoController::class, 'index'])->name('promo');
     Route::view('/contact', 'contact')->name('contact');
     Route::view('/help', 'help')->name('help');
 

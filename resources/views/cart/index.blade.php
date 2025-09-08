@@ -4,6 +4,7 @@
 <style>
     body {
         background-color: #f8f9fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     .cart-container {
@@ -11,190 +12,317 @@
         min-height: 80vh;
     }
 
-    .cart-header {
-        background: linear-gradient(135deg, #422D1C 0%, #8B4513 100%);
-        color: white;
-        padding: 1.5rem;
-        border-radius: 10px 10px 0 0;
-        margin-bottom: 0;
-    }
-
-    .cart-card {
+    .cart-main-section {
         background: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: 0;
         margin-bottom: 2rem;
     }
 
-    .cart-content {
-        padding: 0;
-    }
-
-    .cart-item {
+    .cart-header-simple {
         padding: 1.5rem;
         border-bottom: 1px solid #e9ecef;
-        transition: background-color 0.3s ease;
     }
 
-    .cart-item:hover {
+    .cart-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #212529;
+        margin: 0;
+    }
+
+    .cart-item-count {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .cart-table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .cart-table-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .cart-table-header th {
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.9rem;
+        text-align: left;
+        border: none;
+    }
+
+    .cart-table-header th:last-child {
+        text-align: center;
+    }
+
+    .cart-item-row {
+        border-bottom: 1px solid #f1f3f4;
+        transition: background-color 0.2s ease;
+    }
+
+    .cart-item-row:hover {
         background-color: #f8f9fa;
     }
 
-    .cart-item:last-child {
+    .cart-item-row:last-child {
         border-bottom: none;
     }
 
-    .item-details {
+    .cart-item-row td {
+        padding: 1.5rem;
+        vertical-align: middle;
+        border: none;
+    }
+
+    .product-detail {
         display: flex;
         align-items: center;
         gap: 1rem;
     }
 
-    .item-image {
-        width: 100px;
-        height: 100px;
+    .product-image {
+        width: 60px;
+        height: 60px;
         object-fit: cover;
-        border-radius: 8px;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
     }
 
-    .item-info {
+    .product-info {
         flex: 1;
     }
 
-    .item-name {
+    .product-name {
         font-weight: 600;
         color: #212529;
-        margin-bottom: 0.5rem;
-        font-size: 1.1rem;
+        margin: 0 0 0.25rem 0;
+        font-size: 0.95rem;
     }
 
-    .item-specs {
+    .product-size {
         color: #6c757d;
-        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+        margin: 0;
     }
 
-    .item-price {
-        font-weight: 600;
-        color: #422D1C;
-        font-size: 1.1rem;
+    .quantity-cell {
+        text-align: center;
     }
 
-    .quantity-controls {
+    .quantity-selector {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        margin-top: 1rem;
+        justify-content: center;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+        width: fit-content;
+        margin: 0 auto;
     }
 
-    .qty-btn {
-        width: 35px;
-        height: 35px;
-        border: 1px solid #ccc;
+    .qty-btn-new {
         background: #f8f9fa;
+        border: none;
+        width: 32px;
+        height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        border-radius: 4px;
-        transition: all 0.3s ease;
+        color: #495057;
+        font-weight: 600;
+        transition: background-color 0.2s ease;
     }
 
-    .qty-btn:hover {
-        background: #422D1C;
-        color: white;
-        border-color: #422D1C;
+    .qty-btn-new:hover {
+        background: #e9ecef;
     }
 
-    .qty-input {
-        width: 60px;
-        text-align: center;
-        border: 1px solid #ccc;
-        height: 35px;
-        border-radius: 4px;
-    }
-
-    .remove-btn {
-        background: #dc3545;
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-top: 0.5rem;
-    }
-
-    .remove-btn:hover {
-        background: #c82333;
-        transform: translateY(-1px);
-    }
-
-    .cart-summary {
+    .qty-display {
         background: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-        padding: 2rem;
+        border: none;
+        width: 50px;
+        height: 32px;
+        text-align: center;
+        font-weight: 500;
+        color: #212529;
+        border-left: 1px solid #e9ecef;
+        border-right: 1px solid #e9ecef;
+    }
+
+    .price-cell {
+        text-align: right;
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .total-cell {
+        text-align: right;
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .delete-btn {
+        background: none;
+        border: none;
+        color: #dc3545;
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 3px;
+        transition: background-color 0.2s ease;
+    }
+
+    .delete-btn:hover {
+        background: #f8d7da;
+    }
+
+    .continue-shopping-link {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.75rem 0;
+        display: inline-block;
+    }
+
+    .continue-shopping-link:hover {
+        color: #0056b3;
+        text-decoration: none;
+    }
+
+    .summary-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        height: fit-content;
+    }
+
+    .summary-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #212529;
+        margin: 0 0 1.5rem 0;
     }
 
     .summary-row {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         margin-bottom: 1rem;
-        padding: 0.5rem 0;
+        color: #495057;
     }
 
-    .summary-row.total {
-        font-weight: bold;
-        font-size: 1.2rem;
-        color: #422D1C;
+    .summary-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .summary-label {
+        font-size: 0.9rem;
+    }
+
+    .summary-value {
+        font-weight: 500;
+    }
+
+    .delivery-section {
+        margin: 1.5rem 0;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 6px;
+    }
+
+    .delivery-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #495057;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .delivery-option {
+        display: flex;
+        justify-content: space-between;
+        color: #6c757d;
+        font-size: 0.85rem;
+        margin: 0;
+    }
+
+    .promo-section {
+        margin: 1.5rem 0;
+    }
+
+    .promo-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #495057;
+        margin: 0 0 0.75rem 0;
+    }
+
+    .promo-input-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .promo-input {
+        flex: 1;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+
+    .promo-btn {
+        background: #8B4513;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .promo-btn:hover {
+        background: #6d3410;
+    }
+
+    .total-section {
         border-top: 2px solid #e9ecef;
         padding-top: 1rem;
-        margin-top: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #212529;
     }
 
     .checkout-btn {
-        background: linear-gradient(135deg, #422D1C 0%, #8B4513 100%);
-        border: none;
+        background: #8B4513;
         color: white;
-        font-size: 1.1rem;
-        font-weight: 600;
-        padding: 1rem 2rem;
-        border-radius: 8px;
+        border: none;
         width: 100%;
-        transition: all 0.3s ease;
-        margin-top: 1rem;
+        padding: 0.875rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 1.5rem;
+        font-size: 0.95rem;
+        transition: background-color 0.2s ease;
     }
 
     .checkout-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(66, 45, 28, 0.3);
-    }
-
-    .checkout-btn:disabled {
-        background: #ccc;
-        transform: none;
-        box-shadow: none;
-        cursor: not-allowed;
-    }
-
-    .continue-shopping {
-        color: #422D1C;
-        text-decoration: none;
-        font-weight: 500;
-        padding: 0.75rem 1.5rem;
-        border: 2px solid #422D1C;
-        border-radius: 8px;
-        display: inline-block;
-        margin-top: 1rem;
-        width: 100%;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-
-    .continue-shopping:hover {
-        background: #422D1C;
-        color: white;
-        text-decoration: none;
+        background: #6d3410;
     }
 
     .empty-cart {
@@ -209,46 +337,44 @@
         opacity: 0.5;
     }
 
-    .clear-cart-btn {
-        background: #dc3545;
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        float: right;
-        margin-bottom: 1rem;
-    }
-
-    .clear-cart-btn:hover {
-        background: #c82333;
-    }
-
     @media (max-width: 768px) {
         .cart-container {
             padding: 1rem 0;
         }
         
-        .item-details {
-            flex-direction: column;
-            text-align: center;
+        .cart-table-header {
+            display: none;
         }
         
-        .item-image {
+        .cart-item-row {
+            display: block;
+            border-bottom: 1px solid #e9ecef;
+            padding: 1rem;
+        }
+        
+        .cart-item-row td {
+            display: block;
+            padding: 0.5rem 0;
+            border: none;
+        }
+        
+        .product-detail {
             margin-bottom: 1rem;
         }
         
-        .quantity-controls {
-            justify-content: center;
+        .quantity-cell,
+        .price-cell,
+        .total-cell {
+            text-align: left;
         }
         
-        .summary-row {
-            font-size: 0.9rem;
-        }
-        
-        .cart-item {
-            padding: 1rem;
+        .quantity-cell::before,
+        .price-cell::before,
+        .total-cell::before {
+            content: attr(data-label);
+            font-weight: 600;
+            margin-right: 1rem;
+            color: #495057;
         }
     }
 </style>
@@ -256,106 +382,111 @@
 <div class="cart-container">
     <div class="container">
         <div class="row">
-            <div class="col-12">
-                <div class="cart-card">
-                    <div class="cart-header">
-                        <h3 class="mb-0">🛒 Keranjang Belanja</h3>
-                        <p class="mb-0">{{ count($cartItems) }} item dalam keranjang</p>
+            <div class="col-lg-8">
+                <div class="cart-main-section">
+                    <div class="cart-header-simple">
+                        <h2 class="cart-title">Keranjang</h2>
+                        <p class="cart-item-count">{{ count($cartItems) }} Items</p>
                     </div>
                     
-                    <div class="cart-content">
-                        @if(count($cartItems) > 0)
-                            <button type="button" class="clear-cart-btn" onclick="clearCart()">
-                                <i class="bi bi-trash"></i> Kosongkan Keranjang
-                            </button>
-                            <div class="clearfix"></div>
-                            
-                            @foreach($cartItems as $key => $item)
-                            <div class="cart-item" id="cart-item-{{ $key }}">
-                                <div class="item-details">
-                                    <img src="{{ $item['product']->images->first()->image_path ?? 'path/to/placeholder.jpg' }}" 
-                                         alt="{{ $item['product']->name }}" class="item-image">
-                                    
-                                    <div class="item-info">
-                                        <div class="item-name">{{ $item['product']->name }}</div>
-                                        <div class="item-specs">
-                                            Ukuran: {{ $item['size'] }} | 
-                                            Harga: Rp {{ number_format($item['product']->harga, 0, ',', '.') }}
+                    @if(count($cartItems) > 0)
+                        <table class="cart-table">
+                            <thead class="cart-table-header">
+                                <tr>
+                                    <th>Detail Produk</th>
+                                    <th>Jumlah</th>
+                                    <th>Harga</th>
+                                    <th>Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($cartItems as $key => $item)
+                                <tr class="cart-item-row" id="cart-item-{{ $key }}">
+                                    <td>
+                                        <div class="product-detail">
+                                            <img src="{{ $item['product']->images->first()->image_path ?? 'path/to/placeholder.jpg' }}" 
+                                                 alt="{{ $item['product']->name }}" class="product-image">
+                                            <div class="product-info">
+                                                <p class="product-name">{{ $item['product']->name }}</p>
+                                                <p class="product-size">Ukuran: {{ $item['size'] }}</p>
+                                            </div>
                                         </div>
-                                        <div class="item-price">
-                                            Subtotal: Rp {{ number_format($item['subtotal'], 0, ',', '.') }}
+                                    </td>
+                                    <td class="quantity-cell" data-label="Jumlah: ">
+                                        <div class="quantity-selector">
+                                            <button class="qty-btn-new" onclick="updateQuantity('{{ $key }}', -1)">-</button>
+                                            <input type="text" class="qty-display" id="qty-{{ $key }}" 
+                                                   value="{{ $item['quantity'] }}" readonly>
+                                            <button class="qty-btn-new" onclick="updateQuantity('{{ $key }}', 1)">+</button>
                                         </div>
-                                        
-                                        <div class="quantity-controls">
-                                            <button type="button" class="qty-btn" onclick="updateQuantity('{{ $key }}', -1)">-</button>
-                                            <input type="number" class="qty-input" id="qty-{{ $key }}" 
-                                                   value="{{ $item['quantity'] }}" min="1" max="{{ $item['product']->stock_kuantitas }}" readonly>
-                                            <button type="button" class="qty-btn" onclick="updateQuantity('{{ $key }}', 1)">+</button>
-                                            
-                                            <button type="button" class="remove-btn" onclick="removeItem('{{ $key }}')">
-                                                <i class="bi bi-trash"></i> Hapus
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
-                        @else
-                            <div class="empty-cart">
-                                <div class="empty-cart-icon">🛒</div>
-                                <h4>Keranjang Belanja Kosong</h4>
-                                <p>Belum ada produk dalam keranjang belanja Anda</p>
-                                <a href="{{ route('products.index') }}" class="btn btn-primary">
-                                    Mulai Berbelanja
-                                </a>
-                            </div>
-                        @endif
-                    </div>
+                                    </td>
+                                    <td class="price-cell" data-label="Harga: ">
+                                        Rp {{ number_format($item['product']->harga, 0, ',', '.') }}
+                                    </td>
+                                    <td class="total-cell" data-label="Total: ">
+                                        <span id="item-total-{{ $key }}">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</span>
+                                    </td>
+                                    <td>
+                                        <button class="delete-btn" onclick="removeItem('{{ $key }}')">
+                                            <span style="color: red; font-weight: bold;">Hapus</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        
+                        <div style="padding: 1.5rem;">
+                            <a href="{{ route('products.index') }}" class="continue-shopping-link">
+                                ← Lanjutkan Belanja
+                            </a>
+                        </div>
+                    @else
+                        <div class="empty-cart">
+                            <div class="empty-cart-icon">🛒</div>
+                            <h4>Keranjang Belanja Kosong</h4>
+                            <p>Belum ada produk dalam keranjang belanja Anda</p>
+                            <a href="{{ route('products.index') }}" class="btn btn-primary">
+                                Mulai Berbelanja
+                            </a>
+                        </div>
+                    @endif
                 </div>
-            </div>
-        </div>
-
-        @if(count($cartItems) > 0)
-        <div class="row">
-            <div class="col-lg-8">
-                <a href="{{ route('products.index') }}" class="continue-shopping">
-                    ← Lanjut Berbelanja
-                </a>
             </div>
             
+            @if(count($cartItems) > 0)
             <div class="col-lg-4">
-                <div class="cart-summary">
-                    <h5 class="mb-3">📋 Ringkasan Pesanan</h5>
+                <div class="summary-section">
+                    <h3 class="summary-title">Rangkuman Pemesanan</h3>
                     
                     <div class="summary-row">
-                        <span>Subtotal ({{ array_sum(array_column($cartItems, 'quantity')) }} item)</span>
-                        <span id="cart-subtotal">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                        <span class="summary-label">Items {{ array_sum(array_column($cartItems, 'quantity')) }}</span>
+                        <span class="summary-value" id="cart-subtotal">Rp {{ number_format($total, 0, ',', '.') }}</span>
                     </div>
                     
-                    <div class="summary-row">
-                        <span>Ongkos Kirim</span>
-                        <span>Rp {{ number_format(15000, 0, ',', '.') }}</span>
+                    <div class="promo-section">
+                        <p class="promo-title">Promo Code</p>
+                        <div class="promo-input-group">
+                            <input type="text" class="promo-input" placeholder="Masukkan kodemu">
+                            <button class="promo-btn">Terapkan</button>
+                        </div>
                     </div>
                     
-                    <div class="summary-row total">
-                        <span>Total</span>
-                        <span id="cart-total">Rp {{ number_format($total + 15000, 0, ',', '.') }}</span>
+                    <div class="total-section">
+                        <div class="total-row">
+                            <span>Total Harga</span>
+                            <span id="cart-total">Rp {{ number_format($total + 15000, 0, ',', '.') }}</span>
+                        </div>
                     </div>
                     
-                    <button type="button" class="checkout-btn" onclick="proceedToCheckout()">
-                        <i class="bi bi-credit-card"></i> Lanjut ke Checkout
-                    </button>
-                    
-                    <div class="text-center mt-3">
-                        <small class="text-muted">
-                            <i class="bi bi-shield-check"></i>
-                            Belanja aman dan terpercaya
-                        </small>
-                    </div>
+                   <button type="button" class="checkout-btn" onclick="window.location='{{ route('checkout.index') }}'">
+                    Check Out
+                </button>
                 </div>
             </div>
+            @endif
         </div>
-        @endif
     </div>
 </div>
 
@@ -387,9 +518,9 @@ function updateQuantity(cartKey, change) {
     .then(data => {
         if (data.success) {
             qtyInput.value = newQty;
-            // Update subtotal in the item
-            const itemPrice = cartItem.querySelector('.item-price');
-            itemPrice.innerHTML = 'Subtotal: Rp ' + new Intl.NumberFormat('id-ID').format(data.item_subtotal);
+            // Update item total
+            const itemTotal = document.getElementById('item-total-' + cartKey);
+            itemTotal.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.item_subtotal);
             
             // Update cart total
             updateCartSummary(data.cart_total);

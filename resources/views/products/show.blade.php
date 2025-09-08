@@ -11,7 +11,6 @@
         background-color: #fff;
     }
 
-    /* Bagian gambar produk */
     .product-image-section {
         display: flex;
         gap: 20px;
@@ -19,7 +18,6 @@
         flex-wrap: wrap;
     }
 
-    /* Thumbnail */
   .thumbnail-gallery { display: flex; flex-direction: column; gap: 15px; overflow-y: auto; height: 100%; max-height: 500px; top: 8rem; padding-right: 10px; } 
   .thumbnail-gallery img { width: 80px; height: 80px; cursor: pointer; object-fit: cover; border: 1px solid transparent; transition: border-color 0.2s ease, transform 0.2s ease; margin-top: 2px; }
 
@@ -29,7 +27,6 @@
         transform: translateY(-2px);
     }
 
-    /* Main image */
     .main-image-display {
         flex: 1;
         min-height: 500px;
@@ -52,7 +49,6 @@
         cursor: zoom-in;
     }
 
-    /* Informasi produk */
     .product-info-wrapper {
         padding-left: 2rem;
         flex: 1;
@@ -90,10 +86,11 @@
     .add-to-cart-btn:hover {
         background: #8B4513;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        color: white;
     }
 
     .buy-now-btn {
-        background: #ff6b35;
+        background: #8B4513;
         border: none;
         color: white;
         font-size: 1.1rem;
@@ -105,7 +102,8 @@
     }
 
     .buy-now-btn:hover {
-        background: #e55a2b;
+        background: #422D1C;
+        color: white;
         box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
         transform: translateY(-2px);
     }
@@ -128,7 +126,6 @@
         border-color: #422D1C;
     }
 
-    /* Kuantitas */
     .quantity-control {
         display: flex;
         align-items: center;
@@ -165,7 +162,6 @@
         margin: 0;
     }
 
-    /* Zoomed image modal */
     .zoomed-image-container {
         position: fixed;
         top: 0;
@@ -256,20 +252,17 @@
 <div class="product-detail-container">
     <div class="container">
         <div class="row">
-            <!-- Gambar produk -->
             <div class="col-md-6">
                 <div class="product-image-section">
 
-                    <!-- Thumbnail -->
                     @if($product->images->count() > 1)
-                    <div class="thumbnail-gallery">
-                        @foreach($product->images as $thumb)
-                            <img src="{{ $thumb->image_path }}" class="thumbnail" alt="Thumbnail">
-                        @endforeach
-                    </div>
+                        <div class="thumbnail-gallery">
+                            @foreach($product->images as $thumb)
+                                <img src="{{ $thumb->image_path }}" class="thumbnail" alt="Thumbnail">
+                            @endforeach
+                        </div>
                     @endif
 
-                    <!-- Main image -->
                     <div class="main-image-display">
                         <img id="main-product-image" 
                              src="{{ $product->images->first()->image_path ?? 'path/to/placeholder.jpg' }}" 
@@ -280,14 +273,33 @@
                 </div>
             </div>
 
-            <!-- Info produk -->
             <div class="col-md-6">
                 <div class="product-info-wrapper">
                     <h1 class="product-title-detail">{{ $product->name }}</h1>
-                    <p class="product-price-detail">Rp {{ number_format($product->harga,0,',','.') }}</p>
+                    @php
+                        $discount = $activeDiscounts->firstWhere('products.0.id', $product->id);
+                    @endphp
+
+                    @if($discount)
+                        @php
+                            $discountedPrice = $product->harga - ($product->harga * $discount->percentage / 100);
+                        @endphp
+                      <p class="product-price-detail d-flex align-items-center gap-2">
+    <span class="text-muted" style="text-decoration: line-through;">
+        Rp {{ number_format($product->harga, 0, ',', '.') }}
+    </span>
+    <span class="text-danger fw-bold">
+        Rp {{ number_format($discountedPrice, 0, ',', '.') }}
+    </span>
+</p>
+                    @else
+                        <p class="product-price-detail">
+                            Rp {{ number_format($product->harga,0,',','.') }}
+                        </p>
+                    @endif
+
                     <p class="product-description-detail">{{ $product->deskripsi }}</p>
 
-                    <!-- Form untuk checkout -->
                     <form id="product-form" method="POST">
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
@@ -329,29 +341,26 @@
             </div>
         </div>
 
-        <!-- Produk Rekomendasi -->
         @if($recommendedProducts->count() > 0)
-        <div class="mt-5">
-            <hr class="my-5">
-            <h3 class="text-center mb-5">Produk Rekomendasi Untukmu</h3>
-            <div class="row g-3">
-                @foreach($recommendedProducts as $product)
-                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                        @include('partials.product-card', ['product' => $product])
-                    </div>
-                @endforeach
+            <div class="mt-5">
+                <hr class="my-5">
+                <h3 class="text-center mb-5">Produk Rekomendasi Untukmu</h3>
+                <div class="row g-3">
+                    @foreach($recommendedProducts as $product)
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                            @include('partials.product-card', [
+                                'product' => $product,
+                                'activeDiscounts' => $recommendedDiscounts
+                            ])
+                        </div>
+                    @endforeach
+                </div>
             </div>
-        </div>
         @endif
 
     </div>
 </div>
-
-<!-- Zoom modal -->
-<div id="zoomed-image-container" class="zoomed-image-container">
-    <span class="close-btn">&times;</span>
-    <img id="zoomed-image" class="zoomed-image" src="" alt="Zoomed Product Image">
-</div>
+@endsection
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -369,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const buyNowBtn = document.getElementById('buy-now');
     const selectedSizeInput = document.getElementById('selected-size');
 
-    // Thumbnail click
+    /** ---------------- Thumbnail Click ---------------- **/
     thumbnails.forEach(thumbnail => {
         thumbnail.addEventListener('click', function() {
             mainImage.src = this.src;
@@ -378,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Size select
+    /** ---------------- Size Selection ---------------- **/
     sizeOptions.forEach(option => {
         option.addEventListener('click', function() {
             sizeOptions.forEach(o => o.classList.remove('active'));
@@ -386,23 +395,23 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedSizeInput.value = this.dataset.size;
         });
     });
-    // Set default size
-    if(sizeOptions.length > 0) {
+    // Default pilih size pertama
+    if (sizeOptions.length > 0) {
         sizeOptions[0].classList.add('active');
         selectedSizeInput.value = sizeOptions[0].dataset.size;
     }
 
-    // Quantity control
+    /** ---------------- Quantity Control ---------------- **/
     decreaseBtn.addEventListener('click', function() {
         let currentQty = parseInt(quantityInput.value);
-        if(currentQty > 1) quantityInput.value = currentQty - 1;
+        if (currentQty > 1) quantityInput.value = currentQty - 1;
     });
     increaseBtn.addEventListener('click', function() {
         let currentQty = parseInt(quantityInput.value);
-        if(currentQty < stockValue) quantityInput.value = currentQty + 1;
+        if (currentQty < stockValue) quantityInput.value = currentQty + 1;
     });
 
-    // Zoom functionality
+    /** ---------------- Zoom Image ---------------- **/
     mainImage.addEventListener('click', function() {
         zoomedImage.src = this.src;
         zoomedImageContainer.style.display = 'flex';
@@ -410,11 +419,11 @@ document.addEventListener('DOMContentLoaded', function() {
     closeBtn.addEventListener('click', function() {
         zoomedImageContainer.style.display = 'none';
     });
-    zoomedImageContainer.addEventListener('click', function(e){
-        if(e.target === this) this.style.display = 'none';
+    zoomedImageContainer.addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
     });
 
-    // Validation function
+    /** ---------------- Validation ---------------- **/
     function validateForm() {
         if (!selectedSizeInput.value) {
             alert('Silakan pilih ukuran produk terlebih dahulu!');
@@ -431,33 +440,26 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
-    // Add to cart functionality
+    /** ---------------- Add to Cart ---------------- **/
     addToCartBtn.addEventListener('click', function() {
         if (!validateForm()) return;
 
-        // Show loading state
         this.classList.add('btn-loading');
         this.disabled = true;
         const originalText = this.innerHTML;
         this.innerHTML = '';
 
-        // Simulate API call - replace with your actual cart API
         const formData = new FormData(document.getElementById('product-form'));
-        
-        // Example AJAX call to add to cart
+
         fetch('/cart/add', {
             method: 'POST',
             body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-            }
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Show success message
                 alert('Produk berhasil ditambahkan ke keranjang!');
-                // You can also update cart count in navbar here
                 updateCartCount();
             } else {
                 alert(data.message || 'Gagal menambahkan produk ke keranjang!');
@@ -468,75 +470,34 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Terjadi kesalahan. Silakan coba lagi!');
         })
         .finally(() => {
-            // Remove loading state
             this.classList.remove('btn-loading');
             this.disabled = false;
             this.innerHTML = originalText;
         });
     });
 
-    // Buy now functionality
-    buyNowBtn.addEventListener('click', function() {
+    /** ---------------- Buy Now ---------------- **/
+    buyNowBtn.addEventListener('click', function(e) {
+        e.preventDefault();
         if (!validateForm()) return;
 
-        // Show loading state
         this.classList.add('btn-loading');
         this.disabled = true;
         const originalText = this.innerHTML;
         this.innerHTML = '';
 
-        // Create form data for direct checkout
         const formData = new FormData(document.getElementById('product-form'));
-        
-        // Redirect langsung ke checkout dengan data produk
-        const params = new URLSearchParams();
-        params.append('product_id', formData.get('product_id'));
-        params.append('product_name', formData.get('product_name'));
-        params.append('product_price', formData.get('product_price'));
-        params.append('product_image', formData.get('product_image'));
-        params.append('size', formData.get('size'));
-        params.append('quantity', formData.get('quantity'));
-        
+        const params = new URLSearchParams(formData);
+
+        // Bisa langsung redirect ke checkout dengan query string
         window.location.href = '/checkout?' + params.toString();
     });
-        
-        // Add to cart first, then redirect to checkout
-        fetch('/cart/add', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Redirect to checkout page
-                window.location.href = '/checkout';
-            } else {
-                alert(data.message || 'Gagal memproses pesanan!');
-                // Remove loading state
-                this.classList.remove('btn-loading');
-                this.disabled = false;
-                this.innerHTML = originalText;
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Terjadi kesalahan. Silakan coba lagi!');
-            // Remove loading state
-            this.classList.remove('btn-loading');
-            this.disabled = false;
-            this.innerHTML = originalText;
-        });
-    });
 
-    // Function to update cart count (optional)
+    /** ---------------- Update Cart Count ---------------- **/
     function updateCartCount() {
         fetch('/cart/count')
         .then(response => response.json())
         .then(data => {
-            // Update cart count in navbar if exists
             const cartCountElement = document.querySelector('.cart-count');
             if (cartCountElement) {
                 cartCountElement.textContent = data.count;
@@ -546,4 +507,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endsection
