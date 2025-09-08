@@ -10,6 +10,12 @@
         padding-bottom: 3rem;
     }
 
+    /* Container dengan padding yang responsif */
+    .container {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+
     /* CSS product card yang digabungkan dan diperkuat dengan !important */
     .product-card-wrapper {
         max-width: 250px;
@@ -88,6 +94,76 @@
         font-weight: 500;
         color: #8B4513;
         margin-bottom: 0;
+    }
+
+    /* Responsive margin fixes */
+    @media (max-width: 1200px) {
+        .container {
+            padding-left: 25px !important;
+            padding-right: 25px !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+        }
+        
+        /* Mengurangi gap pada mobile untuk memberikan ruang margin */
+        .row.g-3 {
+            --bs-gutter-x: 1rem !important;
+        }
+        
+        .col-6 {
+            padding-left: 8px !important;
+            padding-right: 8px !important;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .container {
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+        }
+        
+        .row.g-3 {
+            --bs-gutter-x: 0.75rem !important;
+        }
+        
+        .col-6 {
+            padding-left: 6px !important;
+            padding-right: 6px !important;
+        }
+        
+        .content-wrapper {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+        }
+        
+        .row.g-3 {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .col-6 {
+            padding-left: 4px !important;
+            padding-right: 4px !important;
+        }
+    }
+
+    /* Perbaikan untuk sidebar agar tidak mengganggu margin */
+    @media (max-width: 768px) {
+        .col-md-9 {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
     }
 </style>
 
