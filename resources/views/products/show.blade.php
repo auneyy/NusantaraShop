@@ -371,9 +371,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const increaseBtn = document.getElementById('increase-qty');
     const quantityInput = document.getElementById('product-qty');
     const stockValue = parseInt(document.getElementById('stock-value').innerText);
-    const zoomedImageContainer = document.getElementById('zoomed-image-container');
-    const zoomedImage = document.getElementById('zoomed-image');
-    const closeBtn = document.querySelector('.close-btn');
     const addToCartBtn = document.getElementById('add-to-cart');
     const buyNowBtn = document.getElementById('buy-now');
     const selectedSizeInput = document.getElementById('selected-size');
@@ -411,17 +408,23 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentQty < stockValue) quantityInput.value = currentQty + 1;
     });
 
-    /** ---------------- Zoom Image ---------------- **/
-    mainImage.addEventListener('click', function() {
-        zoomedImage.src = this.src;
-        zoomedImageContainer.style.display = 'flex';
-    });
-    closeBtn.addEventListener('click', function() {
-        zoomedImageContainer.style.display = 'none';
-    });
-    zoomedImageContainer.addEventListener('click', function(e) {
-        if (e.target === this) this.style.display = 'none';
-    });
+    /** ---------------- Zoom Image (jika ada container zoom) ---------------- **/
+    const zoomedImageContainer = document.getElementById('zoomed-image-container');
+    const zoomedImage = document.getElementById('zoomed-image');
+    const closeBtn = document.querySelector('.close-btn');
+    
+    if (zoomedImageContainer && zoomedImage && closeBtn) {
+        mainImage.addEventListener('click', function() {
+            zoomedImage.src = this.src;
+            zoomedImageContainer.style.display = 'flex';
+        });
+        closeBtn.addEventListener('click', function() {
+            zoomedImageContainer.style.display = 'none';
+        });
+        zoomedImageContainer.addEventListener('click', function(e) {
+            if (e.target === this) this.style.display = 'none';
+        });
+    }
 
     /** ---------------- Validation ---------------- **/
     function validateForm() {
@@ -444,23 +447,34 @@ document.addEventListener('DOMContentLoaded', function() {
     addToCartBtn.addEventListener('click', function() {
         if (!validateForm()) return;
 
+        // Disable button dan show loading
         this.classList.add('btn-loading');
         this.disabled = true;
         const originalText = this.innerHTML;
-        this.innerHTML = '';
+        this.innerHTML = '<span>Menambahkan...</span>';
 
-        const formData = new FormData(document.getElementById('product-form'));
+        // Siapkan data
+        const formData = {
+            product_id: document.querySelector('input[name="product_id"]').value,
+            quantity: quantityInput.value,
+            size: selectedSizeInput.value,
+            _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        };
 
         fetch('/cart/add', {
             method: 'POST',
-            body: formData,
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': formData._token,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(formData)
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
                 alert('Produk berhasil ditambahkan ke keranjang!');
-                updateCartCount();
+                updateCartCount(data.cart_count);
             } else {
                 alert(data.message || 'Gagal menambahkan produk ke keranjang!');
             }
@@ -481,29 +495,28 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         if (!validateForm()) return;
 
-        this.classList.add('btn-loading');
-        this.disabled = true;
-        const originalText = this.innerHTML;
-        this.innerHTML = '';
+        const productId = document.querySelector('input[name="product_id"]').value;
+        const quantity = quantityInput.value;
+        const size = selectedSizeInput.value;
 
-        const formData = new FormData(document.getElementById('product-form'));
-        const params = new URLSearchParams(formData);
-
-        // Bisa langsung redirect ke checkout dengan query string
-        window.location.href = '/checkout?' + params.toString();
+        // Redirect ke checkout dengan parameter
+        window.location.href = `/checkout?product_id=${productId}&quantity=${quantity}&size=${size}`;
     });
 
     /** ---------------- Update Cart Count ---------------- **/
-    function updateCartCount() {
-        fetch('/cart/count')
-        .then(response => response.json())
-        .then(data => {
-            const cartCountElement = document.querySelector('.cart-count');
-            if (cartCountElement) {
-                cartCountElement.textContent = data.count;
+    function updateCartCount(count) {
+        const cartCountElements = document.querySelectorAll('.cart-count, .cart-badge');
+        cartCountElements.forEach(element => {
+            if (element) {
+                element.textContent = count || 0;
+                // Show badge if count > 0
+                if (count > 0) {
+                    element.style.display = 'inline';
+                } else {
+                    element.style.display = 'none';
+                }
             }
-        })
-        .catch(error => console.error('Error updating cart count:', error));
+        });
     }
 });
 </script>

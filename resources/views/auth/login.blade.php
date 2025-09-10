@@ -18,6 +18,7 @@
         padding: 3rem;
         width: 100%;
         max-width: 450px;
+        margin-bottom: 20px;
     }
 
     .login-title {

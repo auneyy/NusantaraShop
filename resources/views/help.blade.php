@@ -4,12 +4,15 @@
 <style>
   /* Help Page Styles */
   .hero-help {
-    background: linear-gradient(135deg, #8B4513 0%, #422D1C 100%);
+    background-image: url('/storage/product_images/banner-bantuan.png');
+    background-size: cover;
+    background-position: center;
     padding: 100px 0 80px 0;
     color: white;
     text-align: center;
     position: relative;
     overflow: hidden;
+    min-height: 600px;
   }
 
   .hero-help::before {

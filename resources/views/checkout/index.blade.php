@@ -348,7 +348,7 @@
                             <div class="payment-info mt-3">
                                 <h6 class="text-primary mb-2">💳 Pembayaran via Midtrans</h6>
                                 <p class="mb-2 small text-muted">
-                                    Anda akan diarahkan ke halaman pembayaran Midtrans yang aman untuk menyelesaikan transaksi
+                                    BELUM JADI MIDTRANSNYA
                                 </p>
                                 <div class="d-flex justify-content-center align-items-center flex-wrap gap-2">
                                     <span class="badge bg-light text-dark">💳 Kartu Kredit</span>

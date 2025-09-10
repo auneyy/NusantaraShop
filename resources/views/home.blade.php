@@ -6,7 +6,7 @@
   .hero-section {
     background: linear-gradient(135deg, #f8f9fa 0%, rgb(239, 229, 209) 100%);
     padding: 0;
-    min-height: 600px;
+    min-height: 650px;
     display: flex;
     align-items: center;
     margin-bottom: 50px;
@@ -82,7 +82,7 @@
 
   .hero-image img {
     width: 100%;
-    height: auto;
+    height: 650px;
     object-fit: cover;
   }
 
@@ -96,7 +96,7 @@
 
   .hero-section .hero-content {
     flex: 1;
-    min-width: 400px;
+    min-width: 300px;
     padding: 60px 40px;
   }
 
@@ -495,7 +495,7 @@
             <i class="bi bi-truck"></i>
           </div>
           <h5 class="feature-title">Pengiriman Gratis</h5>
-          <p class="text-muted">Nikmati pengiriman gratis untuk pembelian di atas Rp 500.000 ke seluruh Indonesia</p>
+          <p class="text-muted">Nikmati pengiriman gratis untuk pembelian di atas Rp 300.000 ke seluruh Indonesia</p>
         </div>
       </div>
       <div class="col-md-4 mb-4">

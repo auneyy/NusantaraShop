@@ -33,7 +33,7 @@
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         background: #ffffff;
         position: relative;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     }
 
     .minimalist-product-card:hover {
