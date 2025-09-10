@@ -4,12 +4,15 @@
 <style>
   /* Help Page Styles */
   .hero-help {
-    background: linear-gradient(135deg, #8B4513 0%, #422D1C 100%);
+    background-image: url('/storage/product_images/banner-bantuan.png');
+    background-size: cover;
+    background-position: center;
     padding: 100px 0 80px 0;
     color: white;
     text-align: center;
     position: relative;
     overflow: hidden;
+    min-height: 600px;
   }
 
   .hero-help::before {
@@ -59,7 +62,7 @@
     background-color: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     color: #422D1C;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   }
 
   .search-input::placeholder {
@@ -96,7 +99,7 @@
 
   .topics-section {
     padding: 100px 0;
-    background-color: #f8f9fa;
+    background-color:rgb(235, 235, 235);
   }
 
   .section-title {
@@ -154,7 +157,7 @@
 
   .featured-articles {
     padding: 100px 0;
-    background-color: white;
+    background-color:rgb(235, 235, 235);
   }
 
   .articles-container {
@@ -163,7 +166,7 @@
   }
 
   .article-item {
-    background: #f8f9fa;
+    background:rgb(255, 255, 255);
     border-radius: 15px;
     padding: 25px 30px;
     margin-bottom: 20px;
