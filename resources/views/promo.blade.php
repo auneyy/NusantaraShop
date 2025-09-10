@@ -109,7 +109,7 @@
     }
 
     .empty-state p {
-        color: #718096;
+        color: #ffffff;
         margin-bottom: 2rem;
         line-height: 1.6;
     }
@@ -232,40 +232,9 @@
     </div>
     
     <div class="discount-hero-content">
-        <div class="discount-badge">
-            <i class="fas fa-fire"></i> Promo Spesial
-        </div>
         <h1>Penawaran Terbaik</h1>
         <p class="lead mb-4">Dapatkan produk berkualitas dengan harga yang tak tertandingi</p>
         
-        @if($discountCount > 0)
-        <div class="discount-stats">
-            <div class="stat-item">
-                <span class="stat-number">{{ $discountCount }}</span>
-                <span class="stat-label">Produk Diskon</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">
-                    @php
-                        $maxDiscount = 0;
-                        foreach($activeDiscounts as $discount) {
-                            if($discount->discount_percentage > $maxDiscount) {
-                                $maxDiscount = $discount->discount_percentage;
-                            }
-                        }
-                        echo $maxDiscount;
-                    @endphp%
-                </span>
-                <span class="stat-label">Diskon Maksimal</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">
-                    <i class="fas fa-clock"></i>
-                </span>
-                <span class="stat-label">Penawaran Terbatas</span>
-            </div>
-        </div>
-        @endif
     </div>
 </section>
 
