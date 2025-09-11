@@ -492,16 +492,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /** ---------------- Buy Now ---------------- **/
     buyNowBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        if (!validateForm()) return;
+    e.preventDefault();
+    if (!validateForm()) return;
 
-        const productId = document.querySelector('input[name="product_id"]').value;
-        const quantity = quantityInput.value;
-        const size = selectedSizeInput.value;
+    const productId = document.querySelector('input[name="product_id"]').value;
+    const quantity = quantityInput.value;
+    const size = selectedSizeInput.value;
 
-        // Redirect ke checkout dengan parameter
-        window.location.href = `/checkout?product_id=${productId}&quantity=${quantity}&size=${size}`;
-    });
+    // Redirect langsung ke checkout dengan parameters
+    window.location.href = `/checkout?product_id=${productId}&quantity=${quantity}&size=${size}`;
+});
 
     /** ---------------- Update Cart Count ---------------- **/
     function updateCartCount(count) {

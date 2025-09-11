@@ -18,6 +18,10 @@ class Order extends Model
         'grand_total',
         'payment_method',
         'payment_status',
+        'snap_token', // Field tambahan untuk Midtrans
+        'midtrans_transaction_id', // Field tambahan untuk Midtrans
+        'midtrans_payment_type', // Field tambahan untuk Midtrans
+        'payment_completed_at', // Field tambahan untuk Midtrans
         'shipping_name',
         'shipping_phone',
         'shipping_email',
@@ -34,6 +38,7 @@ class Order extends Model
         'order_date' => 'datetime',
         'shipped_date' => 'datetime',
         'delivered_date' => 'datetime',
+        'payment_completed_at' => 'datetime', // Cast tambahan untuk Midtrans
     ];
 
     // Relationships
@@ -47,7 +52,7 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    // Accessors
+    // Accessors - tetap kompatibel dengan enum lama
     public function getStatusLabelAttribute()
     {
         $labels = [
@@ -64,9 +69,19 @@ class Order extends Model
     public function getPaymentStatusLabelAttribute()
     {
         $labels = [
+            // Status lama (tetap support)
             'pending' => 'Menunggu Pembayaran',
             'paid' => 'Sudah Dibayar',
             'failed' => 'Pembayaran Gagal',
+            
+            // Status baru untuk Midtrans (jika diperlukan)
+            'settlement' => 'Pembayaran Berhasil',
+            'capture' => 'Pembayaran Berhasil',
+            'deny' => 'Pembayaran Ditolak',
+            'cancel' => 'Pembayaran Dibatalkan',
+            'expire' => 'Pembayaran Kadaluarsa',
+            'failure' => 'Pembayaran Gagal',
+            'challenge' => 'Pembayaran Dalam Review',
         ];
 
         return $labels[$this->payment_status] ?? 'Unknown';
@@ -78,9 +93,31 @@ class Order extends Model
             'bank_transfer' => 'Transfer Bank',
             'cod' => 'Cash on Delivery (COD)',
             'ewallet' => 'E-Wallet',
+            'midtrans' => 'Midtrans Payment Gateway', // Tambahan untuk Midtrans
         ];
 
         return $labels[$this->payment_method] ?? 'Unknown';
+    }
+
+    // Helper methods untuk status pembayaran
+    public function isPaymentSuccessful()
+    {
+        return in_array($this->payment_status, ['paid', 'settlement', 'capture']);
+    }
+
+    public function isPaymentPending()
+    {
+        return $this->payment_status === 'pending';
+    }
+
+    public function isPaymentFailed()
+    {
+        return in_array($this->payment_status, ['failed', 'deny', 'cancel', 'expire', 'failure']);
+    }
+
+    public function isMidtransPayment()
+    {
+        return $this->payment_method === 'midtrans';
     }
 
     // Scopes
@@ -89,8 +126,18 @@ class Order extends Model
         return $query->where('status', 'pending');
     }
 
-    public function scopePaid($query)
+    public function scopePaymentSuccessful($query)
     {
-        return $query->where('payment_status', 'paid');
+        return $query->whereIn('payment_status', ['paid', 'settlement', 'capture']);
+    }
+
+    public function scopePaymentPending($query)
+    {
+        return $query->where('payment_status', 'pending');
+    }
+
+    public function scopeMidtransOrders($query)
+    {
+        return $query->where('payment_method', 'midtrans');
     }
 }

@@ -549,57 +549,116 @@
     </div>
 </div>
 
-<!-- Midtrans Snap JS -->
-@if(isset($snapToken))
-<script type="text/javascript" src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+<!-- Midtrans Snap JS - FIXED URL -->
+@if(isset($snapToken) && $snapToken)
+<script type="text/javascript" 
+        src="https://app.{{ config('midtrans.is_production') ? 'midtrans' : 'sandbox.midtrans' }}.com/snap/snap.js" 
+        data-client-key="{{ config('midtrans.client_key') }}"></script>
 <script type="text/javascript">
-    document.getElementById('pay-button').onclick = function(){
-        snap.pay('{{ $snapToken }}', {
-            onSuccess: function(result){
-                console.log('Payment success:', result);
-                alert('Pembayaran berhasil!');
-                // Redirect atau refresh halaman
-                window.location.reload();
-            },
-            onPending: function(result){
-                console.log('Payment pending:', result);
-                alert('Pembayaran pending, silakan selesaikan pembayaran Anda');
-                // Refresh halaman untuk update status
-                window.location.reload();
-            },
-            onError: function(result){
-                console.log('Payment error:', result);
-                alert('Pembayaran gagal, silakan coba lagi');
-            },
-            onClose: function(){
-                console.log('Payment popup closed');
-                alert('Anda menutup popup pembayaran sebelum menyelesaikan pembayaran');
-            }
-        });
-    };
+    document.addEventListener('DOMContentLoaded', function() {
+        const payButton = document.getElementById('pay-button');
+        
+        if (payButton) {
+            payButton.onclick = function() {
+                // Disable button temporarily
+                payButton.disabled = true;
+                payButton.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Memuat...';
+                
+                snap.pay('{{ $snapToken }}', {
+                    onSuccess: function(result){
+                        console.log('Payment success:', result);
+                        alert('Pembayaran berhasil! Terima kasih atas pesanan Anda.');
+                        
+                        // Update UI
+                        document.querySelector('.payment-status').innerHTML = `
+                            <span class="status-badge status-paid">
+                                ✅ Pembayaran Berhasil
+                            </span>
+                        `;
+                        
+                        // Hide pay button
+                        payButton.style.display = 'none';
+                        
+                        // Refresh after 3 seconds
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 3000);
+                    },
+                    onPending: function(result){
+                        console.log('Payment pending:', result);
+                        alert('Pembayaran sedang diproses. Mohon tunggu konfirmasi.');
+                        
+                        // Re-enable button
+                        payButton.disabled = false;
+                        payButton.innerHTML = '<i class="bi bi-credit-card me-2"></i>Bayar Sekarang - Rp {{ number_format($order->grand_total, 0, ",", ".") }}';
+                        
+                        // Refresh to check status
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 5000);
+                    },
+                    onError: function(result){
+                        console.log('Payment error:', result);
+                        alert('Pembayaran gagal. Silakan coba lagi atau hubungi customer service.');
+                        
+                        // Re-enable button
+                        payButton.disabled = false;
+                        payButton.innerHTML = '<i class="bi bi-credit-card me-2"></i>Coba Bayar Lagi - Rp {{ number_format($order->grand_total, 0, ",", ".") }}';
+                    },
+                    onClose: function(){
+                        console.log('Payment popup closed');
+                        
+                        // Re-enable button
+                        payButton.disabled = false;
+                        payButton.innerHTML = '<i class="bi bi-credit-card me-2"></i>Bayar Sekarang - Rp {{ number_format($order->grand_total, 0, ",", ".") }}';
+                    }
+                });
+            };
+        } else {
+            console.error('Pay button not found');
+        }
+    });
+</script>
+@else
+<script>
+    console.log('Snap token not available:', {!! json_encode($snapToken ?? 'undefined') !!});
 </script>
 @endif
 
 <script>
-// Auto refresh halaman setiap 60 detik untuk update status pembayaran
+// FIXED: Remove auto refresh and check payment status code
+// Hanya refresh jika masih pending setelah 5 menit
 @if(!isset($order->payment_status) || $order->payment_status === 'pending')
 setTimeout(function() {
-    location.reload();
-}, 60000);
+    if (confirm('Apakah Anda ingin me-refresh halaman untuk melihat status pembayaran terbaru?')) {
+        location.reload();
+    }
+}, 300000); // 5 minutes instead of 1 minute
 @endif
 
-// Check payment status setiap 30 detik jika masih pending
+// Check payment status dengan route yang benar
 @if(!isset($order->payment_status) || $order->payment_status === 'pending')
-setInterval(function() {
-    fetch('{{ route("order.check-payment-status", $order->order_number) }}')
-        .then(response => response.json())
+function checkPaymentStatus() {
+    fetch('{{ route("checkout.check-payment-status", $order->order_number) }}')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
-            if (data.status !== 'pending') {
+            console.log('Payment status check:', data);
+            if (data.status && data.status !== 'pending') {
                 location.reload();
             }
         })
-        .catch(error => console.log('Error checking payment status:', error));
-}, 30000);
+        .catch(error => {
+            console.log('Error checking payment status:', error);
+        });
+}
+
+// Check every 30 seconds
+setInterval(checkPaymentStatus, 30000);
 @endif
 </script>
 @endsection

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->string('product_name'); // Simpan nama produk untuk riwayat
             $table->decimal('product_price', 12, 2); // Simpan harga saat pembelian
-            $table->integer('kuantitas');
+            $table->integer('quantity');
             $table->string('size')->nullable();
             $table->decimal('subtotal', 12, 2);
             $table->timestamps();

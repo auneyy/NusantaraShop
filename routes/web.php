@@ -86,6 +86,8 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::get('/', [CheckoutController::class, 'index'])->name('index');
             Route::post('/process', [CheckoutController::class, 'process'])->name('process');
             Route::get('/success', [CheckoutController::class, 'success'])->name('success');
+            Route::get('/check-payment-status/{orderNumber}', [CheckoutController::class, 'checkPaymentStatus'])->name('check-payment-status');
+            Route::post('/midtrans/notification', [CheckoutController::class, 'notification'])->name('midtrans.notification');
         });
         
         // User Logout

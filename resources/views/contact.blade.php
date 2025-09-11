@@ -4,8 +4,11 @@
 <style>
 
   .contact-hero {
-    background: linear-gradient(135deg,rgb(139, 69, 19) 0%, rgb(66, 45, 28) 100%);
+    background-image: url('/storage/product_images/header-kontak.png');
+    background-size: cover;
+    background-position: center;
     padding: 150px 0 100px 0;
+    height: 600px;
     text-align: center;
   }
 
@@ -16,6 +19,7 @@
     margin-bottom: 1rem;
     justify-content: center;
     display: flex;
+    margin-top: 80px;
   }
 
   .contact-hero p {

@@ -2,6 +2,7 @@
 
 @section('content')
 <style>
+    /* Keep your existing styles - tidak perlu diubah */
     body {
         background-color:rgb(233, 233, 233);
     }
@@ -9,7 +10,6 @@
     .checkout-container {
         padding: 2rem 0;
         min-height: 80vh;
-        
     }
 
     .checkout-card {
@@ -71,6 +71,10 @@
     .form-control:focus {
         border-color: #422D1C;
         box-shadow: 0 0 0 0.2rem rgba(66, 45, 28, 0.25);
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
     }
 
     .order-summary {
@@ -163,19 +167,73 @@
         margin-bottom: 1.5rem;
     }
 
-    .payment-info {
-        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-        border: 1px solid #2196f3;
-        border-radius: 10px;
-        padding: 1.5rem;
+    /* FIXED: Style untuk payment method selection */
+    .payment-methods {
         margin: 1.5rem 0;
-        text-align: center;
     }
 
-    .midtrans-logo {
-        width: 120px;
-        height: auto;
+    .payment-method-item {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1rem;
         margin-bottom: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .payment-method-item:hover {
+        border-color: #422D1C;
+        box-shadow: 0 2px 10px rgba(66, 45, 28, 0.1);
+    }
+
+    .payment-method-item.selected {
+        border-color: #422D1C;
+        background-color: #f8f9fa;
+        box-shadow: 0 2px 10px rgba(66, 45, 28, 0.15);
+    }
+
+    .payment-method-item input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .payment-method-header {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .payment-method-icon {
+        font-size: 1.5rem;
+        margin-right: 0.75rem;
+    }
+
+    .payment-method-desc {
+        font-size: 0.9rem;
+        color: #666;
+        margin-left: 2.25rem;
+    }
+
+    /* FIXED: Visual indicator for selected payment */
+    .payment-method-item.selected::before {
+        content: '✓';
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        width: 24px;
+        height: 24px;
+        background: #422D1C;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: bold;
     }
 
     @media (max-width: 768px) {
@@ -285,6 +343,46 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- FIXED: Payment Method Selection -->
+                            <h5 class="section-title mt-4">💳 Metode Pembayaran</h5>
+                            <div class="payment-methods">
+                                <div class="payment-method-item" data-payment="midtrans">
+                                    <input type="radio" name="payment_method" value="midtrans" id="midtrans" 
+                                           {{ old('payment_method', 'midtrans') === 'midtrans' ? 'checked' : '' }}>
+                                    <div class="payment-method-header">
+                                        <div class="payment-method-icon">💳</div>
+                                        Midtrans Payment Gateway
+                                    </div>
+                                    <div class="payment-method-desc">
+                                        Kartu Kredit/Debit, E-Wallet (GoPay, OVO, DANA), Transfer Bank, Minimarket
+                                    </div>
+                                </div>
+
+                                <div class="payment-method-item" data-payment="bank_transfer">
+                                    <input type="radio" name="payment_method" value="bank_transfer" id="bank_transfer" 
+                                           {{ old('payment_method') === 'bank_transfer' ? 'checked' : '' }}>
+                                    <div class="payment-method-header">
+                                        <div class="payment-method-icon">🏦</div>
+                                        Transfer Bank Manual
+                                    </div>
+                                    <div class="payment-method-desc">
+                                        Transfer ke rekening toko, konfirmasi manual diperlukan
+                                    </div>
+                                </div>
+
+                                <div class="payment-method-item" data-payment="cod">
+                                    <input type="radio" name="payment_method" value="cod" id="cod" 
+                                           {{ old('payment_method') === 'cod' ? 'checked' : '' }}>
+                                    <div class="payment-method-header">
+                                        <div class="payment-method-icon">💵</div>
+                                        Bayar di Tempat (COD)
+                                    </div>
+                                    <div class="payment-method-desc">
+                                        Bayar saat barang diterima, tersedia untuk area tertentu
+                                    </div>
+                                </div>
+                            </div>
                             
                             <!-- Catatan -->
                             <h5 class="section-title mt-4">📝 Catatan (Opsional)</h5>
@@ -340,27 +438,12 @@
                                 </div>
                             </div>
 
-                            <!-- Payment Method Hidden Input -->
-                            <input type="hidden" name="payment_method" value="midtrans">
+                            <!-- Total Amount Hidden Input -->
                             <input type="hidden" name="total_amount" value="{{ $total }}">
-
-                            <!-- Payment Information -->
-                            <div class="payment-info mt-3">
-                                <h6 class="text-primary mb-2">💳 Pembayaran via Midtrans</h6>
-                                <p class="mb-2 small text-muted">
-                                    BELUM JADI MIDTRANSNYA
-                                </p>
-                                <div class="d-flex justify-content-center align-items-center flex-wrap gap-2">
-                                    <span class="badge bg-light text-dark">💳 Kartu Kredit</span>
-                                    <span class="badge bg-light text-dark">🏦 Transfer Bank</span>
-                                    <span class="badge bg-light text-dark">📱 E-Wallet</span>
-                                    <span class="badge bg-light text-dark">🏪 Minimarket</span>
-                                </div>
-                            </div>
 
                             <button type="submit" class="btn checkout-btn mt-3" id="process-order">
                                 <i class="bi bi-credit-card me-2"></i>
-                                Bayar Sekarang - Rp {{ number_format($total + 15000, 0, ',', '.') }}
+                                Proses Pesanan - Rp {{ number_format($total + 15000, 0, ',', '.') }}
                             </button>
 
                             <div class="text-center mt-3">
@@ -381,13 +464,56 @@
 document.addEventListener('DOMContentLoaded', function() {
     const processOrderBtn = document.getElementById('process-order');
     const checkoutForm = document.getElementById('checkout-form');
+    const paymentMethodItems = document.querySelectorAll('.payment-method-item');
 
-    // Form validation before submit
+    // FIXED: Payment method selection handler
+    function selectPaymentMethod(method) {
+        // Remove selected class from all items
+        paymentMethodItems.forEach(item => {
+            item.classList.remove('selected');
+        });
+        
+        // Find and select the clicked item
+        const selectedItem = document.querySelector(`[data-payment="${method}"]`);
+        if (selectedItem) {
+            selectedItem.classList.add('selected');
+            
+            // Check the corresponding radio button
+            const radioButton = document.getElementById(method);
+            if (radioButton) {
+                radioButton.checked = true;
+            }
+        }
+    }
+
+    // FIXED: Add click event listeners to payment method items
+    paymentMethodItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            // Prevent double event if clicking on radio button directly
+            e.preventDefault();
+            
+            const paymentMethod = this.getAttribute('data-payment');
+            selectPaymentMethod(paymentMethod);
+        });
+    });
+
+    // FIXED: Set default payment method and show visual selection
+    const defaultPaymentMethod = document.querySelector('input[name="payment_method"]:checked');
+    if (defaultPaymentMethod) {
+        const defaultMethod = defaultPaymentMethod.value;
+        selectPaymentMethod(defaultMethod);
+    } else {
+        // Set midtrans as default if none selected
+        selectPaymentMethod('midtrans');
+        document.getElementById('midtrans').checked = true;
+    }
+
+    // FIXED: Form validation before submit
     checkoutForm.addEventListener('submit', function(e) {
-        // Basic form validation
-        const requiredFields = checkoutForm.querySelectorAll('[required]');
         let isValid = true;
-
+        
+        // Basic required field validation
+        const requiredFields = checkoutForm.querySelectorAll('[required]');
         requiredFields.forEach(field => {
             if (!field.value.trim()) {
                 field.classList.add('is-invalid');
@@ -397,15 +523,40 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
+        // FIXED: Check if payment method is selected
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+        if (!paymentMethod) {
+            alert('Mohon pilih metode pembayaran!');
+            
+            // Highlight payment methods section
+            document.querySelector('.payment-methods').style.border = '2px solid #dc3545';
+            document.querySelector('.payment-methods').style.borderRadius = '10px';
+            document.querySelector('.payment-methods').style.padding = '1rem';
+            
+            setTimeout(() => {
+                document.querySelector('.payment-methods').style.border = '';
+                document.querySelector('.payment-methods').style.padding = '';
+            }, 3000);
+            
+            isValid = false;
+        }
+
         if (!isValid) {
             e.preventDefault();
             alert('Mohon lengkapi semua field yang diperlukan!');
+            
+            // Scroll to first invalid field
+            const firstInvalid = checkoutForm.querySelector('.is-invalid');
+            if (firstInvalid) {
+                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstInvalid.focus();
+            }
             return;
         }
 
         // Show loading state
         processOrderBtn.disabled = true;
-        processOrderBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Memproses pembayaran...';
+        processOrderBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Memproses pesanan...';
     });
 
     // Remove invalid class on input
@@ -414,7 +565,17 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.remove('is-invalid');
         });
     });
+
+    // FIXED: Also handle direct radio button clicks
+    document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                selectPaymentMethod(this.value);
+            }
+        });
+    });
+
+    console.log('Checkout page initialized successfully');
 });
 </script>
-
 @endsection
