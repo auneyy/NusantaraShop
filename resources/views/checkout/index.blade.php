@@ -236,6 +236,37 @@
         font-weight: bold;
     }
 
+    /* Loading overlay */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        flex-direction: column;
+        color: white;
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
     @media (max-width: 768px) {
         .checkout-container {
             padding: 1rem 0;
@@ -256,6 +287,12 @@
         }
     }
 </style>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner"></div>
+    <div>Memproses pesanan...</div>
+</div>
 
 <div class="checkout-container">
     <div class="container">
@@ -347,7 +384,7 @@
                             <!-- FIXED: Payment Method Selection -->
                             <h5 class="section-title mt-4">💳 Metode Pembayaran</h5>
                             <div class="payment-methods">
-                                <div class="payment-method-item" data-payment="midtrans">
+                                <div class="payment-method-item selected" data-payment="midtrans">
                                     <input type="radio" name="payment_method" value="midtrans" id="midtrans" 
                                            {{ old('payment_method', 'midtrans') === 'midtrans' ? 'checked' : '' }}>
                                     <div class="payment-method-header">
@@ -398,7 +435,7 @@
                 <div class="col-lg-4">
                     <div class="checkout-card">
                         <div class="form-section">
-                            <h5 class="section-title">🛍️ Ringkasan Pesanan</h5>
+                            <h5 class="section-title">🛒 Ringkasan Pesanan</h5>
                             
                             <!-- Produk yang dibeli -->
                             @foreach($checkoutItems as $index => $item)
@@ -460,25 +497,27 @@
     </div>
 </div>
 
+<!-- Midtrans Snap JS -->
+<script type="text/javascript" 
+        src="https://app.sandbox.midtrans.com/snap/snap.js" 
+        data-client-key="{{ config('midtrans.client_key') }}"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const processOrderBtn = document.getElementById('process-order');
     const checkoutForm = document.getElementById('checkout-form');
     const paymentMethodItems = document.querySelectorAll('.payment-method-item');
+    const loadingOverlay = document.getElementById('loading-overlay');
 
-    // FIXED: Payment method selection handler
+    // Payment method selection handler
     function selectPaymentMethod(method) {
-        // Remove selected class from all items
         paymentMethodItems.forEach(item => {
             item.classList.remove('selected');
         });
         
-        // Find and select the clicked item
         const selectedItem = document.querySelector(`[data-payment="${method}"]`);
         if (selectedItem) {
             selectedItem.classList.add('selected');
-            
-            // Check the corresponding radio button
             const radioButton = document.getElementById(method);
             if (radioButton) {
                 radioButton.checked = true;
@@ -486,30 +525,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // FIXED: Add click event listeners to payment method items
+    // Add click event listeners to payment method items
     paymentMethodItems.forEach(item => {
         item.addEventListener('click', function(e) {
-            // Prevent double event if clicking on radio button directly
             e.preventDefault();
-            
             const paymentMethod = this.getAttribute('data-payment');
             selectPaymentMethod(paymentMethod);
         });
     });
 
-    // FIXED: Set default payment method and show visual selection
+    // Set default payment method
     const defaultPaymentMethod = document.querySelector('input[name="payment_method"]:checked');
     if (defaultPaymentMethod) {
-        const defaultMethod = defaultPaymentMethod.value;
-        selectPaymentMethod(defaultMethod);
+        selectPaymentMethod(defaultPaymentMethod.value);
     } else {
-        // Set midtrans as default if none selected
         selectPaymentMethod('midtrans');
         document.getElementById('midtrans').checked = true;
     }
 
-    // FIXED: Form validation before submit
+    // Form submission handler
     checkoutForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
         let isValid = true;
         
         // Basic required field validation
@@ -523,29 +560,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // FIXED: Check if payment method is selected
+        // Check if payment method is selected
         const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
         if (!paymentMethod) {
             alert('Mohon pilih metode pembayaran!');
-            
-            // Highlight payment methods section
-            document.querySelector('.payment-methods').style.border = '2px solid #dc3545';
-            document.querySelector('.payment-methods').style.borderRadius = '10px';
-            document.querySelector('.payment-methods').style.padding = '1rem';
-            
-            setTimeout(() => {
-                document.querySelector('.payment-methods').style.border = '';
-                document.querySelector('.payment-methods').style.padding = '';
-            }, 3000);
-            
             isValid = false;
         }
 
         if (!isValid) {
-            e.preventDefault();
             alert('Mohon lengkapi semua field yang diperlukan!');
-            
-            // Scroll to first invalid field
             const firstInvalid = checkoutForm.querySelector('.is-invalid');
             if (firstInvalid) {
                 firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -554,9 +577,77 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Show loading state
+        // Show loading overlay
+        loadingOverlay.style.display = 'flex';
         processOrderBtn.disabled = true;
         processOrderBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Memproses pesanan...';
+
+        // Submit form via AJAX
+        const formData = new FormData(checkoutForm);
+        
+        fetch(checkoutForm.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            loadingOverlay.style.display = 'none';
+            
+            if (data.success) {
+                // Jika payment method adalah midtrans dan ada snap token
+                if (paymentMethod.value === 'midtrans' && data.snap_token) {
+                    // Langsung buka Midtrans Snap
+                    snap.pay(data.snap_token, {
+                        onSuccess: function(result){
+                            console.log('Payment success:', result);
+                            // Redirect ke success page
+                            window.location.href = `/checkout/success?order=${data.order_number}`;
+                        },
+                        onPending: function(result){
+                            console.log('Payment pending:', result);
+                            // Redirect ke success page dengan status pending
+                            window.location.href = `/checkout/success?order=${data.order_number}`;
+                        },
+                        onError: function(result){
+                            console.log('Payment error:', result);
+                            alert('Pembayaran gagal. Silakan coba lagi.');
+                            // Reset form
+                            processOrderBtn.disabled = false;
+                            processOrderBtn.innerHTML = '<i class="bi bi-credit-card me-2"></i>Proses Pesanan - Rp {{ number_format($total + 15000, 0, ",", ".") }}';
+                        },
+                        onClose: function(){
+                            console.log('Payment popup closed');
+                            // User menutup popup, redirect ke success page untuk melihat status
+                            window.location.href = `/checkout/success?order=${data.order_number}`;
+                        }
+                    });
+                } else {
+                    // Untuk payment method lain, redirect langsung ke success
+                    window.location.href = `/checkout/success?order=${data.order_number}`;
+                }
+            } else {
+                throw new Error(data.message || 'Checkout failed');
+            }
+        })
+        .catch(error => {
+            console.error('Checkout error:', error);
+            loadingOverlay.style.display = 'none';
+            
+            // Reset form
+            processOrderBtn.disabled = false;
+            processOrderBtn.innerHTML = '<i class="bi bi-credit-card me-2"></i>Proses Pesanan - Rp {{ number_format($total + 15000, 0, ",", ".") }}';
+            
+            alert('Terjadi kesalahan: ' + error.message);
+        });
     });
 
     // Remove invalid class on input
@@ -566,7 +657,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // FIXED: Also handle direct radio button clicks
+    // Handle direct radio button clicks
     document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
         radio.addEventListener('change', function() {
             if (this.checked) {

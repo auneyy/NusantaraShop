@@ -222,6 +222,261 @@
         100% { transform: rotate(360deg); }
     }
 
+    /* Custom Alert Styles */
+    .custom-alert-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(2px);
+    }
+
+    .custom-alert {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+        position: relative;
+        transform: scale(0.7);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .custom-alert.show {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .custom-alert.success .alert-icon {
+        background: linear-gradient(135deg, #4CAF50, #45a049);
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+        animation: checkmark 0.6s ease-in-out;
+    }
+
+    .custom-alert.error .alert-icon {
+        background: linear-gradient(135deg, #f44336, #d32f2f);
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+        animation: shake 0.6s ease-in-out;
+    }
+
+    .custom-alert.warning .alert-icon {
+        background: linear-gradient(135deg, #ff9800, #f57c00);
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes checkmark {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.3);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    .alert-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .alert-message {
+        color: #666;
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .alert-button {
+        background: linear-gradient(135deg, #422D1C, #8B4513);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+    .alert-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(66, 45, 28, 0.3);
+    }
+
+    .alert-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        color: #999;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+    }
+
+    .alert-close:hover {
+        background: #f5f5f5;
+        color: #666;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+    }
+
+    .custom-toast {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        margin-bottom: 10px;
+        min-width: 300px;
+        max-width: 400px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transform: translateX(100%);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        border-left: 4px solid #4CAF50;
+    }
+
+    .custom-toast.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .custom-toast.error {
+        border-left-color: #f44336;
+    }
+
+    .custom-toast.warning {
+        border-left-color: #ff9800;
+    }
+
+    .toast-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    .toast-icon.success {
+        background: #4CAF50;
+    }
+
+    .toast-icon.error {
+        background: #f44336;
+    }
+
+    .toast-icon.warning {
+        background: #ff9800;
+    }
+
+    .toast-content {
+        flex-grow: 1;
+    }
+
+    .toast-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+        color: #333;
+    }
+
+    .toast-message {
+        font-size: 0.8rem;
+        color: #666;
+        margin: 0;
+    }
+
+    .toast-close {
+        background: none;
+        border: none;
+        color: #999;
+        cursor: pointer;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .toast-close:hover {
+        background: #f5f5f5;
+        color: #666;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .product-image-section {
@@ -245,6 +500,22 @@
         .buy-now-btn {
             width: 100%;
             padding: 0.8rem;
+        }
+
+        .custom-alert {
+            margin: 1rem;
+            max-width: none;
+        }
+
+        .toast-container {
+            top: 10px;
+            right: 10px;
+            left: 10px;
+        }
+
+        .custom-toast {
+            min-width: auto;
+            max-width: none;
         }
     }
 </style>
@@ -360,6 +631,23 @@
 
     </div>
 </div>
+
+<!-- Custom Alert Modal -->
+<div class="custom-alert-overlay" id="customAlertOverlay">
+    <div class="custom-alert" id="customAlert">
+        <button class="alert-close" id="alertClose">&times;</button>
+        <div class="alert-icon" id="alertIcon">
+            <i class="bi bi-check-lg"></i>
+        </div>
+        <h4 class="alert-title" id="alertTitle">Berhasil!</h4>
+        <p class="alert-message" id="alertMessage">Produk berhasil ditambahkan ke keranjang</p>
+        <button class="alert-button" id="alertButton">OK</button>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
 @endsection
 
 <script>
@@ -374,6 +662,102 @@ document.addEventListener('DOMContentLoaded', function() {
     const addToCartBtn = document.getElementById('add-to-cart');
     const buyNowBtn = document.getElementById('buy-now');
     const selectedSizeInput = document.getElementById('selected-size');
+
+    /** ---------------- Custom Alert Functions ---------------- **/
+    function showCustomAlert(type, title, message, callback = null) {
+        const overlay = document.getElementById('customAlertOverlay');
+        const alert = document.getElementById('customAlert');
+        const icon = document.getElementById('alertIcon');
+        const titleEl = document.getElementById('alertTitle');
+        const messageEl = document.getElementById('alertMessage');
+        const button = document.getElementById('alertButton');
+        const closeBtn = document.getElementById('alertClose');
+
+        // Reset classes
+        alert.className = 'custom-alert ' + type;
+        
+        // Set content
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        
+        // Set icon based on type
+        if (type === 'success') {
+            icon.innerHTML = '<i class="bi bi-check-lg"></i>';
+        } else if (type === 'error') {
+            icon.innerHTML = '<i class="bi bi-x-lg"></i>';
+        } else if (type === 'warning') {
+            icon.innerHTML = '<i class="bi bi-exclamation-lg"></i>';
+        }
+
+        // Show overlay
+        overlay.style.display = 'flex';
+        
+        // Add show class with slight delay for animation
+        setTimeout(() => {
+            alert.classList.add('show');
+        }, 10);
+
+        // Handle close events
+        const closeAlert = () => {
+            alert.classList.remove('show');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                if (callback) callback();
+            }, 300);
+        };
+
+        button.onclick = closeAlert;
+        closeBtn.onclick = closeAlert;
+        
+        // Close on overlay click
+        overlay.onclick = (e) => {
+            if (e.target === overlay) closeAlert();
+        };
+    }
+
+    function showToast(type, title, message, duration = 4000) {
+        const container = document.getElementById('toastContainer');
+        
+        const toast = document.createElement('div');
+        toast.className = `custom-toast ${type}`;
+        
+        const iconClass = type === 'success' ? 'bi-check-lg' : 
+                         type === 'error' ? 'bi-x-lg' : 'bi-exclamation-lg';
+        
+        toast.innerHTML = `
+            <div class="toast-icon ${type}">
+                <i class="bi ${iconClass}"></i>
+            </div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close">&times;</button>
+        `;
+        
+        container.appendChild(toast);
+        
+        // Show toast
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+        
+        // Close button
+        const closeBtn = toast.querySelector('.toast-close');
+        const closeToast = () => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                if (container.contains(toast)) {
+                    container.removeChild(toast);
+                }
+            }, 300);
+        };
+        
+        closeBtn.onclick = closeToast;
+        
+        // Auto close
+        setTimeout(closeToast, duration);
+    }
 
     /** ---------------- Thumbnail Click ---------------- **/
     thumbnails.forEach(thumbnail => {
@@ -429,15 +813,15 @@ document.addEventListener('DOMContentLoaded', function() {
     /** ---------------- Validation ---------------- **/
     function validateForm() {
         if (!selectedSizeInput.value) {
-            alert('Silakan pilih ukuran produk terlebih dahulu!');
+            showCustomAlert('warning', 'Pilih Ukuran', 'Silakan pilih ukuran produk terlebih dahulu!');
             return false;
         }
         if (parseInt(quantityInput.value) < 1) {
-            alert('Jumlah produk minimal 1!');
+            showCustomAlert('warning', 'Jumlah Tidak Valid', 'Jumlah produk minimal 1!');
             return false;
         }
         if (parseInt(quantityInput.value) > stockValue) {
-            alert('Jumlah produk melebihi stok yang tersedia!');
+            showCustomAlert('error', 'Stok Tidak Mencukupi', 'Jumlah produk melebihi stok yang tersedia!');
             return false;
         }
         return true;
@@ -473,15 +857,21 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Produk berhasil ditambahkan ke keranjang!');
+                // Tampilkan toast notification
+                showToast('success', 'Berhasil!', 'Produk berhasil ditambahkan ke keranjang');
+                
+                // Update cart count
                 updateCartCount(data.cart_count);
+                
+                // Atau gunakan custom alert (pilih salah satu)
+                // showCustomAlert('success', 'Berhasil!', 'Produk berhasil ditambahkan ke keranjang');
             } else {
-                alert(data.message || 'Gagal menambahkan produk ke keranjang!');
+                showCustomAlert('error', 'Gagal!', data.message || 'Gagal menambahkan produk ke keranjang!');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Terjadi kesalahan. Silakan coba lagi!');
+            showCustomAlert('error', 'Terjadi Kesalahan', 'Silakan coba lagi dalam beberapa saat!');
         })
         .finally(() => {
             this.classList.remove('btn-loading');
@@ -492,16 +882,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /** ---------------- Buy Now ---------------- **/
     buyNowBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    if (!validateForm()) return;
+        e.preventDefault();
+        if (!validateForm()) return;
 
-    const productId = document.querySelector('input[name="product_id"]').value;
-    const quantity = quantityInput.value;
-    const size = selectedSizeInput.value;
+        const productId = document.querySelector('input[name="product_id"]').value;
+        const quantity = quantityInput.value;
+        const size = selectedSizeInput.value;
 
-    // Redirect langsung ke checkout dengan parameters
-    window.location.href = `/checkout?product_id=${productId}&quantity=${quantity}&size=${size}`;
-});
+        // Redirect langsung ke checkout dengan parameters
+        window.location.href = `/checkout?product_id=${productId}&quantity=${quantity}&size=${size}`;
+    });
 
     /** ---------------- Update Cart Count ---------------- **/
     function updateCartCount(count) {
@@ -518,5 +908,17 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    /** ---------------- Keyboard Support ---------------- **/
+    document.addEventListener('keydown', function(e) {
+        const overlay = document.getElementById('customAlertOverlay');
+        if (overlay.style.display === 'flex' && e.key === 'Escape') {
+            const alert = document.getElementById('customAlert');
+            alert.classList.remove('show');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 300);
+        }
+    });
 });
 </script>

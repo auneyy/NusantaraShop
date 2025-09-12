@@ -319,10 +319,15 @@
         margin-top: 1.5rem;
         font-size: 0.95rem;
         transition: background-color 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
     }
 
     .checkout-btn:hover {
         background: #6d3410;
+        color: white;
+        text-decoration: none;
     }
 
     .empty-cart {
@@ -480,9 +485,10 @@
                         </div>
                     </div>
                     
-                   <button type="button" class="checkout-btn" onclick="window.location='{{ route('checkout.index') }}'">
-                    Check Out
-                </button>
+                   <!-- UPDATED: Checkout button menuju halaman checkout -->
+                   <a href="{{ route('checkout.index') }}" class="checkout-btn">
+                        Lanjut ke Checkout
+                   </a>
                 </div>
             </div>
             @endif
@@ -606,10 +612,6 @@ function updateCartSummary(newTotal) {
         subtotalElement.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(newTotal);
         totalElement.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(newTotal + 15000);
     }
-}
-
-function proceedToCheckout() {
-    window.location.href = '/checkout';
 }
 </script>
 @endsection

@@ -37,9 +37,27 @@ class CheckoutController extends Controller
             $total = $checkoutItems[0]['subtotal'];
             $source = 'direct'; // Pembelian langsung
         } else {
-            // Jika dari keranjang (implementasi nanti jika ada)
-            // Untuk sementara redirect ke home jika tidak ada data
-            return redirect()->route('home')->with('error', 'Tidak ada produk untuk checkout.');
+            // Ambil dari keranjang (session)
+            $cartItems = $this->getCartItems();
+            
+            if (empty($cartItems)) {
+                return redirect()->route('cart.index')->with('error', 'Keranjang belanja Anda kosong.');
+            }
+            
+            $checkoutItems = [];
+            $total = 0;
+            
+            foreach ($cartItems as $key => $item) {
+                $checkoutItems[] = [
+                    'product' => $item['product'],
+                    'quantity' => $item['quantity'],
+                    'size' => $item['size'],
+                    'subtotal' => $item['subtotal']
+                ];
+                $total += $item['subtotal'];
+            }
+            
+            $source = 'cart'; // Dari keranjang
         }
 
         return view('checkout.index', compact('checkoutItems', 'total', 'source'));
@@ -108,12 +126,12 @@ class CheckoutController extends Controller
                 $product->decrement('stock_kuantitas', $item['quantity']);
             }
 
-            // FIXED: Jika payment method adalah midtrans, buat snap token
+            // Jika payment method adalah midtrans, buat snap token
             $snapToken = null;
             if ($request->payment_method === 'midtrans') {
                 $snapToken = $this->createMidtransTransaction($order);
                 
-                // FIXED: Simpan snap token ke database dengan kolom yang benar
+                // Simpan snap token ke database
                 if ($snapToken) {
                     $order->update(['midtrans_transaction_id' => $snapToken]);
                 }
@@ -121,16 +139,45 @@ class CheckoutController extends Controller
 
             DB::commit();
 
-            // FIXED: Pass snapToken ke success page
+            // Jika dari keranjang, hapus keranjang setelah checkout berhasil
+            if (!$request->has('direct_buy')) {
+                Session::forget('cart');
+            }
+
+            // Jika midtrans, langsung return snap token untuk frontend
+            if ($request->payment_method === 'midtrans' && $snapToken) {
+                // Jika request AJAX
+                if ($request->ajax() || $request->expectsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'snap_token' => $snapToken,
+                        'order_number' => $order->order_number
+                    ]);
+                }
+                
+                // Jika bukan AJAX, redirect ke success dengan snap token
+                return redirect()->route('checkout.success', ['order' => $order->order_number])
+                               ->with([
+                                   'success' => 'Pesanan berhasil dibuat!',
+                                   'snapToken' => $snapToken
+                               ]);
+            }
+
+            // Untuk payment method lain
             return redirect()->route('checkout.success', ['order' => $order->order_number])
-                           ->with([
-                               'success' => 'Pesanan berhasil dibuat!',
-                               'snapToken' => $snapToken
-                           ]);
+                           ->with('success', 'Pesanan berhasil dibuat!');
 
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Checkout Error: ' . $e->getMessage());
+            
+            if ($request->ajax() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 400);
+            }
+            
             return back()->with('error', $e->getMessage())->withInput();
         }
     }
@@ -147,19 +194,19 @@ class CheckoutController extends Controller
             return redirect()->route('home')->with('error', 'Pesanan tidak ditemukan.');
         }
 
-        // FIXED: Ambil snapToken dari session atau dari database
+        // Ambil snapToken dari session atau dari database
         $snapToken = session('snapToken') ?? $order->midtrans_transaction_id;
 
         return view('checkout.success', compact('order', 'snapToken'));
     }
 
     /**
-     * FIXED: Membuat transaksi Midtrans dan mendapatkan Snap Token
+     * Membuat transaksi Midtrans dan mendapatkan Snap Token
      */
     private function createMidtransTransaction($order)
     {
         try {
-            // FIXED: Set konfigurasi Midtrans dengan error handling
+            // Set konfigurasi Midtrans dengan error handling
             if (!config('midtrans.server_key') || !config('midtrans.client_key')) {
                 throw new \Exception('Midtrans configuration is missing');
             }
@@ -169,7 +216,7 @@ class CheckoutController extends Controller
             \Midtrans\Config::$isSanitized = true;
             \Midtrans\Config::$is3ds = true;
 
-            // FIXED: Pastikan semua data required tersedia
+            // Pastikan semua data required tersedia
             $params = [
                 'transaction_details' => [
                     'order_id' => $order->order_number,
@@ -207,7 +254,7 @@ class CheckoutController extends Controller
                 ]
             ];
 
-            // FIXED: Tambahkan item details dengan validation
+            // Tambahkan item details dengan validation
             foreach ($order->orderItems as $item) {
                 $params['item_details'][] = [
                     'id' => 'product_' . $item->product_id,
@@ -217,7 +264,7 @@ class CheckoutController extends Controller
                 ];
             }
 
-            // FIXED: Tambahkan ongkos kirim sebagai item terpisah
+            // Tambahkan ongkos kirim sebagai item terpisah
             if ($order->shipping_cost > 0) {
                 $params['item_details'][] = [
                     'id' => 'shipping_cost',
@@ -227,14 +274,14 @@ class CheckoutController extends Controller
                 ];
             }
 
-            // FIXED: Set expiry time yang lebih reasonable
+            // Set expiry time yang lebih reasonable
             $params['expiry'] = [
                 'start_time' => date("Y-m-d H:i:s O"),
                 'unit' => 'hours',
                 'duration' => 24
             ];
 
-            // FIXED: Log untuk debugging
+            // Log untuk debugging
             Log::info('Creating Midtrans transaction', [
                 'order_number' => $order->order_number,
                 'gross_amount' => $order->grand_total,
@@ -262,7 +309,7 @@ class CheckoutController extends Controller
     }
 
     /**
-     * FIXED: Handle webhook notification dari Midtrans
+     * Handle webhook notification dari Midtrans
      */
     public function midtransNotification(Request $request)
     {
@@ -291,7 +338,7 @@ class CheckoutController extends Controller
                 return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
             }
 
-            // FIXED: Update order berdasarkan status transaksi dengan logic yang lebih jelas
+            // Update order berdasarkan status transaksi
             $updateData = [
                 'midtrans_transaction_id' => $notif->transaction_id ?? null,
                 'midtrans_payment_type' => $type,
@@ -333,7 +380,7 @@ class CheckoutController extends Controller
     }
 
     /**
-     * FIXED: Check payment status untuk AJAX
+     * Check payment status untuk AJAX
      */
     public function checkPaymentStatus($orderNumber)
     {
@@ -361,6 +408,29 @@ class CheckoutController extends Controller
             
             return response()->json(['error' => 'Internal server error'], 500);
         }
+    }
+
+    /**
+     * Helper method untuk mendapatkan cart items dari session
+     */
+    private function getCartItems()
+    {
+        $cart = Session::get('cart', []);
+        $cartItems = [];
+
+        foreach ($cart as $key => $item) {
+            $product = Product::with('images')->find($item['product_id']);
+            if ($product) {
+                $cartItems[$key] = [
+                    'product' => $product,
+                    'size' => $item['size'],
+                    'quantity' => $item['quantity'],
+                    'subtotal' => $item['subtotal'],
+                ];
+            }
+        }
+
+        return $cartItems;
     }
 
     /**

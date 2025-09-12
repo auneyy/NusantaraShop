@@ -78,7 +78,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::post('/update', [CartController::class, 'update'])->name('update');
             Route::post('/remove', [CartController::class, 'remove'])->name('remove');
             Route::post('/clear', [CartController::class, 'clear'])->name('clear');
-            Route::get('/count', [CartController::class, 'getCart'])->name('count'); // Fixed: renamed from 'get' to 'count'
+            Route::get('/count', [CartController::class, 'getCart'])->name('count');
         });
         
         // Checkout Routes
@@ -87,15 +87,19 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::post('/process', [CheckoutController::class, 'process'])->name('process');
             Route::get('/success', [CheckoutController::class, 'success'])->name('success');
             Route::get('/check-payment-status/{orderNumber}', [CheckoutController::class, 'checkPaymentStatus'])->name('check-payment-status');
-            Route::post('/midtrans/notification', [CheckoutController::class, 'notification'])->name('midtrans.notification');
+            // FIXED: Route untuk notifikasi Midtrans
+            Route::post('/midtrans/notification', [CheckoutController::class, 'midtransNotification'])->name('midtrans.notification');
         });
         
         // User Logout
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     });
 
+    // TAMBAHAN: Route untuk webhook Midtrans (tanpa middleware auth karena dipanggil oleh Midtrans server)
+    Route::post('/webhook/midtrans', [CheckoutController::class, 'midtransNotification'])->name('webhook.midtrans');
+
     // ==========================
-    // 🔐 ADMIN ROUTES
+    // 👑 ADMIN ROUTES
     // ==========================
 
     Route::middleware('isAdmin')
