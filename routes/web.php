@@ -20,6 +20,8 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
     // 🏠 PUBLIC ROUTES
     // ==========================
 
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+
     // Route utama (landing page)
     Route::get('/', function () {return redirect('/home');});
 
@@ -50,6 +52,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
 
     // Guest only routes (redirect jika sudah login)
     Route::middleware('guest')->group(function () {
+
         // User Registration
         Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
         Route::post('/register', [RegisterController::class, 'register']);
@@ -68,8 +71,6 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
     // ==========================
 
     Route::middleware('auth')->group(function () {
-        // User Dashboard/Home
-        Route::get('/home', [HomeController::class, 'index'])->name('home');
         
         // Cart Routes
         Route::prefix('cart')->name('cart.')->group(function () {
@@ -120,6 +121,25 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::resource('discounts', DiscountController::class);
             Route::patch('/discounts/{discount}/toggle-status', [DiscountController::class, 'toggleStatus'])
                 ->name('discounts.toggle-status');
+
+             // Kategori
+            Route::resource('kategori', DiscountController::class);
+            Route::patch('/kategori/{kategori}/toggle-status', [DiscountController::class, 'toggleStatus'])
+                ->name('kategori.toggle-status');
+
+             // Artikel
+            Route::resource('artikel', DiscountController::class);
+            Route::patch('/artikel/{artikel}/toggle-status', [DiscountController::class, 'toggleStatus'])
+                ->name('artikel.toggle-status');
+            
+            // Pesanan
+            Route::get('/pesanan', fn () => view('admin.pesanan'))->name('pesanan');
+
+            // Laporan Pendapatan
+            Route::get('/pendapatan', fn () => view('admin.pendapatan'))->name('pendapatan');
+
+             // Pesan Masuk
+            Route::get('/pesanmasuk', fn () => view('admin.pesanmasuk'))->name('pesanmasuk');
                 
             // Admin Logout (pindahkan ke dalam middleware admin)
             Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');

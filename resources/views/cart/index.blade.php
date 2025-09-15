@@ -183,7 +183,7 @@
     }
 
     .continue-shopping-link {
-        color: #007bff;
+        color: #422D1C;
         text-decoration: none;
         font-weight: 500;
         padding: 0.75rem 0;
@@ -191,7 +191,7 @@
     }
 
     .continue-shopping-link:hover {
-        color: #0056b3;
+        color: #8B4513;
         text-decoration: none;
     }
 
@@ -342,6 +342,25 @@
         opacity: 0.5;
     }
 
+    .btn-brown {
+    background-color: #422D1C;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-brown:hover {
+    background-color: #6d4c32; /* versi lebih terang/dark untuk hover */
+    color: white;
+    text-decoration: none;
+}
+
     @media (max-width: 768px) {
         .cart-container {
             padding: 1rem 0;
@@ -452,7 +471,7 @@
                             <div class="empty-cart-icon">🛒</div>
                             <h4>Keranjang Belanja Kosong</h4>
                             <p>Belum ada produk dalam keranjang belanja Anda</p>
-                            <a href="{{ route('products.index') }}" class="btn btn-primary">
+                            <a href="{{ route('products.index') }}" class="btn-brown">
                                 Mulai Berbelanja
                             </a>
                         </div>

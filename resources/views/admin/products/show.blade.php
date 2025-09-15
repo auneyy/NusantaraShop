@@ -76,10 +76,6 @@
                             <td>Rp {{ number_format($product->harga, 0, ',', '.') }}</td>
                         </tr>
                         <tr>
-                            <th>Harga Jual</th>
-                            <td>{{ $product->harga_jual ? 'Rp ' . number_format($product->harga_jual, 0, ',', '.') : '-' }}</td>
-                        </tr>
-                        <tr>
                             <th>Stok</th>
                             <td>{{ $product->stock_kuantitas }}</td>
                         </tr>

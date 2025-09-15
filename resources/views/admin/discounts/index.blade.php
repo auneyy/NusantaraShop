@@ -1,12 +1,13 @@
 @extends('admin.layout.app')
 
+@section('page-title', 'Manajemen Diskon')
+
 @section('content')
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Daftar Discount</h3>
                     <div class="card-tools">
                         <a href="{{ route('admin.discounts.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus"></i> Tambah Discount

@@ -75,7 +75,7 @@
                                             <th>ID</th>
                                             <th>Nama</th>
                                             <th>Harga</th>
-                                            <th>Harga Jual</th>
+                                            <th>Harga Diskon</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
@@ -85,7 +85,7 @@
                                                 <td>{{ $product->id }}</td>
                                                 <td>{{ $product->name }}</td>
                                                 <td>{{ $product->formatted_harga }}</td>
-                                                <td>{{ $product->formatted_harga_jual ?? '-' }}</td>
+                                                <td>{{ $product->formatted_harga_final ?? '-' }}</td>
                                                 <td>
                                                     <span class="badge badge-{{ $product->status == 'active' ? 'success' : 'secondary' }}">
                                                         {{ $product->status }}

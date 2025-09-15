@@ -22,10 +22,9 @@ class PreventBackHistory
                  ->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
         
         // Jika user tidak terautentikasi dan mencoba akses halaman yang butuh auth
-        if (!Auth::check() && $request->is('home*', 'cart*', 'profile*', 'dashboard*')) {
-            return redirect('/login')->with('error', 'Silakan login terlebih dahulu.');
-        }
-        
+       if (!Auth::check() && $request->is('cart*', 'profile*', 'dashboard*')) {
+    return redirect('/login')->with('error', 'Silakan login terlebih dahulu.');
+}
         return $response;
     }
 }
