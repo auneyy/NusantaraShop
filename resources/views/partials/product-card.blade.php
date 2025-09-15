@@ -1,6 +1,6 @@
 <style>
 .product-card-wrapper {
-    max-width: 250px;
+    max-width: 280px;
     margin: 0 auto;
 }
 
@@ -15,25 +15,32 @@
 }
 
 .minimalist-product-card {
-    border: none;
-    border-radius: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background: #ffffff;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
     position: relative;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.05),
+        0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .minimalist-product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        0 8px 16px rgba(0, 0, 0, 0.08);
+    border-color: rgba(255, 255, 255, 0.4);
 }
 
 .product-image-container {
     position: relative;
     width: 100%;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 1;
     overflow: hidden;
+    border-radius: 20px 20px 0 0;
 }
 
 .product-image-primary,
@@ -44,72 +51,151 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: opacity 0.4s ease;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
 }
 
 .product-image-secondary {
     opacity: 0;
+    transform: scale(1.1);
 }
 
 .minimalist-product-card:hover .product-image-primary {
     opacity: 0;
+    transform: scale(0.95);
 }
 
 .minimalist-product-card:hover .product-image-secondary {
     opacity: 1;
+    transform: scale(1);
 }
 
 .card-body-clean {
-    padding: 1rem;
+    padding: 24px 20px;
     text-align: center;
 }
 
 .product-title {
-    font-size: 16px;
-    font-weight: 500;
-    color: black;
-    margin-bottom: 0.25rem;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
 }
 
 .product-price {
-    font-size: 14px;
-    font-weight: 500;
-    color: #8B4513;
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d3748;
     margin-bottom: 0;
+    letter-spacing: -0.01em;
 }
 
 .original-price {
+    font-size: 14px;
+    color: #a0aec0;
     text-decoration: line-through;
-    color: #999;
-    font-size: 12px;
+    font-weight: 400;
     margin-right: 8px;
 }
 
 .discount-price {
-    color: #e53935;
-    font-weight: 600;
+    font-size: 16px;
+    color: #e53e3e;
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
 .discount-badge {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: #e53935;
+    top: 16px;
+    left: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 4px 8px;
-    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 20px;
     z-index: 10;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .price-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 5px;
+    gap: 8px;
+    margin-top: 4px;
 }
-</style>
+
+/* Additional modern touches */
+.minimalist-product-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.minimalist-product-card:hover::before {
+    opacity: 1;
+}
+
+/* Smooth loading animation */
+.minimalist-product-card {
+    animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced placeholder image styling */
+.d-flex.align-items-center.justify-content-center.bg-light {
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%) !important;
+    width: 100%;
+    height: 100%;
+    color: #cbd5e0;
+}
+
+.d-flex.align-items-center.justify-content-center.bg-light .fa-image {
+    color: #cbd5e0 !important;
+    font-size: 48px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .product-card-wrapper {
+        max-width: 250px;
+    }
+    
+    .card-body-clean {
+        padding: 20px 16px;
+    }
+    
+    .product-title {
+        font-size: 16px;
+    }
+    
+    .product-price,
+    .discount-price {
+        font-size: 15px;
+    }
+}
+</style>    
 
 @php
 // Pastikan Anda mengirimkan data diskon dari controller

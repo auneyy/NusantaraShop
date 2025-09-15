@@ -560,95 +560,137 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Check if payment method is selected
-        const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
-        if (!paymentMethod) {
-            alert('Mohon pilih metode pembayaran!');
+        checkoutForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    let isValid = true;
+    
+    // Basic required field validation
+    const requiredFields = checkoutForm.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid');
             isValid = false;
+        } else {
+            field.classList.remove('is-invalid');
         }
-
-        if (!isValid) {
-            alert('Mohon lengkapi semua field yang diperlukan!');
-            const firstInvalid = checkoutForm.querySelector('.is-invalid');
-            if (firstInvalid) {
-                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                firstInvalid.focus();
-            }
-            return;
-        }
-
-        // Show loading overlay
-        loadingOverlay.style.display = 'flex';
-        processOrderBtn.disabled = true;
-        processOrderBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Memproses pesanan...';
-
-        // Submit form via AJAX
-        const formData = new FormData(checkoutForm);
-        
-        fetch(checkoutForm.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json',
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            loadingOverlay.style.display = 'none';
-            
-            if (data.success) {
-                // Jika payment method adalah midtrans dan ada snap token
-                if (paymentMethod.value === 'midtrans' && data.snap_token) {
-                    // Langsung buka Midtrans Snap
-                    snap.pay(data.snap_token, {
-                        onSuccess: function(result){
-                            console.log('Payment success:', result);
-                            // Redirect ke success page
-                            window.location.href = `/checkout/success?order=${data.order_number}`;
-                        },
-                        onPending: function(result){
-                            console.log('Payment pending:', result);
-                            // Redirect ke success page dengan status pending
-                            window.location.href = `/checkout/success?order=${data.order_number}`;
-                        },
-                        onError: function(result){
-                            console.log('Payment error:', result);
-                            alert('Pembayaran gagal. Silakan coba lagi.');
-                            // Reset form
-                            processOrderBtn.disabled = false;
-                            processOrderBtn.innerHTML = '<i class="bi bi-credit-card me-2"></i>Proses Pesanan - Rp {{ number_format($total + 15000, 0, ",", ".") }}';
-                        },
-                        onClose: function(){
-                            console.log('Payment popup closed');
-                            // User menutup popup, redirect ke success page untuk melihat status
-                            window.location.href = `/checkout/success?order=${data.order_number}`;
-                        }
-                    });
-                } else {
-                    // Untuk payment method lain, redirect langsung ke success
-                    window.location.href = `/checkout/success?order=${data.order_number}`;
-                }
-            } else {
-                throw new Error(data.message || 'Checkout failed');
-            }
-        })
-        .catch(error => {
-            console.error('Checkout error:', error);
-            loadingOverlay.style.display = 'none';
-            
-            // Reset form
-            processOrderBtn.disabled = false;
-            processOrderBtn.innerHTML = '<i class="bi bi-credit-card me-2"></i>Proses Pesanan - Rp {{ number_format($total + 15000, 0, ",", ".") }}';
-            
-            alert('Terjadi kesalahan: ' + error.message);
-        });
     });
+
+    // Check if payment method is selected
+    const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+    if (!paymentMethod) {
+        alert('Mohon pilih metode pembayaran!');
+        isValid = false;
+    }
+
+    if (!isValid) {
+        alert('Mohon lengkapi semua field yang diperlukan!');
+        const firstInvalid = checkoutForm.querySelector('.is-invalid');
+        if (firstInvalid) {
+            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstInvalid.focus();
+        }
+        return;
+    }
+
+    // Show loading overlay
+    loadingOverlay.style.display = 'flex';
+    processOrderBtn.disabled = true;
+    processOrderBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Memproses pesanan...';
+
+    // Submit form via AJAX
+    const formData = new FormData(checkoutForm);
+    
+    fetch(checkoutForm.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        loadingOverlay.style.display = 'none';
+        
+        if (data.success) {
+            // FIXED: Use correct property names from your controller response
+            if (paymentMethod.value === 'midtrans' && data.snap_token) {
+                // Buka Midtrans Snap dan tunggu hasilnya
+                snap.pay(data.snap_token, {
+                    onSuccess: function(result){
+                        console.log('Payment success:', result);
+                        // Redirect ke success page dengan status success
+                        window.location.href = `/checkout/success?order=${data.order_number}&status=success`;
+                    },
+                    onPending: function(result){
+                        console.log('Payment pending:', result);
+                        // Redirect dengan status pending
+                        window.location.href = `/checkout/success?order=${data.order_number}&status=pending`;
+                    },
+                    onError: function(result){
+                        console.log('Payment error:', result);
+                        alert('Pembayaran gagal. Silakan coba lagi.');
+                        
+                        // Reset form dan jangan redirect
+                        processOrderBtn.disabled = false;
+                        processOrderBtn.innerHTML = '<i class="bi bi-credit-card me-2"></i>Proses Pesanan - Rp {{ number_format($total + 15000, 0, ",", ".") }}';
+                        
+                        // Tidak redirect ke success page
+                    },
+                    onClose: function(){
+                        console.log('Payment popup closed by user');
+                        
+                        // Show informative message instead of alert
+                        const closeMessage = document.createElement('div');
+                        closeMessage.className = 'alert alert-info mt-3';
+                        closeMessage.innerHTML = `
+                            <strong>💡 Pembayaran Belum Selesai</strong><br>
+                            Pesanan Anda telah tersimpan dengan nomor: <strong>${data.order_number}</strong><br>
+                            Anda dapat melanjutkan pembayaran kapan saja dengan klik tombol di bawah.
+                        `;
+                        
+                        // Insert message after the form
+                        checkoutForm.parentNode.insertBefore(closeMessage, checkoutForm.nextSibling);
+                        
+                        // Update button text to indicate continuation
+                        processOrderBtn.disabled = false;
+                        processOrderBtn.innerHTML = '<i class="bi bi-credit-card me-2"></i>Lanjutkan Pembayaran';
+                        
+                        // Remove message after 10 seconds
+                        setTimeout(() => {
+                            if (closeMessage.parentNode) {
+                                closeMessage.parentNode.removeChild(closeMessage);
+                            }
+                        }, 10000);
+                        
+                        // Tidak redirect ke success page - user tetap di checkout
+                    }
+                });
+            } else {
+                // Untuk payment method lain (bank transfer, COD), redirect langsung ke success
+                window.location.href = `/checkout/success?order=${data.order_number}&status=pending`;
+            }
+        } else {
+            throw new Error(data.message || 'Checkout failed');
+        }
+    })
+    .catch(error => {
+        console.error('Checkout error:', error);
+        loadingOverlay.style.display = 'none';
+        
+        // Reset form
+        processOrderBtn.disabled = false;
+        processOrderBtn.innerHTML = '<i class="bi bi-credit-card me-2"></i>Proses Pesanan - Rp {{ number_format($total + 15000, 0, ",", ".") }}';
+        
+        alert('Terjadi kesalahan: ' + error.message);
+    });
+});
 
     // Remove invalid class on input
     document.querySelectorAll('.form-control').forEach(input => {

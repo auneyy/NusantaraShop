@@ -35,7 +35,7 @@ class CheckoutController extends Controller
             ];
             
             $total = $checkoutItems[0]['subtotal'];
-            $source = 'direct'; // Pembelian langsung
+            $source = 'direct';
         } else {
             // Ambil dari keranjang (session)
             $cartItems = $this->getCartItems();
@@ -57,7 +57,7 @@ class CheckoutController extends Controller
                 $total += $item['subtotal'];
             }
             
-            $source = 'cart'; // Dari keranjang
+            $source = 'cart';
         }
 
         return view('checkout.index', compact('checkoutItems', 'total', 'source'));
@@ -133,7 +133,10 @@ class CheckoutController extends Controller
                 
                 // Simpan snap token ke database
                 if ($snapToken) {
-                    $order->update(['midtrans_transaction_id' => $snapToken]);
+                    $order->update([
+                        'midtrans_transaction_id' => $snapToken,
+                        'midtrans_snap_token' => $snapToken // Add this field to store snap token separately
+                    ]);
                 }
             }
 
@@ -144,32 +147,27 @@ class CheckoutController extends Controller
                 Session::forget('cart');
             }
 
-            // Jika midtrans, langsung return snap token untuk frontend
-            if ($request->payment_method === 'midtrans' && $snapToken) {
-                // Jika request AJAX
-                if ($request->ajax() || $request->expectsJson()) {
-                    return response()->json([
-                        'success' => true,
-                        'snap_token' => $snapToken,
-                        'order_number' => $order->order_number
-                    ]);
-                }
-                
-                // Jika bukan AJAX, redirect ke success dengan snap token
-                return redirect()->route('checkout.success', ['order' => $order->order_number])
-                               ->with([
-                                   'success' => 'Pesanan berhasil dibuat!',
-                                   'snapToken' => $snapToken
-                               ]);
+            // Always return JSON for AJAX requests
+            if ($request->ajax() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'snap_token' => $snapToken,
+                    'order_number' => $order->order_number,
+                    'payment_method' => $request->payment_method,
+                    'redirect_url' => route('checkout.success', ['order' => $order->order_number])
+                ]);
             }
-
-            // Untuk payment method lain
+            
+            // Fallback for non-AJAX requests
             return redirect()->route('checkout.success', ['order' => $order->order_number])
                            ->with('success', 'Pesanan berhasil dibuat!');
 
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Checkout Error: ' . $e->getMessage());
+            Log::error('Checkout Error: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'request_data' => $request->except(['_token'])
+            ]);
             
             if ($request->ajax() || $request->expectsJson()) {
                 return response()->json([
@@ -182,41 +180,72 @@ class CheckoutController extends Controller
         }
     }
 
+    /**
+     * Enhanced success method with better status handling
+     */
     public function success(Request $request)
     {
         $orderNumber = $request->get('order');
+        $status = $request->get('status', 'pending');
+        
+        if (!$orderNumber) {
+            return redirect()->route('home')->with('error', 'Pesanan tidak ditemukan.');
+        }
+
         $order = Order::where('order_number', $orderNumber)
                      ->where('user_id', Auth::id())
-                     ->with('orderItems.product')
+                     ->with(['orderItems.product.images'])
                      ->first();
 
         if (!$order) {
             return redirect()->route('home')->with('error', 'Pesanan tidak ditemukan.');
         }
 
-        // Ambil snapToken dari session atau dari database
-        $snapToken = session('snapToken') ?? $order->midtrans_transaction_id;
+        // Update payment status if coming from success callback
+        if ($status === 'success') {
+            $this->updateOrderPaymentStatus($order, 'settlement');
+        }
+
+        // Generate new snap token if payment is still pending and using Midtrans
+        $snapToken = null;
+        if ($this->isPaymentPending($order) && $order->payment_method === 'midtrans') {
+            try {
+                $snapToken = $this->createMidtransTransaction($order);
+                if ($snapToken) {
+                    $order->update(['midtrans_snap_token' => $snapToken]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to generate snap token for existing order', [
+                    'order_number' => $order->order_number,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
 
         return view('checkout.success', compact('order', 'snapToken'));
     }
 
     /**
-     * Membuat transaksi Midtrans dan mendapatkan Snap Token
+     * Enhanced Midtrans transaction creation
      */
     private function createMidtransTransaction($order)
     {
         try {
-            // Set konfigurasi Midtrans dengan error handling
-            if (!config('midtrans.server_key') || !config('midtrans.client_key')) {
-                throw new \Exception('Midtrans configuration is missing');
+            // Validate Midtrans configuration
+            $serverKey = config('midtrans.server_key');
+            $clientKey = config('midtrans.client_key');
+            
+            if (!$serverKey || !$clientKey) {
+                throw new \Exception('Midtrans configuration is incomplete. Please check server_key and client_key.');
             }
 
-            \Midtrans\Config::$serverKey = config('midtrans.server_key');
+            // Set Midtrans configuration
+            \Midtrans\Config::$serverKey = $serverKey;
             \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
             \Midtrans\Config::$isSanitized = true;
             \Midtrans\Config::$is3ds = true;
 
-            // Pastikan semua data required tersedia
+            // Prepare transaction parameters
             $params = [
                 'transaction_details' => [
                     'order_id' => $order->order_number,
@@ -230,7 +259,7 @@ class CheckoutController extends Controller
                         'first_name' => $order->shipping_name,
                         'email' => $order->shipping_email,
                         'phone' => $order->shipping_phone,
-                        'address' => $order->shipping_address,
+                        'address' => substr($order->shipping_address, 0, 200), // Limit length
                         'city' => $order->shipping_city,
                         'postal_code' => $order->shipping_postal_code,
                         'country_code' => 'IDN'
@@ -239,7 +268,7 @@ class CheckoutController extends Controller
                         'first_name' => $order->shipping_name,
                         'email' => $order->shipping_email,
                         'phone' => $order->shipping_phone,
-                        'address' => $order->shipping_address,
+                        'address' => substr($order->shipping_address, 0, 200), // Limit length
                         'city' => $order->shipping_city,
                         'postal_code' => $order->shipping_postal_code,
                         'country_code' => 'IDN'
@@ -249,59 +278,70 @@ class CheckoutController extends Controller
                 'enabled_payments' => [
                     'credit_card', 'mandiri_clickpay', 'cimb_clicks',
                     'bca_klikbca', 'bca_klikpay', 'bri_epay', 'echannel',
-                    'permata_va', 'bca_va', 'bni_va', 'other_va',
-                    'gopay', 'indomaret', 'danamon_online', 'akulaku'
+                    'permata_va', 'bca_va', 'bni_va', 'bri_va', 'other_va',
+                    'gopay', 'shopeepay', 'indomaret', 'alfamart'
+                ],
+                'expiry' => [
+                    'start_time' => date("Y-m-d H:i:s O"),
+                    'unit' => 'hours',
+                    'duration' => 24
                 ]
             ];
 
-            // Tambahkan item details dengan validation
+            // Add item details
             foreach ($order->orderItems as $item) {
                 $params['item_details'][] = [
-                    'id' => 'product_' . $item->product_id,
+                    'id' => 'item_' . $item->product_id . '_' . $item->size,
                     'price' => (int) $item->product_price,
                     'quantity' => (int) $item->quantity,
-                    'name' => substr($item->product_name . ' (Size: ' . $item->size . ')', 0, 50),
+                    'name' => substr($item->product_name . ' (' . $item->size . ')', 0, 50),
                 ];
             }
 
-            // Tambahkan ongkos kirim sebagai item terpisah
+            // Add shipping cost as separate item
             if ($order->shipping_cost > 0) {
                 $params['item_details'][] = [
-                    'id' => 'shipping_cost',
+                    'id' => 'shipping',
                     'price' => (int) $order->shipping_cost,
                     'quantity' => 1,
                     'name' => 'Ongkos Kirim',
                 ];
             }
 
-            // Set expiry time yang lebih reasonable
-            $params['expiry'] = [
-                'start_time' => date("Y-m-d H:i:s O"),
-                'unit' => 'hours',
-                'duration' => 24
-            ];
+            // Validate total amount
+            $itemsTotal = array_sum(array_map(function($item) {
+                return $item['price'] * $item['quantity'];
+            }, $params['item_details']));
 
-            // Log untuk debugging
+            if ($itemsTotal !== (int) $order->grand_total) {
+                Log::warning('Items total mismatch', [
+                    'order_number' => $order->order_number,
+                    'calculated_total' => $itemsTotal,
+                    'expected_total' => $order->grand_total
+                ]);
+            }
+
             Log::info('Creating Midtrans transaction', [
                 'order_number' => $order->order_number,
                 'gross_amount' => $order->grand_total,
                 'items_count' => count($params['item_details'])
             ]);
 
+            // Create snap token
             $snapToken = \Midtrans\Snap::getSnapToken($params);
             
             Log::info('Midtrans snap token created successfully', [
                 'order_number' => $order->order_number,
-                'snap_token' => substr($snapToken, 0, 20) . '...'
+                'snap_token_preview' => substr($snapToken, 0, 20) . '...'
             ]);
 
             return $snapToken;
 
         } catch (\Exception $e) {
             Log::error('Midtrans transaction creation failed', [
-                'order_number' => $order->order_number,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'order_number' => $order->order_number ?? 'unknown',
+                'error_message' => $e->getMessage(),
+                'error_trace' => $e->getTraceAsString()
             ]);
             
             throw new \Exception('Gagal membuat transaksi pembayaran: ' . $e->getMessage());
@@ -309,78 +349,140 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Handle webhook notification dari Midtrans
+     * Enhanced webhook notification handler
      */
     public function midtransNotification(Request $request)
     {
         try {
+            // Set Midtrans config
             \Midtrans\Config::$serverKey = config('midtrans.server_key');
             \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
 
+            // Get notification
             $notif = new \Midtrans\Notification();
 
-            $transaction = $notif->transaction_status;
-            $type = $notif->payment_type;
+            $transactionStatus = $notif->transaction_status;
+            $paymentType = $notif->payment_type;
             $orderId = $notif->order_id;
-            $fraud = $notif->fraud_status ?? 'accept';
+            $fraudStatus = $notif->fraud_status ?? 'accept';
+            $transactionId = $notif->transaction_id ?? null;
 
             Log::info('Midtrans notification received', [
                 'order_id' => $orderId,
-                'transaction_status' => $transaction,
-                'payment_type' => $type,
-                'fraud_status' => $fraud
+                'transaction_status' => $transactionStatus,
+                'payment_type' => $paymentType,
+                'fraud_status' => $fraudStatus,
+                'transaction_id' => $transactionId
             ]);
 
+            // Find order
             $order = Order::where('order_number', $orderId)->first();
             
             if (!$order) {
-                Log::error('Order not found for notification: ' . $orderId);
+                Log::error('Order not found for notification', ['order_id' => $orderId]);
                 return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
             }
 
-            // Update order berdasarkan status transaksi
-            $updateData = [
-                'midtrans_transaction_id' => $notif->transaction_id ?? null,
-                'midtrans_payment_type' => $type,
-            ];
-
-            if ($transaction == 'capture' || $transaction == 'settlement') {
-                if ($type == 'credit_card' && $transaction == 'capture' && $fraud == 'challenge') {
-                    // Challenge by FDS, tunggu approval manual
-                    $updateData['payment_status'] = 'pending';
-                } else {
-                    // Payment success
-                    $updateData['payment_status'] = 'settlement';
-                    $updateData['status'] = 'processing';
-                    $updateData['payment_completed_at'] = now();
-                }
-            } elseif ($transaction == 'pending') {
-                $updateData['payment_status'] = 'pending';
-            } elseif (in_array($transaction, ['deny', 'expire', 'cancel', 'failure'])) {
-                $updateData['payment_status'] = 'failure';
-            }
-
-            $order->update($updateData);
-
-            Log::info('Order updated from Midtrans notification', [
-                'order_id' => $orderId,
-                'old_status' => $order->getOriginal('payment_status'),
-                'new_status' => $updateData['payment_status'] ?? $order->payment_status
-            ]);
+            // Process notification based on transaction status
+            $this->processPaymentNotification($order, $transactionStatus, $paymentType, $fraudStatus, $transactionId);
 
             return response()->json(['status' => 'success']);
 
         } catch (\Exception $e) {
-            Log::error('Midtrans notification error', [
+            Log::error('Midtrans notification processing error', [
                 'error' => $e->getMessage(),
-                'request_data' => $request->all()
+                'request_data' => $request->all(),
+                'trace' => $e->getTraceAsString()
             ]);
+            
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
 
     /**
-     * Check payment status untuk AJAX
+     * Process payment notification and update order
+     */
+    private function processPaymentNotification($order, $transactionStatus, $paymentType, $fraudStatus, $transactionId)
+    {
+        $updateData = [
+            'midtrans_transaction_id' => $transactionId,
+            'midtrans_payment_type' => $paymentType,
+            'updated_at' => now()
+        ];
+
+        $oldStatus = $order->payment_status;
+
+        switch ($transactionStatus) {
+            case 'capture':
+                if ($paymentType == 'credit_card') {
+                    $updateData['payment_status'] = ($fraudStatus == 'challenge') ? 'pending' : 'settlement';
+                    $updateData['status'] = ($fraudStatus == 'challenge') ? 'pending' : 'processing';
+                    if ($fraudStatus != 'challenge') {
+                        $updateData['payment_completed_at'] = now();
+                    }
+                } else {
+                    $updateData['payment_status'] = 'settlement';
+                    $updateData['status'] = 'processing';
+                    $updateData['payment_completed_at'] = now();
+                }
+                break;
+                
+            case 'settlement':
+                $updateData['payment_status'] = 'settlement';
+                $updateData['status'] = 'processing';
+                $updateData['payment_completed_at'] = now();
+                break;
+                
+            case 'pending':
+                $updateData['payment_status'] = 'pending';
+                $updateData['status'] = 'pending';
+                break;
+                
+            case 'deny':
+                $updateData['payment_status'] = 'failure';
+                $updateData['status'] = 'cancelled';
+                $this->restoreStock($order);
+                break;
+                
+            case 'expire':
+                $updateData['payment_status'] = 'expire';
+                $updateData['status'] = 'cancelled';
+                $this->restoreStock($order);
+                break;
+                
+            case 'cancel':
+                $updateData['payment_status'] = 'cancel';
+                $updateData['status'] = 'cancelled';
+                $this->restoreStock($order);
+                break;
+                
+            case 'failure':
+                $updateData['payment_status'] = 'failure';
+                $updateData['status'] = 'cancelled';
+                $this->restoreStock($order);
+                break;
+                
+            default:
+                Log::warning('Unknown transaction status received', [
+                    'order_number' => $order->order_number,
+                    'transaction_status' => $transactionStatus
+                ]);
+                return;
+        }
+
+        // Update order
+        $order->update($updateData);
+
+        Log::info('Order updated from Midtrans notification', [
+            'order_number' => $order->order_number,
+            'old_payment_status' => $oldStatus,
+            'new_payment_status' => $updateData['payment_status'],
+            'transaction_status' => $transactionStatus
+        ]);
+    }
+
+    /**
+     * Enhanced payment status check with better error handling
      */
     public function checkPaymentStatus($orderNumber)
     {
@@ -393,20 +495,122 @@ class CheckoutController extends Controller
                 return response()->json(['error' => 'Order not found'], 404);
             }
 
+            // If using Midtrans, check status from Midtrans API
+            if ($order->payment_method === 'midtrans' && $order->midtrans_transaction_id) {
+                try {
+                    \Midtrans\Config::$serverKey = config('midtrans.server_key');
+                    \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+                    
+                    $status = \Midtrans\Transaction::status($order->order_number);
+                    
+                    Log::info('Midtrans status check result', [
+                        'order_number' => $order->order_number,
+                        'current_status' => $order->payment_status,
+                        'midtrans_status' => $status->transaction_status
+                    ]);
+                    
+                    // Update order if status changed
+                    if ($status->transaction_status !== $order->payment_status) {
+                        $this->processPaymentNotification(
+                            $order, 
+                            $status->transaction_status, 
+                            $status->payment_type ?? $order->midtrans_payment_type,
+                            $status->fraud_status ?? 'accept',
+                            $status->transaction_id ?? $order->midtrans_transaction_id
+                        );
+                        
+                        // Refresh order data
+                        $order->refresh();
+                    }
+                    
+                } catch (\Exception $e) {
+                    Log::error('Error checking Midtrans status', [
+                        'order_number' => $order->order_number,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
             return response()->json([
                 'status' => $order->payment_status,
                 'order_status' => $order->status,
                 'payment_method' => $order->payment_method,
-                'transaction_id' => $order->midtrans_transaction_id
+                'transaction_id' => $order->midtrans_transaction_id,
+                'updated_at' => $order->updated_at->toISOString()
             ]);
 
         } catch (\Exception $e) {
             Log::error('Check payment status error', [
                 'order_number' => $orderNumber,
+                'user_id' => Auth::id(),
                 'error' => $e->getMessage()
             ]);
             
             return response()->json(['error' => 'Internal server error'], 500);
+        }
+    }
+
+    /**
+     * Helper method to check if payment is pending
+     */
+    private function isPaymentPending($order)
+    {
+        return !isset($order->payment_status) || 
+               $order->payment_status === 'pending' ||
+               $order->payment_status === null;
+    }
+
+    /**
+     * Helper method to update order payment status
+     */
+    private function updateOrderPaymentStatus($order, $status)
+    {
+        $updateData = [
+            'payment_status' => $status,
+            'updated_at' => now()
+        ];
+
+        if (in_array($status, ['settlement', 'capture'])) {
+            $updateData['status'] = 'processing';
+            $updateData['payment_completed_at'] = now();
+        } elseif (in_array($status, ['failure', 'cancel', 'expire', 'deny'])) {
+            $updateData['status'] = 'cancelled';
+            $this->restoreStock($order);
+        }
+
+        $order->update($updateData);
+
+        Log::info('Order payment status updated', [
+            'order_number' => $order->order_number,
+            'new_status' => $status,
+            'order_status' => $updateData['status'] ?? $order->status
+        ]);
+    }
+
+    /**
+     * Restore product stock when order is cancelled
+     */
+    private function restoreStock($order)
+    {
+        try {
+            foreach ($order->orderItems as $item) {
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    $product->increment('stock_kuantitas', $item->quantity);
+                    
+                    Log::info('Stock restored', [
+                        'product_id' => $product->id,
+                        'product_name' => $product->name,
+                        'quantity_restored' => $item->quantity,
+                        'new_stock' => $product->fresh()->stock_kuantitas
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error restoring stock', [
+                'order_number' => $order->order_number,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 
@@ -446,5 +650,107 @@ class CheckoutController extends Controller
         } while (Order::where('order_number', $orderNumber)->exists());
         
         return $orderNumber;
+    }
+
+    /**
+     * Handle payment return from Midtrans (for redirect flow)
+     */
+    public function paymentReturn(Request $request)
+    {
+        $orderNumber = $request->get('order_id');
+        $transactionStatus = $request->get('transaction_status');
+        
+        if (!$orderNumber) {
+            return redirect()->route('home')->with('error', 'Invalid payment return.');
+        }
+
+        $order = Order::where('order_number', $orderNumber)
+                     ->where('user_id', Auth::id())
+                     ->first();
+
+        if (!$order) {
+            return redirect()->route('home')->with('error', 'Order not found.');
+        }
+
+        // Map transaction status to our success page parameter
+        $statusParam = 'pending';
+        if (in_array($transactionStatus, ['settlement', 'capture'])) {
+            $statusParam = 'success';
+        } elseif (in_array($transactionStatus, ['failure', 'cancel', 'expire', 'deny'])) {
+            $statusParam = 'failed';
+        }
+
+        return redirect()->route('checkout.success', [
+            'order' => $orderNumber,
+            'status' => $statusParam
+        ]);
+    }
+
+    /**
+     * Manual payment status refresh endpoint
+     */
+    public function refreshPaymentStatus($orderNumber)
+    {
+        try {
+            $order = Order::where('order_number', $orderNumber)
+                         ->where('user_id', Auth::id())
+                         ->first();
+            
+            if (!$order) {
+                return response()->json(['error' => 'Order not found'], 404);
+            }
+
+            // Force check from Midtrans if applicable
+            if ($order->payment_method === 'midtrans') {
+                try {
+                    \Midtrans\Config::$serverKey = config('midtrans.server_key');
+                    \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+                    
+                    $status = \Midtrans\Transaction::status($order->order_number);
+                    
+                    $this->processPaymentNotification(
+                        $order,
+                        $status->transaction_status,
+                        $status->payment_type ?? $order->midtrans_payment_type,
+                        $status->fraud_status ?? 'accept',
+                        $status->transaction_id ?? $order->midtrans_transaction_id
+                    );
+                    
+                    $order->refresh();
+                    
+                    Log::info('Manual payment status refresh completed', [
+                        'order_number' => $orderNumber,
+                        'status' => $status->transaction_status,
+                        'updated_payment_status' => $order->payment_status
+                    ]);
+                    
+                } catch (\Exception $e) {
+                    Log::error('Manual refresh failed', [
+                        'order_number' => $orderNumber,
+                        'error' => $e->getMessage()
+                    ]);
+                    
+                    return response()->json([
+                        'error' => 'Unable to refresh payment status',
+                        'message' => 'Please try again later or contact support'
+                    ], 500);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'status' => $order->payment_status,
+                'order_status' => $order->status,
+                'message' => 'Payment status refreshed successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Refresh payment status error', [
+                'order_number' => $orderNumber,
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json(['error' => 'Internal server error'], 500);
+        }
     }
 }
