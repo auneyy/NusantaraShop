@@ -487,7 +487,7 @@
                     
                    <!-- UPDATED: Checkout button menuju halaman checkout -->
                    <a href="{{ route('checkout.index') }}" class="checkout-btn">
-                        Lanjut ke Checkout
+                        Lanjut Pembayaran
                    </a>
                 </div>
             </div>
