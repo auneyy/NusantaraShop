@@ -7,11 +7,6 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Detail Discount</h3>
-                    <div class="card-tools">
-                        <a href="{{ route('admin.discounts.edit', $discount->id) }}" class="btn btn-warning">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -76,7 +71,6 @@
                                             <th>Nama</th>
                                             <th>Harga</th>
                                             <th>Harga Diskon</th>
-                                            <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -86,11 +80,6 @@
                                                 <td>{{ $product->name }}</td>
                                                 <td>{{ $product->formatted_harga }}</td>
                                                 <td>{{ $product->formatted_harga_final ?? '-' }}</td>
-                                                <td>
-                                                    <span class="badge badge-{{ $product->status == 'active' ? 'success' : 'secondary' }}">
-                                                        {{ $product->status }}
-                                                    </span>
-                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>

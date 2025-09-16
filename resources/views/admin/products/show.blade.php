@@ -12,7 +12,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">{{ $product->name }}</h6>
+            <h6 class="m-0 font-weight-bold">{{ $product->name }}</h6>
             <div>
                 @php
                     $statusClass = [
@@ -93,11 +93,6 @@
                     {!! $product->deskripsi !!}
                 </div>
             </div>
-        </div>
-        <div class="card-footer">
-            <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-primary">
-                <i class="fas fa-edit"></i> Edit
-            </a>
         </div>
     </div>
 </div>

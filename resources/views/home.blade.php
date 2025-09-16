@@ -455,16 +455,6 @@
                  style="width: 100%; object-fit: cover;">
         </a>
     </div>
-@else
-    <!-- Fallback jika tidak ada diskon -->
-    <div class="banner-container text-center">
-        <a href="{{ route('promo') }}">
-            <img src="{{ asset('storage/product_images/discount.png') }}" 
-                 alt="Special Discounts" 
-                 class="banner-discount img-fluid"
-                 style="max-height: 300px; width: 100%; object-fit: cover;">
-        </a>
-    </div>
 @endif
 
 

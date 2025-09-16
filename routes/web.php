@@ -12,6 +12,10 @@ use App\Http\Controllers\Admin\DiscountController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PromoController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ArtikelController;
+use App\Http\Controllers\Admin\MessageController;
+use App\Http\Controllers\ContactController;
 
 // Middleware untuk mencegah back history di seluruh aplikasi
 Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(function () {
@@ -91,6 +95,8 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             // FIXED: Route untuk notifikasi Midtrans
             Route::post('/midtrans/notification', [CheckoutController::class, 'midtransNotification'])->name('midtrans.notification');
         });
+
+        Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
         
         // User Logout
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -123,15 +129,11 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
                 ->name('discounts.toggle-status');
 
              // Kategori
-            Route::resource('kategori', DiscountController::class);
-            Route::patch('/kategori/{kategori}/toggle-status', [DiscountController::class, 'toggleStatus'])
-                ->name('kategori.toggle-status');
+            Route::resource('categories', CategoryController::class)->except(['show']);
 
              // Artikel
-            Route::resource('artikel', DiscountController::class);
-            Route::patch('/artikel/{artikel}/toggle-status', [DiscountController::class, 'toggleStatus'])
-                ->name('artikel.toggle-status');
-            
+            Route::resource('artikel', ArtikelController::class);
+           
             // Pesanan
             Route::get('/pesanan', fn () => view('admin.pesanan'))->name('pesanan');
 
@@ -139,7 +141,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::get('/pendapatan', fn () => view('admin.pendapatan'))->name('pendapatan');
 
              // Pesan Masuk
-            Route::get('/pesanmasuk', fn () => view('admin.pesanmasuk'))->name('pesanmasuk');
+            Route::resource('admin/messages', MessageController::class)->only(['index','show']);
                 
             // Admin Logout (pindahkan ke dalam middleware admin)
             Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');

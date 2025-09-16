@@ -400,7 +400,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="{{ route('admin.kategori.index') }}" class="nav-link {{ request()->routeIs('admin.kategori.index') ? 'active' : '' }}">
+                        <a href="{{ route('admin.categories.index') }}" class="nav-link {{ request()->routeIs('admin.categories.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-layer-group"></i>
                             Kategori
                         </a>
@@ -414,7 +414,7 @@
                     </li>
 
                     <li class="nav-item">
-                         <a href="{{ route('admin.pesanmasuk') }}" class="nav-link {{ request()->routeIs('admin.pesanmasuk') ? 'active' : '' }}">
+                         <a href="{{ route('admin.messages.index') }}" class="nav-link {{ request()->routeIs('admin.messages.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-inbox"></i>
                             Pesan Masuk
                         </a>
@@ -503,10 +503,15 @@
         </main>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
     <script>
         let sidebarVisible = true;
         const sidebar = document.getElementById('sidebar');
