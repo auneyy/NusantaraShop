@@ -147,20 +147,22 @@ class CheckoutController extends Controller
                 Session::forget('cart');
             }
 
-            // Always return JSON for AJAX requests
-            if ($request->ajax() || $request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'snap_token' => $snapToken,
-                    'order_number' => $order->order_number,
-                    'payment_method' => $request->payment_method,
-                    'redirect_url' => route('checkout.success', ['order' => $order->order_number])
-                ]);
-            }
-            
-            // Fallback for non-AJAX requests
-            return redirect()->route('checkout.success', ['order' => $order->order_number])
-                           ->with('success', 'Pesanan berhasil dibuat!');
+          // Add this at the end of the process method, replace the existing redirect logic
+
+        // Always return JSON for AJAX requests
+        if ($request->ajax() || $request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'snap_token' => $snapToken,
+                'order_number' => $order->order_number,
+                'payment_method' => $request->payment_method,
+                'redirect_url' => route('orders.show', $order->order_number) // Changed from checkout.success
+            ]);
+        }
+
+        // Fallback for non-AJAX requests - redirect directly to orders
+        return redirect()->route('orders.show', $order->order_number)
+                        ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran untuk melanjutkan.');
 
         } catch (\Exception $e) {
             DB::rollback();
@@ -180,50 +182,59 @@ class CheckoutController extends Controller
         }
     }
 
-    /**
-     * Enhanced success method with better status handling
-     */
-    public function success(Request $request)
-    {
-        $orderNumber = $request->get('order');
-        $status = $request->get('status', 'pending');
-        
-        if (!$orderNumber) {
-            return redirect()->route('home')->with('error', 'Pesanan tidak ditemukan.');
-        }
+// Add this method or update existing success method in CheckoutController.php
 
-        $order = Order::where('order_number', $orderNumber)
-                     ->where('user_id', Auth::id())
-                     ->with(['orderItems.product.images'])
-                     ->first();
-
-        if (!$order) {
-            return redirect()->route('home')->with('error', 'Pesanan tidak ditemukan.');
-        }
-
-        // Update payment status if coming from success callback
-        if ($status === 'success') {
-            $this->updateOrderPaymentStatus($order, 'settlement');
-        }
-
-        // Generate new snap token if payment is still pending and using Midtrans
-        $snapToken = null;
-        if ($this->isPaymentPending($order) && $order->payment_method === 'midtrans') {
-            try {
-                $snapToken = $this->createMidtransTransaction($order);
-                if ($snapToken) {
-                    $order->update(['midtrans_snap_token' => $snapToken]);
-                }
-            } catch (\Exception $e) {
-                Log::error('Failed to generate snap token for existing order', [
-                    'order_number' => $order->order_number,
-                    'error' => $e->getMessage()
-                ]);
-            }
-        }
-
-        return view('checkout.success', compact('order', 'snapToken'));
+/**
+ * Enhanced success method with better status handling and redirect options
+ */
+public function success(Request $request)
+{
+    $orderNumber = $request->get('order');
+    $status = $request->get('status', 'pending');
+    $redirect = $request->get('redirect', 'success'); // success or orders
+    
+    if (!$orderNumber) {
+        return redirect()->route('home')->with('error', 'Pesanan tidak ditemukan.');
     }
+
+    $order = Order::where('order_number', $orderNumber)
+                 ->where('user_id', Auth::id())
+                 ->with(['orderItems.product.images'])
+                 ->first();
+
+    if (!$order) {
+        return redirect()->route('home')->with('error', 'Pesanan tidak ditemukan.');
+    }
+
+    // Update payment status if coming from success callback
+    if ($status === 'success') {
+        $this->updateOrderPaymentStatus($order, 'settlement');
+    }
+
+    // If redirect to orders is requested, go to orders page
+    if ($redirect === 'orders') {
+        return redirect()->route('orders.show', $orderNumber)
+                        ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran untuk melanjutkan.');
+    }
+
+    // Generate new snap token if payment is still pending and using Midtrans
+    $snapToken = null;
+    if ($this->isPaymentPending($order) && $order->payment_method === 'midtrans') {
+        try {
+            $snapToken = $this->createMidtransTransaction($order);
+            if ($snapToken) {
+                $order->update(['midtrans_snap_token' => $snapToken]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to generate snap token for existing order', [
+                'order_number' => $order->order_number,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    return view('checkout.success', compact('order', 'snapToken'));
+}
 
     /**
      * Enhanced Midtrans transaction creation

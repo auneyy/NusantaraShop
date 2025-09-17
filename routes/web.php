@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\OrderController; // Added import
 use App\Http\Controllers\ProductController as PublicProductController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\DiscountController;
@@ -79,6 +80,14 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::post('/remove', [CartController::class, 'remove'])->name('remove');
             Route::post('/clear', [CartController::class, 'clear'])->name('clear');
             Route::get('/count', [CartController::class, 'getCart'])->name('count');
+        });
+        
+        // Orders Routes - Added this section
+        Route::prefix('orders')->name('orders.')->group(function () {
+            Route::get('/', [OrderController::class, 'index'])->name('index');
+            Route::get('/{orderNumber}', [OrderController::class, 'show'])->name('show');
+            Route::post('/{orderNumber}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+            Route::get('/{orderNumber}/check-payment-status', [OrderController::class, 'checkPaymentStatus'])->name('check-payment-status');
         });
         
         // Checkout Routes

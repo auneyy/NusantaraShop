@@ -479,6 +479,7 @@
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="#">{{ Auth::user()->name }}</a></li>
               <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{{ route('orders.index') }}">Pesanan Saya</a></li>
               <li>
                 <form action="{{ route('logout') }}" method="POST">
                   @csrf
