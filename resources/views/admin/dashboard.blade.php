@@ -75,6 +75,7 @@
         border-radius: 12px;
         border: 1px solid #e2e8f0;
         overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     .chart-header {
@@ -83,6 +84,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        background: #fafbfc;
     }
 
     .chart-title {
@@ -109,22 +111,27 @@
         border-color: var(--primary-color);
     }
 
-    .chart-content {
-        padding: 24px;
-        height: 300px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-        color: #64748b;
-        font-size: 1rem;
+    .filter-btn:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
     }
 
+    .filter-btn.active:hover {
+        background: #352318;
+        border-color: #352318;
+    }
+
+    .chart-content {
+        padding: 24px;
+        height: 400px;
+        position: relative;
+    }
+
+    /* Data Section - Table */
     .data-section {
         background: #fff;
-        border-radius: 12px;
         border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         overflow: hidden;
     }
 
@@ -134,6 +141,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        background: #fafbfc;
     }
 
     .section-title {
@@ -173,30 +181,63 @@
         border-color: #e2e8f0;
     }
 
+    /* Table Styling - No Border Radius */
+    .table-container {
+        background: #fff;
+        overflow: hidden;
+    }
+
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
     .table th {
         background: #f8fafc;
         font-weight: 600;
         color: #374151;
         font-size: 0.9rem;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 2px solid #e2e8f0;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        padding: 16px 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.8rem;
     }
 
     .table td {
         font-size: 0.9rem;
         border-bottom: 1px solid #f1f5f9;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        padding: 16px 12px;
+        vertical-align: middle;
+    }
+
+    .table tbody tr {
+        transition: background-color 0.15s ease;
     }
 
     .table tbody tr:hover {
         background: #fafbfc;
     }
 
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
     .status-badge {
-        padding: 4px 8px;
+        padding: 6px 12px;
         border-radius: 20px;
         font-size: 0.7rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        display: inline-block;
     }
 
     .status-success {
@@ -214,11 +255,45 @@
         color: #991b1b;
     }
 
+    .order-id {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .customer-name {
+        font-weight: 500;
+        color: #1e293b;
+    }
+
+    .product-name {
+        color: #64748b;
+    }
+
+    .order-total {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .order-time {
+        font-size: 0.8rem;
+        color: #64748b;
+    }
+
     @media (max-width: 768px) {
         .section-header {
             flex-direction: column;
             gap: 16px;
             align-items: flex-start;
+        }
+
+        .chart-header {
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .table-responsive {
+            font-size: 0.8rem;
         }
     }
 </style>
@@ -294,84 +369,214 @@
     </div>
 </div>
 
+<!-- Sales Chart -->
 <div class="chart-container mb-4 fade-in">
     <div class="chart-header">
         <div class="chart-title">Grafik Penjualan</div>
         <div class="chart-filters">
-            <button class="filter-btn active">7 Hari</button>
-            <button class="filter-btn">30 Hari</button>
-            <button class="filter-btn">3 Bulan</button>
-            <button class="filter-btn">1 Tahun</button>
+            <button class="filter-btn active" data-period="7">7 Hari</button>
+            <button class="filter-btn" data-period="30">30 Hari</button>
+            <button class="filter-btn" data-period="90">3 Bulan</button>
+            <button class="filter-btn" data-period="365">1 Tahun</button>
         </div>
     </div>
     <div class="chart-content">
-      <i class="fas fa-chart-line" style="font-size: 3rem; margin-bottom: 16px; color: #808080;"></i>
-        <div>Grafik Penjualan akan ditampilkan di sini</div>
-        <small style="margin-top: 8px; display: block;">Integrasi dengan Chart.js atau library grafik lainnya</small>
+        <canvas id="salesChart" width="100%" height="300"></canvas>
     </div>
 </div>
 
+<!-- Recent Orders Table -->
 <div class="data-section fade-in">
     <div class="section-header">
         <div class="section-title">Pesanan Terbaru</div>
-        <button class="btn btn-primary">
-            <i class="fas fa-eye"></i>
-            Lihat Semua
-        </button>
+     <div class="button"></div>
+           <a href="{{ route('admin.pesanan') }}" class="btn btn-primary">
+    <i class="fas fa-eye"></i>
+    Lihat Semua
+</a>
+</div>
     </div>
-    <div class="table-responsive">
-        <table class="table table-hover mb-0">
-            <thead>
-                <tr>
-                    <th>ID Pesanan</th>
-                    <th>Pelanggan</th>
-                    <th>Produk</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Waktu</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>#NUS-001</td>
-                    <td>Ahmad Santoso</td>
-                    <td>Batik Jogja Premium</td>
-                    <td>Rp 250.000</td>
-                    <td><span class="status-badge status-success">Lunas</span></td>
-                    <td>2 menit lalu</td>
-                    <td><button class="btn btn-secondary btn-sm">Detail</button></td>
-                </tr>
-                <tr>
-                    <td>#NUS-002</td>
-                    <td>Sari Dewi</td>
-                    <td>Kerajinan Bali Set</td>
-                    <td>Rp 180.000</td>
-                    <td><span class="status-badge status-warning">Pending</span></td>
-                    <td>15 menit lalu</td>
-                    <td><button class="btn btn-secondary btn-sm">Detail</button></td>
-                </tr>
-                <tr>
-                    <td>#NUS-003</td>
-                    <td>Budi Pranoto</td>
-                    <td>Songket Palembang</td>
-                    <td>Rp 320.000</td>
-                    <td><span class="status-badge status-danger">Gagal</span></td>
-                    <td>1 jam lalu</td>
-                    <td><button class="btn btn-secondary btn-sm">Detail</button></td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>ID Pesanan</th>
+                        <th>Pelanggan</th>
+                        <th>Produk</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Waktu</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="order-id">#NUS-001</span></td>
+                        <td><span class="customer-name">Ahmad Santoso</span></td>
+                        <td><span class="product-name">Batik Jogja Premium</span></td>
+                        <td><span class="order-total">Rp 250.000</span></td>
+                        <td><span class="status-badge status-success">Lunas</span></td>
+                        <td><span class="order-time">2 menit lalu</span></td>
+                        <td><button class="btn btn-secondary btn-sm">Detail</button></td>
+                    </tr>
+                    <tr>
+                        <td><span class="order-id">#NUS-002</span></td>
+                        <td><span class="customer-name">Sari Dewi</span></td>
+                        <td><span class="product-name">Kerajinan Bali Set</span></td>
+                        <td><span class="order-total">Rp 180.000</span></td>
+                        <td><span class="status-badge status-warning">Pending</span></td>
+                        <td><span class="order-time">15 menit lalu</span></td>
+                        <td><button class="btn btn-secondary btn-sm">Detail</button></td>
+                    </tr>
+                    <tr>
+                        <td><span class="order-id">#NUS-003</span></td>
+                        <td><span class="customer-name">Budi Pranoto</span></td>
+                        <td><span class="product-name">Songket Palembang</span></td>
+                        <td><span class="order-total">Rp 320.000</span></td>
+                        <td><span class="status-badge status-danger">Gagal</span></td>
+                        <td><span class="order-time">1 jam lalu</span></td>
+                        <td><button class="btn btn-secondary btn-sm">Detail</button></td>
+                    </tr>
+                    <tr>
+                        <td><span class="order-id">#NUS-004</span></td>
+                        <td><span class="customer-name">Maya Sari</span></td>
+                        <td><span class="product-name">Tenun Lombok</span></td>
+                        <td><span class="order-total">Rp 150.000</span></td>
+                        <td><span class="status-badge status-success">Lunas</span></td>
+                        <td><span class="order-time">2 jam lalu</span></td>
+                        <td><button class="btn btn-secondary btn-sm">Detail</button></td>
+                    </tr>
+                    <tr>
+                        <td><span class="order-id">#NUS-005</span></td>
+                        <td><span class="customer-name">Rian Pratama</span></td>
+                        <td><span class="product-name">Ukiran Jepara Mini</span></td>
+                        <td><span class="order-total">Rp 420.000</span></td>
+                        <td><span class="status-badge status-warning">Pending</span></td>
+                        <td><span class="order-time">3 jam lalu</span></td>
+                        <td><button class="btn btn-secondary btn-sm">Detail</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 @endsection
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
 <script>
+    const salesData = {
+        '7': {
+            labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+            data: [12.5, 19.2, 15.8, 25.1, 22.4, 18.7, 24.8]
+        },
+        '30': {
+            labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+            data: [85.4, 92.1, 78.6, 96.3]
+        },
+        '90': {
+            labels: ['Jan', 'Feb', 'Mar'],
+            data: [320.5, 285.7, 412.8]
+        },
+        '365': {
+            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+            data: [1250.4, 1380.2, 1150.8, 1420.6]
+        }
+    };
+
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    let salesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: salesData['7'].labels,
+            datasets: [{
+                label: 'Penjualan (Juta Rupiah)',
+                data: salesData['7'].data,
+                borderColor: 'var(--primary-color)',
+                backgroundColor: 'rgba(67, 56, 202, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: 'var(--primary-color)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: '#e2e8f0',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Rp ' + context.parsed.y + ' Juta';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#f1f5f9',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#64748b',
+                        font: {
+                            size: 12
+                        },
+                        callback: function(value) {
+                            return 'Rp ' + value + 'Jt';
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#64748b',
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
+            
+            const period = this.getAttribute('data-period');
+            const data = salesData[period];
+            
+            salesChart.data.labels = data.labels;
+            salesChart.data.datasets[0].data = data.data;
+            salesChart.update('active');
+            
             console.log('Filter selected:', this.textContent);
         });
     });
@@ -385,5 +590,25 @@
             this.style.transform = 'translateY(-2px)';
         });
     });
+
+    document.querySelectorAll('.table tbody tr').forEach(row => {
+        row.addEventListener('click', function() {
+            document.querySelectorAll('.table tbody tr').forEach(r => r.classList.remove('table-active'));
+            this.classList.add('table-active');
+        });
+    });
+
+    setInterval(function() {
+        console.log('Auto-refreshing dashboard data...');
+        
+        const totalSales = document.querySelector('.stat-value');
+        if (totalSales && totalSales.textContent.includes('24,8')) {
+            totalSales.style.transition = 'all 0.3s ease';
+            totalSales.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                totalSales.style.transform = 'scale(1)';
+            }, 300);
+        }
+    }, 30000);
 </script>
 @endpush

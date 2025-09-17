@@ -11,31 +11,34 @@ class AuthController extends Controller
     {
         // Jika sudah login, redirect ke home
         if (Auth::check()) {
-            return redirect('/home');
-        }
+    return redirect()->intended('/home');
+}
         
         return view('auth.login');
     }
 
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+   public function login(Request $request)
+{
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-        // Login hanya jika is_active = true
-        if (Auth::attempt(['email' => $credentials['email'], 'password' => $credentials['password'], 'is_active' => 1])) {
-            $request->session()->regenerate();
-            
-            // Redirect ke home setelah login berhasil
-            return redirect('/home')->with('success', 'Selamat datang! Anda berhasil masuk.');
-        }
+    if (Auth::attempt([
+        'email' => $credentials['email'],
+        'password' => $credentials['password'],
+        'is_active' => 1
+    ])) {
+        $request->session()->regenerate();
 
-        return back()->withErrors([
-            'email' => 'Email atau password salah, atau akun tidak aktif.',
-        ])->withInput();
+        // ✅ Redirect ke halaman yang user coba akses sebelumnya
+        return redirect()->intended('/home')->with('success', 'Selamat datang!');
     }
+
+    return back()->withErrors([
+        'email' => 'Email atau password salah, atau akun tidak aktif.',
+    ])->withInput();
+}
 
     public function logout(Request $request)
     {

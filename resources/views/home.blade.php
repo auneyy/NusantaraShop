@@ -139,8 +139,8 @@
   }
 
   .cta-section {
-    background-color: #422D1C;
-    color: white;
+    background: linear-gradient(135deg, #f8f9fa 0%, rgb(239, 229, 209) 100%);
+    color: #422D1C;
     padding: 60px 0;
     text-align: center;
   }
@@ -157,8 +157,8 @@
   }
 
   .btn-light-custom {
-    background-color: white;
-    color: #422D1C;
+    background-color: #422D1C;
+    color: white;
     border: none;
     padding: 12px 30px;
     font-weight: 600;
@@ -168,15 +168,15 @@
   }
 
   .btn-light-custom:hover {
-    background-color: #f8f9fa;
-    color: #422D1C;
+    background-color: #8B4513;
+    color: white;
     transform: translateY(-2px);
   }
 
   .btn-outline-light-custom {
     background-color: transparent;
-    border: 2px solid white;
-    color: white;
+    border: 2px solid #422D1C;
+    color: #422D1C;
     padding: 12px 30px;
     font-weight: 600;
     border-radius: 8px;
@@ -185,8 +185,8 @@
   }
 
   .btn-outline-light-custom:hover {
-    background-color: white;
-    color: #422D1C;
+    background-color: #422D1C;
+    color: white;
     transform: translateY(-2px);
   }
 
@@ -404,14 +404,25 @@
 <div class="hero-section">
     <div class="container-fluid p-0">
     <div class="row align-items-center">
-        <div class="col-lg-6 hero-content">
-            <h1>Temukan baju batik yang cocok dengan dirimu di <span class="highlight">NusantaraShop</span></h1>
-            <p>Kami menghadirkan koleksi baju batik pilihan yang dirancang untuk membuatmu terhubung dengan budaya lewat kenyamanan</p>
-            @guest
-            <a href="{{ route('register') }}" class="btn-primary-custom">Daftar Sekarang</a>
-            <a href="{{ route('login') }}" class="btn-outline-custom">Masuk</a>
-            @endguest
-        </div>
+      <div class="col-lg-6 hero-content">
+    <h1>
+        Temukan baju batik yang cocok dengan dirimu di 
+        <span class="highlight">NusantaraShop</span>
+    </h1>
+    <p>
+        Kami menghadirkan koleksi baju batik pilihan yang dirancang untuk membuatmu 
+        terhubung dengan budaya lewat kenyamanan
+    </p>
+
+    @guest
+        <a href="{{ route('register') }}" class="btn-primary-custom">Daftar Sekarang</a>
+        <a href="{{ route('login') }}" class="btn-outline-custom">Masuk</a>
+    @endguest
+
+    @auth
+        <a href="{{ url('/products') }}" class="btn-primary-custom">Beli Sekarang</a>
+    @endauth
+</div>
         <div class="col-lg-6 hero-image">
             <img src="{{ asset('storage/product_images/heroadat.png') }}" alt="Traditional Indonesian Clothing" class="img-fluid">
         </div>
@@ -442,16 +453,6 @@
                  alt="Discount Banner - {{ $discountBanner->title }}" 
                  class="banner-discount img-fluid"
                  style="width: 100%; object-fit: cover;">
-        </a>
-    </div>
-@else
-    <!-- Fallback jika tidak ada diskon -->
-    <div class="banner-container text-center">
-        <a href="{{ route('promo') }}">
-            <img src="{{ asset('storage/product_images/discount.png') }}" 
-                 alt="Special Discounts" 
-                 class="banner-discount img-fluid"
-                 style="max-height: 300px; width: 100%; object-fit: cover;">
         </a>
     </div>
 @endif

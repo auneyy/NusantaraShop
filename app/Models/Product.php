@@ -16,7 +16,6 @@ class Product extends Model
         'slug',
         'deskripsi',
         'harga',
-        'harga_jual',
         'sku',
         'stock_kuantitas',
         'berat',
@@ -32,7 +31,6 @@ class Product extends Model
         'meta_data' => 'array',
         'is_featured' => 'boolean',
         'harga' => 'decimal:2',
-        'harga_jual' => 'decimal:2',
         'rating_rata' => 'decimal:2'
     ];
 
@@ -51,6 +49,25 @@ class Product extends Model
         return $this->belongsToMany(Discount::class, 'product_discount')->withTimestamps();
     }
 
+public function getFormattedHargaFinalAttribute()
+{
+    $currentDate = now()->format('Y-m-d');
+
+    $activeDiscount = $this->discounts()
+        ->where('start_date', '<=', $currentDate)
+        ->where('end_date', '>=', $currentDate)
+        ->orderBy('percentage', 'desc')
+        ->first();
+
+    $harga = $this->harga;
+
+    if ($activeDiscount) {
+        $harga = $harga - ($harga * $activeDiscount->percentage / 100);
+    }
+
+    return 'Rp ' . number_format($harga, 0, ',', '.');
+}
+
     public function getPrimaryImageAttribute()
     {
         $primaryImage = $this->images()->where('is_primary', true)->first();
@@ -60,11 +77,6 @@ class Product extends Model
     public function getFormattedHargaAttribute()
     {
         return 'Rp ' . number_format($this->harga, 0, ',', '.');
-    }
-
-    public function getFormattedHargaJualAttribute()
-    {
-        return $this->harga_jual ? 'Rp ' . number_format($this->harga_jual, 0, ',', '.') : null;
     }
 
     public function setNameAttribute($value)
