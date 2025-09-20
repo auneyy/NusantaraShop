@@ -2,6 +2,7 @@
 .product-card-wrapper {
     max-width: 280px;
     margin: 0 auto;
+    max-height: 600px;
 }
 
 .product-card-link {
@@ -18,6 +19,7 @@
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
     position: relative;
@@ -39,6 +41,7 @@
     width: 100%;
     aspect-ratio: 1;
     overflow: hidden;
+    border-radius: 20px 20px 0 0;
 }
 
 .product-image-primary,
@@ -108,7 +111,7 @@
     position: absolute;
     top: 16px;
     left: 16px;
-    background: linear-gradient(135deg, #e53e3e 0%, #ee0000ff 100%);
+    background: linear-gradient(135deg,rgb(229, 98, 62) 0%,rgb(224, 13, 6) 100%);
     color: white;
     font-size: 11px;
     font-weight: 700;
@@ -117,7 +120,7 @@
     z-index: 10;
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    box-shadow: 0 4px 12px rgba(234, 102, 102, 0.4);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .price-container {

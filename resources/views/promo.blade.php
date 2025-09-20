@@ -3,45 +3,48 @@
 @section('content')
 <style>
     .discount-hero {
-        background-image: url('/storage/product_images/banner-promo.png');
-        background-size: cover;
-        background-position: center;
-        position: relative;
-        overflow: hidden;
-        min-height: 600px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        text-align: center;
-    }
-
-    .discount-hero::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-        opacity: 0.3;
+    background-image: url('/storage/product_images/banner-promo.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    padding: 180px 0 120px 0;
+    height: 70vh;
+    min-height: 600px;
+    text-align: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
     }
 
     .discount-hero-content {
         position: relative;
         z-index: 2;
         max-width: 600px;
+        margin: 0 auto;
     }
 
-    .discount-hero h1 {
-        font-size: 3rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        background: linear-gradient(45deg, #fff, #f8f9fa);
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
+    .discount-hero-content h1 {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 3.2rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    position: relative;
+    z-index: 2;
+    letter-spacing: -0.02em;
+  }
+
+  .discount-hero-content p {
+    color: rgba(248, 249, 250, 0.95);
+    font-size: 1.25rem;
+    font-weight: 300;
+    max-width: 650px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+    line-height: 1.7;
+  }
 
     .discount-badge {
         display: inline-block;
@@ -204,6 +207,13 @@
     }
 
     @media (max-width: 768px) {
+        .discount-hero {
+            padding: 80px 0 60px 0;
+            height: 60vh;
+            min-height: 500px;
+            background-attachment: scroll;
+        }
+        
         .discount-hero h1 {
             font-size: 2rem;
         }

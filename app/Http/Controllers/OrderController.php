@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -58,31 +59,106 @@ class OrderController extends Controller
     }
 
     /**
-     * Cancel an order (only if payment is pending)
+     * Cancel an order (supports both web and AJAX requests)
      */
-    public function cancel($orderNumber)
+    public function cancel(Request $request, $orderNumber)
     {
-        $order = Order::where('order_number', $orderNumber)
-                     ->where('user_id', Auth::id())
-                     ->firstOrFail();
+        try {
+            DB::beginTransaction();
 
-        // Only allow cancellation if payment is pending
-        if (!$this->isPaymentPending($order)) {
-            return redirect()->route('orders.show', $orderNumber)
-                           ->with('error', 'Pesanan tidak dapat dibatalkan karena pembayaran sudah diproses.');
+            $order = Order::where('order_number', $orderNumber)
+                         ->where('user_id', Auth::id())
+                         ->first();
+
+            if (!$order) {
+                $message = 'Pesanan tidak ditemukan.';
+                
+                if ($request->ajax() || $request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $message
+                    ], 404);
+                }
+                
+                return redirect()->route('orders.index')->with('error', $message);
+            }
+
+            // Only allow cancellation if payment is pending
+            if (!$this->isPaymentPending($order)) {
+                $message = 'Pesanan tidak dapat dibatalkan karena pembayaran sudah diproses.';
+                
+                if ($request->ajax() || $request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $message
+                    ], 400);
+                }
+                
+                return redirect()->route('orders.show', $orderNumber)->with('error', $message);
+            }
+
+            // Update order status
+            $order->update([
+                'status' => 'cancelled',
+                'payment_status' => 'cancelled', // Changed from 'cancel' to 'cancelled'
+                'cancelled_at' => now(),
+                'cancelled_reason' => 'Dibatalkan oleh pelanggan'
+            ]);
+
+            // Restore stock
+            $this->restoreStock($order);
+
+            // Cancel Midtrans transaction if exists
+            if ($order->payment_method === 'midtrans' && $order->midtrans_snap_token) {
+                try {
+                    \Midtrans\Config::$serverKey = config('midtrans.server_key');
+                    \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+                    
+                    \Midtrans\Transaction::cancel($order->order_number);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to cancel Midtrans transaction: ' . $e->getMessage());
+                }
+            }
+
+            DB::commit();
+
+            $message = 'Pesanan berhasil dibatalkan dan stok produk telah dikembalikan.';
+
+            if ($request->ajax() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'order' => [
+                        'id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'status' => $order->status,
+                        'payment_status' => $order->payment_status
+                    ]
+                ]);
+            }
+
+            return redirect()->route('orders.index')->with('success', $message);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Order cancellation failed', [
+                'order_number' => $orderNumber,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage()
+            ]);
+
+            $message = 'Terjadi kesalahan saat membatalkan pesanan. Silakan coba lagi.';
+
+            if ($request->ajax() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 500);
+            }
+
+            return redirect()->route('orders.index')->with('error', $message);
         }
-
-        // Update order status
-        $order->update([
-            'status' => 'cancelled',
-            'payment_status' => 'cancel'
-        ]);
-
-        // Restore stock
-        $this->restoreStock($order);
-
-        return redirect()->route('orders.index')
-                        ->with('success', 'Pesanan berhasil dibatalkan dan stok produk telah dikembalikan.');
     }
 
     /**
@@ -129,6 +205,7 @@ class OrderController extends Controller
             }
 
             return response()->json([
+                'success' => true,
                 'status' => $order->payment_status,
                 'order_status' => $order->status,
                 'payment_method' => $order->payment_method,
@@ -285,6 +362,13 @@ class OrderController extends Controller
                 $product = \App\Models\Product::find($item->product_id);
                 if ($product) {
                     $product->increment('stock_kuantitas', $item->quantity);
+                    
+                    Log::info('Stock restored for product', [
+                        'product_id' => $product->id,
+                        'product_name' => $product->nama_produk,
+                        'quantity_restored' => $item->quantity,
+                        'new_stock' => $product->fresh()->stock_kuantitas
+                    ]);
                 }
             }
         } catch (\Exception $e) {
