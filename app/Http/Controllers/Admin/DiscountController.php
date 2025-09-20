@@ -103,7 +103,7 @@ public function getActiveBanner()
 
         $discount->products()->sync($request->products);
 
-        return redirect()->route('admin.discounts.index')->with('success', 'Discount created successfully.');
+        return redirect()->route('admin.discounts.index');
     }
 
     public function edit(Discount $discount)
@@ -164,7 +164,7 @@ public function getActiveBanner()
         // Update associated products
         $discount->products()->sync($request->products);
 
-        return redirect()->route('admin.discounts.index')->with('success', 'Discount updated successfully.');
+        return redirect()->route('admin.discounts.index');
     }
 
     public function destroy(Discount $discount)
@@ -179,7 +179,7 @@ public function getActiveBanner()
         $discount->products()->detach();
         $discount->delete();
 
-        return redirect()->route('admin.discounts.index')->with('success', 'Discount deleted successfully.');
+        return redirect()->route('admin.discounts.index');
     }
 
     private function extractFileIdFromUrl($url)

@@ -46,9 +46,11 @@
                             <td>{{ $product->category->name }}</td>
                             <td>Rp {{ number_format($product->harga, 0, ',', '.') }}</td>
                             <td>{{ $product->stock_kuantitas }}</td>
-                            <td class="text-{{ $product->status == 'tersedia' ? 'success' : ($product->status == 'habis' ? 'muted' : 'danger') }}">
-                                {{ ucfirst(str_replace(['tersedia', 'habis', 'pre-order'], ['Tersedia', 'Habis', 'Pre-Order'], $product->status)) }}
-                            </td>
+                            <td>
+                           <span class="badge {{ $product->status == 'tersedia' ? 'text-bg-success' : ($product->status == 'habis' ? 'text-bg-secondary' : 'text-bg-info') }}">
+    {{ ucfirst($product->status) }}
+</span>
+</td>
                             <td>
                                 <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-sm btn-info">
                                     <i class="fas fa-eye"></i>
@@ -59,7 +61,7 @@
                                 <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Hapus produk ini?')">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>

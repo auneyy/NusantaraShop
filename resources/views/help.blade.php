@@ -12,7 +12,7 @@
     text-align: center;
     position: relative;
     overflow: hidden;
-    min-height: 600px;
+    min-height: 450px;
   }
 
   .hero-help::before {
@@ -99,15 +99,15 @@
 
   .topics-section {
     padding: 100px 0;
-    background-color:rgb(235, 235, 235);
+    background-color: white;
   }
 
   .section-title {
     text-align: center;
     color: #422D1C;
     font-weight: 700;
-    font-size: 2.5rem;
-    margin-bottom: 80px;
+    font-size: 2rem;
+    margin-bottom: 60px;
   }
 
   .topic-card {
@@ -157,7 +157,7 @@
 
   .featured-articles {
     padding: 100px 0;
-    background-color:rgb(235, 235, 235);
+    background-color: white;
   }
 
   .articles-container {
@@ -177,6 +177,7 @@
     border: 2px solid transparent;
     cursor: pointer;
     text-decoration: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   }
 
   .article-item:hover {
@@ -323,6 +324,11 @@
       height: 40px;
     }
   }
+
+  .features-section {
+     background-color: white;
+     margin-bottom: 80px;
+  }
 </style>
 
 <!-- Hero Section -->
@@ -379,46 +385,54 @@
   </div>
 </div>
 
-<!-- Featured Articles Section -->
-<div class="featured-articles">
+<!-- FAQ Section -->
+<div class="features-section"">
   <div class="container">
-    <h2 class="section-title">Artikel Unggulan</h2>
-    
-    <div class="articles-container">
-      <a href="#" class="article-item" data-article="register">
-        <h5 class="article-title">Cara mendaftar akun NusantaraShop</h5>
-        <div class="article-arrow">
-          <i class="bi bi-arrow-right"></i>
+    <div class="text-center mb-5 mt-5">
+      <h2 style="color: #422D1C; font-weight: 700;">Pertanyaan Umum</h2>
+      <p style="color: #666; font-size: 1.1rem;">Temukan jawaban untuk pertanyaan yang sering diajukan</p>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-4">
+        <div class="feature-card" style="text-align: left; padding: 2rem;">
+          <h5 style="color: #422D1C; font-weight: 600; margin-bottom: 1rem;">
+            <i class="bi bi-question-circle-fill me-2" style="color: #8B4513;"></i>
+            Bagaimana cara perawatan batik?
+          </h5>
+          <p class="text-muted">Cuci dengan air dingin, hindari deterjen keras, dan jemur di tempat teduh untuk menjaga kualitas warna dan kain.</p>
         </div>
-      </a>
+      </div>
       
-      <a href="#" class="article-item" data-article="payment">
-        <h5 class="article-title">Metode pembayaran yang tersedia</h5>
-        <div class="article-arrow">
-          <i class="bi bi-arrow-right"></i>
+      <div class="col-md-6 mb-4">
+        <div class="feature-card" style="text-align: left; padding: 2rem;">
+          <h5 style="color: #422D1C; font-weight: 600; margin-bottom: 1rem;">
+            <i class="bi bi-truck me-2" style="color: #8B4513;"></i>
+            Berapa lama waktu pengiriman?
+          </h5>
+          <p class="text-muted">Pengiriman dalam kota 1-2 hari, luar kota 3-5 hari kerja. Gratis ongkir untuk pembelian di atas Rp 500.000.</p>
         </div>
-      </a>
+      </div>
       
-      <a href="#" class="article-item" data-article="tracking">
-        <h5 class="article-title">Cara melacak pesanan Anda</h5>
-        <div class="article-arrow">
-          <i class="bi bi-arrow-right"></i>
+      <div class="col-md-6 mb-4">
+        <div class="feature-card" style="text-align: left; padding: 2rem;">
+          <h5 style="color: #422D1C; font-weight: 600; margin-bottom: 1rem;">
+            <i class="bi bi-arrow-repeat me-2" style="color: #8B4513;"></i>
+            Apakah bisa return/tukar?
+          </h5>
+          <p class="text-muted">Ya, kami menerima return/tukar dalam 7 hari dengan kondisi produk masih dalam keadaan baik dan belum dicuci.</p>
         </div>
-      </a>
+      </div>
       
-      <a href="#" class="article-item" data-article="return">
-        <h5 class="article-title">Kebijakan pengembalian dan penukaran</h5>
-        <div class="article-arrow">
-          <i class="bi bi-arrow-right"></i>
+      <div class="col-md-6 mb-4">
+        <div class="feature-card" style="text-align: left; padding: 2rem;">
+          <h5 style="color: #422D1C; font-weight: 600; margin-bottom: 1rem;">
+            <i class="bi bi-shield-check me-2" style="color: #8B4513;"></i>
+            Apakah produk asli?
+          </h5>
+          <p class="text-muted">Semua produk batik kami adalah produk asli dari pengrajin terpercaya dengan sertifikat keaslian.</p>
         </div>
-      </a>
-      
-      <a href="#" class="article-item" data-article="sizing">
-        <h5 class="article-title">Panduan ukuran baju batik</h5>
-        <div class="article-arrow">
-          <i class="bi bi-arrow-right"></i>
-        </div>
-      </a>
+      </div>
     </div>
   </div>
 </div>

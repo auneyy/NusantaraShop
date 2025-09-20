@@ -5,7 +5,6 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Manajemen Diskon</h1>
         <a href="{{ route('admin.discounts.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Tambah Diskon
         </a>
@@ -54,9 +53,9 @@
                                 <td>{{ $discount->end_date->format('d M Y H:i') }}</td>
                                 <td>
                                     @if($discount->is_valid)
-                                        <span class="badge bg-success">Aktif</span>
+                                        <span class="badge bg-success">Active</span>
                                     @else
-                                        <span class="badge bg-secondary">Tidak Aktif</span>
+                                        <span class="badge bg-secondary">Inactive</span>
                                     @endif
                                 </td>
                                 <td>

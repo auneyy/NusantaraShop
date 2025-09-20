@@ -131,8 +131,8 @@
                     </div>
                 </div>
 
-                <div class="form-group mt-4 text-center">
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Simpan Produk</button>
+                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-primary">Tambah</button>
                 </div>
             </form>
         </div>

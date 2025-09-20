@@ -35,6 +35,7 @@
            class="form-control @error('slug') is-invalid @enderror" 
            id="slug" name="slug" 
            value="{{ old('slug') }}" readonly>
+            <div class="form-text">Slug otomatis berubah.</div>
     @error('slug')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
@@ -46,7 +47,7 @@
                             </div>
                             
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button type="submit" class="btn btn-primary">Update</button>
+                                <button type="submit" class="btn btn-primary">Tambah</button>
                             </div>
                         </form>
                     </div>
