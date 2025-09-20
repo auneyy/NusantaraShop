@@ -91,7 +91,10 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
         Route::prefix('orders')->name('orders.')->group(function () {
             Route::get('/', [OrderController::class, 'index'])->name('index');
             Route::get('/{orderNumber}', [OrderController::class, 'show'])->name('show');
-            Route::post('/{orderNumber}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+            
+            // PERBAIKAN: Support both POST and DELETE methods for cancellation
+            Route::match(['POST', 'DELETE'], '/{orderNumber}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+            
             Route::get('/{orderNumber}/check-payment-status', [OrderController::class, 'checkPaymentStatus'])->name('check-payment-status');
         });
         

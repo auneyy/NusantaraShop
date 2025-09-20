@@ -302,6 +302,119 @@
         text-decoration: none;
     }
 
+    /* Custom Modal Styles */
+    .custom-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 0;
+        border: none;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        text-align: center;
+        border-radius: 15px 15px 0 0;
+    }
+
+    .modal-header.success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+
+    .modal-header.error {
+        background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+        color: white;
+    }
+
+    .modal-header.pending {
+        background: linear-gradient(135deg, #ffc107 0%, #f39c12 100%);
+        color: white;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .modal-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        text-align: center;
+        background: #f8f9fa;
+        border-radius: 0 0 15px 15px;
+    }
+
+    .btn-modal {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 0.5rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 0.25rem;
+    }
+
+    .btn-modal:hover {
+        background: #0056b3;
+    }
+
+    .btn-modal.secondary {
+        background: #6c757d;
+    }
+
+    .btn-modal.secondary:hover {
+        background: #495057;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ffffff;
+        border-top: 2px solid transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-right: 0.5rem;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
     @media (max-width: 768px) {
         .order-container {
             padding: 1rem 0;
@@ -337,6 +450,11 @@
         .btn-danger-custom {
             width: 100%;
             max-width: 300px;
+        }
+
+        .modal-content {
+            width: 95%;
+            margin: 10% auto;
         }
     }
 </style>
@@ -503,7 +621,10 @@
                                         @if(!isset($order->payment_status) || $order->payment_status === 'pending')
                                             Menunggu pembayaran
                                         @elseif($order->payment_status === 'settlement' || $order->payment_status === 'capture')
-                                            Pembayaran berhasil - {{ $order->payment_completed_at->format('d M Y, H:i') }} WIB
+                                            Pembayaran berhasil
+                                            @if($order->payment_completed_at)
+                                                - {{ $order->payment_completed_at->format('d M Y, H:i') }} WIB
+                                            @endif
                                         @else
                                             Pembayaran gagal/dibatalkan
                                         @endif
@@ -553,4 +674,299 @@
                                 </div>
                             </div>
                         </div>
-                        @endsection
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <a href="{{ route('orders.index') }}" class="btn-primary-custom">
+                                ← Kembali ke Daftar Pesanan
+                            </a>
+                            <a href="{{ route('products.index') }}" class="btn-outline-custom">
+                                🛍️ Belanja Lagi
+                            </a>
+                            
+                            @if($order->status === 'pending' && (!isset($order->payment_status) || $order->payment_status === 'pending'))
+                            <form action="{{ route('orders.cancel', $order->order_number) }}" method="POST" style="display: inline-block;" 
+                                  onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-danger-custom">
+                                    ❌ Batalkan Pesanan
+                                </button>
+                            </form>
+                            @endif
+                        </div>
+
+                        <!-- Info Tambahan -->
+                        <div class="alert alert-info mt-4">
+                            <strong>📞 Butuh Bantuan?</strong><br>
+                            Jika ada pertanyaan mengenai pesanan atau pembayaran Anda, silakan hubungi customer service kami di WhatsApp <strong>+62 812-3456-7890</strong> 
+                            atau email <strong>cs@tokofashion.com</strong> dengan menyertakan nomor pesanan <strong>{{ $order->order_number }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Modal -->
+<div id="customModal" class="custom-modal">
+    <div class="modal-content">
+        <div class="modal-header" id="modalHeader">
+            <div class="modal-icon" id="modalIcon">⏳</div>
+            <h4 id="modalTitle">Memproses Pembayaran</h4>
+        </div>
+        <div class="modal-body">
+            <p id="modalMessage">Silakan tunggu...</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal" id="modalPrimaryBtn" onclick="closeModal()">OK</button>
+            <button class="btn-modal secondary" id="modalSecondaryBtn" onclick="closeModal()" style="display: none;">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<!-- Midtrans Snap JS -->
+@if(isset($snapToken) && $snapToken)
+<script type="text/javascript" 
+        src="https://app.{{ config('midtrans.is_production') ? 'midtrans' : 'sandbox.midtrans' }}.com/snap/snap.js" 
+        data-client-key="{{ config('midtrans.client_key') }}"></script>
+<script type="text/javascript">
+    // Modal Functions
+    function showModal(type, title, message, callback = null) {
+        const modal = document.getElementById('customModal');
+        const header = document.getElementById('modalHeader');
+        const icon = document.getElementById('modalIcon');
+        const titleEl = document.getElementById('modalTitle');
+        const messageEl = document.getElementById('modalMessage');
+        const primaryBtn = document.getElementById('modalPrimaryBtn');
+        const secondaryBtn = document.getElementById('modalSecondaryBtn');
+
+        // Reset classes
+        header.className = 'modal-header';
+        
+        // Set modal type
+        switch(type) {
+            case 'success':
+                header.classList.add('success');
+                icon.textContent = '✅';
+                primaryBtn.style.background = '#28a745';
+                break;
+            case 'error':
+                header.classList.add('error');
+                icon.textContent = '❌';
+                primaryBtn.style.background = '#dc3545';
+                break;
+            case 'pending':
+                header.classList.add('pending');
+                icon.textContent = '⏳';
+                primaryBtn.style.background = '#ffc107';
+                break;
+            default:
+                header.classList.add('pending');
+                icon.textContent = '⏳';
+        }
+
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        
+        // Handle callback
+        if (callback) {
+            primaryBtn.onclick = function() {
+                closeModal();
+                callback();
+            };
+            secondaryBtn.style.display = 'inline-block';
+            secondaryBtn.onclick = closeModal;
+        } else {
+            primaryBtn.onclick = closeModal;
+            secondaryBtn.style.display = 'none';
+        }
+
+        modal.style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('customModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('customModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+
+    // Update UI function
+    function updatePaymentStatus(status) {
+        const statusContainer = document.getElementById('payment-status-container');
+        const paymentTimelineIcon = document.getElementById('payment-timeline-icon');
+        const paymentTimelineText = document.getElementById('payment-timeline-text');
+        const processingTimelineIcon = document.getElementById('processing-timeline-icon');
+        const orderStatusBadge = document.getElementById('order-status-badge');
+
+        switch(status) {
+            case 'settlement':
+            case 'capture':
+                statusContainer.innerHTML = `
+                    <span class="status-badge status-failed">
+                        ❌ Pembayaran Gagal
+                    </span>
+                `;
+
+                // Update timeline
+                if (paymentTimelineIcon) {
+                    paymentTimelineIcon.className = 'timeline-icon inactive';
+                    paymentTimelineIcon.textContent = '❌';
+                }
+                
+                if (paymentTimelineText) {
+                    paymentTimelineText.textContent = 'Pembayaran gagal/dibatalkan';
+                }
+                
+                if (processingTimelineIcon) {
+                    processingTimelineIcon.className = 'timeline-icon inactive';
+                }
+                break;
+        }
+    }
+
+    // Function to attach pay button listener
+    function attachPayButtonListener(button) {
+        if (!button) return;
+        
+        button.onclick = function() {
+            // Disable button and show loading
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner"></span>Memuat...';
+            
+            snap.pay('{{ $snapToken }}', {
+                onSuccess: function(result){
+                    console.log('Payment success:', result);
+                    
+                    showModal('success', 'Pembayaran Berhasil!', 'Terima kasih atas pembayaran Anda. Halaman akan dimuat ulang untuk menampilkan status terbaru.', function() {
+                        window.location.reload();
+                    });
+                    
+                    updatePaymentStatus('settlement');
+                },
+                onPending: function(result){
+                    console.log('Payment pending:', result);
+                    
+                    showModal('pending', 'Pembayaran Sedang Diproses', 'Pembayaran Anda sedang diproses. Mohon tunggu konfirmasi dari sistem pembayaran.', function() {
+                        // Check status after 5 seconds
+                        setTimeout(checkPaymentStatus, 5000);
+                    });
+                    
+                    // Re-enable button
+                    button.disabled = false;
+                    button.innerHTML = '💳 Bayar Sekarang - Rp {{ number_format($order->grand_total, 0, ",", ".") }}';
+                },
+                onError: function(result){
+                    console.log('Payment error:', result);
+                    
+                    showModal('error', 'Pembayaran Gagal', 'Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi atau hubungi customer service jika masalah berlanjut.');
+                    
+                    updatePaymentStatus('failure');
+                    
+                    // Re-enable button
+                    button.disabled = false;
+                    button.innerHTML = '💳 Coba Bayar Lagi - Rp {{ number_format($order->grand_total, 0, ",", ".") }}';
+                },
+                onClose: function(){
+                    console.log('Payment popup closed');
+                    
+                    // Re-enable button
+                    button.disabled = false;
+                    button.innerHTML = '💳 Bayar Sekarang - Rp {{ number_format($order->grand_total, 0, ",", ".") }}';
+                }
+            });
+        };
+    }
+
+    // Check payment status function
+    function checkPaymentStatus() {
+        fetch('{{ route("orders.check-payment-status", $order->order_number) }}')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Payment status check:', data);
+                if (data.status && data.status !== 'pending') {
+                    updatePaymentStatus(data.status);
+                    
+                    // Show status update modal
+                    if (data.status === 'settlement' || data.status === 'capture') {
+                        showModal('success', 'Status Update', 'Pembayaran Anda telah berhasil dikonfirmasi!');
+                    } else if (data.status === 'failure' || data.status === 'cancel' || data.status === 'expire') {
+                        showModal('error', 'Status Update', 'Status pembayaran telah diperbarui. Pembayaran tidak berhasil.');
+                    }
+                }
+            })
+            .catch(error => {
+                console.log('Error checking payment status:', error);
+            });
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const payButton = document.getElementById('pay-button');
+        
+        if (payButton) {
+            attachPayButtonListener(payButton);
+        } else {
+            console.log('Pay button not found - payment might be completed or not using Midtrans');
+        }
+
+        // Auto check payment status for pending payments
+        @if(!isset($order->payment_status) || $order->payment_status === 'pending')
+        // Check status every 30 seconds
+        const statusCheckInterval = setInterval(() => {
+            checkPaymentStatus();
+        }, 30000);
+
+        // Show initial check after 5 seconds
+        setTimeout(checkPaymentStatus, 5000);
+        @endif
+    });
+</script>
+@else
+<script>
+    console.log('Snap token not available for this order');
+    
+    // Still check payment status even without snap token
+    function checkPaymentStatus() {
+        fetch('{{ route("orders.check-payment-status", $order->order_number) }}')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Payment status check:', data);
+                if (data.status && data.status !== 'pending') {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.log('Error checking payment status:', error);
+            });
+    }
+
+    // Check every 30 seconds for status updates
+    @if(!isset($order->payment_status) || $order->payment_status === 'pending')
+    setInterval(checkPaymentStatus, 30000);
+    @endif
+</script>
+@endif
+
+<!-- ESC key to close modal -->
+<script>
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeModal();
+    }
+});
+</script>
+
+@endsection
