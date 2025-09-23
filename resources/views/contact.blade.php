@@ -584,6 +584,7 @@
     margin-top: 0.5rem;
     font-weight: 500;
   }
+  
 
   /* Responsive Design */
   @media (max-width: 1200px) {

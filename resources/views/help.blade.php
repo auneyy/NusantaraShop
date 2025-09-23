@@ -28,14 +28,15 @@
     background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), 
                 url('/storage/product_images/banner-bantuan.png') center/cover no-repeat fixed;
     min-height: 620px;
+    height: 70vh; /* Tambahkan height yang konsisten seperti contact */
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 2rem 1rem;
+    padding: 180px 0 120px 0; /* Sesuaikan padding seperti contact */
     overflow: hidden;
     color: var(--light-text);
-    background-attachment: scroll;
+    background-attachment: fixed; /* Pastikan parallax aktif */
   }
 
   .hero-content {
@@ -47,11 +48,12 @@
   }
 
   .hero-help h1 {
-    font-size: 3.5rem;
-    font-weight: 800;
+    font-size: 3.2rem; /* Sesuaikan ukuran dengan contact */
+    font-weight: 700; /* Konsisten dengan contact */
     margin-bottom: 1.5rem;
     line-height: 1.2;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Enhanced shadow seperti contact */
+    letter-spacing: -0.02em; /* Tambahkan letter spacing */
   }
 
   .hero-help p {
@@ -397,13 +399,17 @@
   @keyframes fadeInUp {
     from {
       opacity: 0;
-      transform: translateY(30px);
+      transform: translateY(40px);
     }
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
+
+  html {
+  scroll-behavior: smooth;
+}
 
   /* Responsive Design */
   @media (max-width: 992px) {

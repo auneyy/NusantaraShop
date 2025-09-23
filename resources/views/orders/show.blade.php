@@ -516,14 +516,14 @@
                                          alt="{{ $item->product_name }}" class="item-image">
                                     <div class="item-info">
                                         <div class="item-name">{{ $item->product_name }}</div>
-                                        <div class="item-specs">
+                                        <!-- <div class="item-specs">
                                             Ukuran: {{ $item->size }} | Qty: {{ $item->quantity }} | 
                                             @{{ number_format($item->product_price, 0, ',', '.') }}
                                         </div>
                                     </div>
                                     <div class="item-price">
                                         Rp {{ number_format($item->subtotal, 0, ',', '.') }}
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                             @endforeach
