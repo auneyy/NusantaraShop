@@ -2,50 +2,6 @@
 
 @section('content')
 <style>
-    .discount-hero {
-    background-image: url('/storage/product_images/banner-promo.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    padding: 180px 0 120px 0;
-    height: 70vh;
-    min-height: 600px;
-    text-align: center;
-    position: relative;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-    }
-
-    .discount-hero-content {
-        position: relative;
-        z-index: 2;
-        max-width: 600px;
-        margin: 0 auto;
-    }
-
-    .discount-hero-content h1 {
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 3.2rem;
-    margin-bottom: 1.5rem;
-    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    position: relative;
-    z-index: 2;
-    letter-spacing: -0.02em;
-  }
-
-  .discount-hero-content p {
-    color: rgba(248, 249, 250, 0.95);
-    font-size: 1.25rem;
-    font-weight: 300;
-    max-width: 650px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 2;
-    line-height: 1.7;
-  }
-
     .discount-badge {
         display: inline-block;
         background: rgba(255, 255, 255, 0.2);
@@ -58,28 +14,19 @@
 
     .products-section {
         padding: 4rem 0;
-        background: #f8fafc;
+        background: white;
         min-height: 60vh;
     }
 
-    .section-title {
+        .section-title {
         text-align: center;
-        margin-bottom: 3rem;
+        margin-bottom: 1.5rem;
     }
 
     .section-title h2 {
-        font-size: 2.5rem;
         font-weight: 600;
         color: #2d3748;
         margin-bottom: 0.5rem;
-    }
-
-    .section-subtitle {
-        color: #718096;
-        font-size: 1.1rem;
-        max-width: 500px;
-        margin: 0 auto;
-        line-height: 1.6;
     }
 
     .products-grid {
@@ -231,34 +178,52 @@
             gap: 1.5rem;
         }
     }
-</style>
 
-<!-- Hero Section -->
-<section class="discount-hero">
-    <div class="floating-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-    </div>
-    
-    <div class="discount-hero-content">
-        <h1>Penawaran Terbaik</h1>
-        <p class="lead mb-4">Dapatkan produk berkualitas dengan harga yang tak tertandingi</p>
-        
-    </div>
-</section>
+    .sort-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #fff;
+    font-size: 14px;
+    color: #2d3748;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sort-select:hover {
+    border-color: #422D1C;
+}
+
+.sort-select:focus {
+    border-color: #422D1C;
+    box-shadow: 0 0 0 2px rgba(66, 45, 28, 0.15);
+    outline: none;
+}
+
+</style>
 
 <!-- Products Section -->
 <section class="products-section">
     <div class="container">
         @if($discountCount > 0)
             <div class="section-title">
-                <h2>Produk Pilihan</h2>
-                <p class="section-subtitle">
-                    Jangan lewatkan kesempatan untuk mendapatkan produk favorit dengan harga spesial
-                </p>
-            </div>
-            
+    <h2>Penawaran Spesial</h2>
+</div>
+    
+<div class="sort-box">
+<form method="GET" action="{{ route('promo') }}#products-section">
+    <select name="sort" class="sort-select ms-3" onchange="this.form.submit()">
+        <option value="">Urutkan</option>
+        <option value="az" {{ request('sort')=='az'?'selected':'' }}>Abjad A-Z</option>
+        <option value="za" {{ request('sort')=='za'?'selected':'' }}>Abjad Z-A</option>
+        <option value="low_high" {{ request('sort')=='low_high'?'selected':'' }}>Harga Terendah</option>
+        <option value="high_low" {{ request('sort')=='high_low'?'selected':'' }}>Harga Tertinggi</option>
+    </select>
+</form>
+</div>
+
+
+
             <div class="products-grid">
                 @foreach($discountedProducts as $product)
                     {{-- Panggil partials product-card --}}

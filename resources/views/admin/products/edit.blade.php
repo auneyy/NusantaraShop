@@ -159,9 +159,10 @@
                     </div>
                 </div>
 
-                <div class="form-group mt-4 text-center">
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Perbarui Produk</button>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
+
             </form>
         </div>
     </div>
@@ -180,10 +181,6 @@
                     <div class="form-group">
                         <label for="category_name">Nama Kategori</label>
                         <input type="text" class="form-control" id="category_name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="category_slug">Slug (Opsional)</label>
-                        <input type="text" class="form-control" id="category_slug" name="slug">
                     </div>
                 </form>
             </div>

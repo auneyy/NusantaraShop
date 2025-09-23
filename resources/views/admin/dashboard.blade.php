@@ -385,16 +385,14 @@
     </div>
 </div>
 
-<!-- Recent Orders Table -->
 <div class="data-section fade-in">
     <div class="section-header">
         <div class="section-title">Pesanan Terbaru</div>
-     <div class="button"></div>
-           <a href="{{ route('admin.pesanan') }}" class="btn btn-primary">
-    <i class="fas fa-eye"></i>
-    Lihat Semua
-</a>
-</div>
+        <div class="button">
+            <a href="{{ route('admin.orders.index') }}" class="btn btn-primary">
+                <i class="fas fa-eye"></i> Lihat Semua
+            </a>
+        </div>
     </div>
     <div class="table-container">
         <div class="table-responsive">
@@ -403,59 +401,51 @@
                     <tr>
                         <th>ID Pesanan</th>
                         <th>Pelanggan</th>
-                        <th>Produk</th>
                         <th>Total</th>
-                        <th>Status</th>
+                        <th>Status Pembayaran</th>
+                        <th>Status Pesanan</th>
                         <th>Waktu</th>
-                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><span class="order-id">#NUS-001</span></td>
-                        <td><span class="customer-name">Ahmad Santoso</span></td>
-                        <td><span class="product-name">Batik Jogja Premium</span></td>
-                        <td><span class="order-total">Rp 250.000</span></td>
-                        <td><span class="status-badge status-success">Lunas</span></td>
-                        <td><span class="order-time">2 menit lalu</span></td>
-                        <td><button class="btn btn-secondary btn-sm">Detail</button></td>
-                    </tr>
-                    <tr>
-                        <td><span class="order-id">#NUS-002</span></td>
-                        <td><span class="customer-name">Sari Dewi</span></td>
-                        <td><span class="product-name">Kerajinan Bali Set</span></td>
-                        <td><span class="order-total">Rp 180.000</span></td>
-                        <td><span class="status-badge status-warning">Pending</span></td>
-                        <td><span class="order-time">15 menit lalu</span></td>
-                        <td><button class="btn btn-secondary btn-sm">Detail</button></td>
-                    </tr>
-                    <tr>
-                        <td><span class="order-id">#NUS-003</span></td>
-                        <td><span class="customer-name">Budi Pranoto</span></td>
-                        <td><span class="product-name">Songket Palembang</span></td>
-                        <td><span class="order-total">Rp 320.000</span></td>
-                        <td><span class="status-badge status-danger">Gagal</span></td>
-                        <td><span class="order-time">1 jam lalu</span></td>
-                        <td><button class="btn btn-secondary btn-sm">Detail</button></td>
-                    </tr>
-                    <tr>
-                        <td><span class="order-id">#NUS-004</span></td>
-                        <td><span class="customer-name">Maya Sari</span></td>
-                        <td><span class="product-name">Tenun Lombok</span></td>
-                        <td><span class="order-total">Rp 150.000</span></td>
-                        <td><span class="status-badge status-success">Lunas</span></td>
-                        <td><span class="order-time">2 jam lalu</span></td>
-                        <td><button class="btn btn-secondary btn-sm">Detail</button></td>
-                    </tr>
-                    <tr>
-                        <td><span class="order-id">#NUS-005</span></td>
-                        <td><span class="customer-name">Rian Pratama</span></td>
-                        <td><span class="product-name">Ukiran Jepara Mini</span></td>
-                        <td><span class="order-total">Rp 420.000</span></td>
-                        <td><span class="status-badge status-warning">Pending</span></td>
-                        <td><span class="order-time">3 jam lalu</span></td>
-                        <td><button class="btn btn-secondary btn-sm">Detail</button></td>
-                    </tr>
+                    @forelse($recentOrders as $order)
+                        <tr>
+                            <td><span class="order-id">#{{ $order->order_number }}</span></td>
+                            <td><span class="customer-name">{{ $order->shipping_name }}</span></td>
+                            <td><span class="order-total">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span></td>
+                            <td>
+                                @php
+                                    $paymentStatusClass = 'status-danger';
+                                    if(in_array($order->payment_status, ['paid', 'settlement', 'capture'])) {
+                                        $paymentStatusClass = 'status-success';
+                                    } elseif(in_array($order->payment_status, ['pending', 'challenge'])) {
+                                        $paymentStatusClass = 'status-warning';
+                                    }
+                                @endphp
+                                <span class="status-badge {{ $paymentStatusClass }}">{{ $order->payment_status_label }}</span>
+                            </td>
+                            <td>
+                                @php
+                                    $orderStatusClass = 'status-danger';
+                                    if($order->status == 'delivered') {
+                                        $orderStatusClass = 'status-success';
+                                    } elseif($order->status == 'processing') {
+                                        $orderStatusClass = 'status-info';
+                                    } elseif($order->status == 'shipped') {
+                                        $orderStatusClass = 'status-info';
+                                    } elseif($order->status == 'pending') {
+                                        $orderStatusClass = 'status-warning';
+                                    }
+                                @endphp
+                                <span class="status-badge {{ $orderStatusClass }}">{{ $order->status_label }}</span>
+                            </td>
+                            <td><span class="order-time">{{ $order->created_at->diffForHumans() }}</span></td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center">Tidak ada pesanan terbaru.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

@@ -19,7 +19,6 @@
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 24px;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
     position: relative;
@@ -41,7 +40,6 @@
     width: 100%;
     aspect-ratio: 1;
     overflow: hidden;
-    border-radius: 20px 20px 0 0;
 }
 
 .product-image-primary,

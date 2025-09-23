@@ -1,13 +1,17 @@
 @extends('admin.layout.app')
 
+@section('page-title', 'Tambah Diskon')
+
 @section('content')
 <div class="container-fluid">
+             <div class="d-flex justify-content-between mb-4">
+        <a href="{{ route('admin.discounts.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Tambah Discount Baru</h3>
-                </div>
                 <div class="card-body">
                     <form action="{{ route('admin.discounts.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -68,7 +72,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        <div class="mt-2 mb-4 form-group">
                             <label for="products">Pilih Produk *</label>
                             <select name="products[]" id="products" class="form-control select2 @error('products') is-invalid @enderror" multiple="multiple" required>
                                 @foreach($products as $product)
@@ -82,10 +86,9 @@
                             @enderror
                         </div>
 
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                            <a href="{{ route('admin.discounts.index') }}" class="btn btn-secondary">Batal</a>
-                        </div>
+                       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-primary">Tambah</button>
+                            </div>
                     </form>
                 </div>
             </div>
@@ -104,7 +107,6 @@
     $(document).ready(function() {
         // Initialize Select2
         $('#products').select2({
-            placeholder: 'Pilih produk',
             allowClear: true
         });
 

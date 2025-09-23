@@ -89,18 +89,34 @@
         color: #8B4513;
         margin-bottom: 0;
     }
+
+        .section-title {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title h2 {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        margin-top: 1.5rem;
+    }
 </style>
 
 @section('content')
 <div class="content-wrapper">
     <div class="container">
-        <!-- Tombol Filter -->
-        <button class="btn btn-outline-dark mb-3" data-bs-toggle="offcanvas" data-bs-target="#filterSidebar">
-            <i class="bi bi-sliders"></i> Filter
-        </button>
+
+    <div class="section-title">
+        <h2>Pilihan Terbaik</h2>
+    </div>
+
+    
+     <button class="btn btn-outline-dark mb-5 ms-3" data-bs-toggle="offcanvas" data-bs-target="#filterSidebar">
+    <i class="bi bi-sliders"></i> Filter
+</button>
 
         <div class="row">
-
           <!-- Produk -->
 <div class="col-md-12">
     <div class="row g-3">
@@ -125,7 +141,7 @@
 <!-- Offcanvas untuk mobile -->
 <div class="offcanvas offcanvas-start" tabindex="-1" id="filterSidebar">
     <div class="offcanvas-header">
-        <h5 class="offcanvas-title">Filter Kategori</h5>
+        <h5 class="offcanvas-title">Filter</h5>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">

@@ -1,12 +1,19 @@
 @extends('admin.layout.app')
 
+@section('page-title', 'Detail Diskon')
+
 @section('content')
 <div class="container-fluid">
+      <div class="d-flex justify-content-between mb-4">
+        <a href="{{ route('admin.discounts.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Detail Discount</h3>
+                    <h3 class="m-0 font-weight-bold">{{ $discount->title }}</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -35,16 +42,6 @@
                                 <tr>
                                     <th>Tanggal Berakhir</th>
                                     <td>{{ $discount->end_date->format('d M Y H:i') }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Status</th>
-                                    <td>
-                                        @if($discount->is_valid)
-                                            <span class="badge badge-success">Aktif</span>
-                                        @else
-                                            <span class="badge badge-secondary">Tidak Aktif</span>
-                                        @endif
-                                    </td>
                                 </tr>
                             </table>
                         </div>
@@ -89,9 +86,6 @@
                             <p class="text-muted">Tidak ada produk yang terkait dengan discount ini.</p>
                         @endif
                     </div>
-                </div>
-                <div class="card-footer">
-                    <a href="{{ route('admin.discounts.index') }}" class="btn btn-secondary">Kembali</a>
                 </div>
             </div>
         </div>

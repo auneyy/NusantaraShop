@@ -31,7 +31,7 @@
                             <div class="mb-3">
                                 <label for="slug" class="form-label">Slug</label>
                                 <input type="text" class="form-control" id="slug" value="{{ $category->slug }}" readonly>
-                                <div class="form-text">Slug is automatically generated from the name and will update when you change the name.</div>
+                                <div class="form-text">Slug otomatis berubah.</div>
                             </div>
                             
                             <div class="mb-3 form-check">
@@ -40,7 +40,7 @@
                             </div>
                             
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button type="submit" class="btn btn-primary">Update</button>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </form>
                     </div>

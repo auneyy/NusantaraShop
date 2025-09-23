@@ -2,18 +2,46 @@
 
 @section('content')
 <style>
-  :root {
-    --primary-color: #422D1C;
-    --secondary-color: #8B4513;
-    --accent-color: #D4A76A;
-    --light-bg: #F9F5F0;
-    --dark-text: #2D2424;
-    --light-text: #F5F5F5;
-    --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  }
+:root {
+  --primary-color: #422D1C;
+  --secondary-color: #8B4513;
+  --accent-color: #D4A76A;
+  --light-bg: #F9F5F0;
+  --dark-text: #2D2424;
+  --light-text: #F5F5F5;
+  --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Hilangkan spasi putih bawaan */
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Hero Section */
+.hero-help {
+  position: relative;
+  background: url('/storage/product_images/heroimagebantuan.png') center/cover no-repeat;
+  min-height: 450px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  color: #422D1C;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Hilangkan padding container di dalam hero */
+.hero-help .container {
+  margin: 0;
+  padding: 0;
+}
+
 
   /* Base Styles */
   body {
@@ -40,7 +68,7 @@
   }
 
   .hero-content {
-    max-width: 800px;
+    max-width: 450px;
     margin: 0 auto;
     position: relative;
     z-index: 2;
@@ -57,18 +85,18 @@
   }
 
   .hero-help p {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     opacity: 0.9;
-    margin-bottom: 2.5rem;
-    max-width: 700px;
+    margin-bottom: 2rem;
+    max-width: 600px;
     margin-left: auto;
     margin-right: auto;
   }
 
-  /* Search Bar */
+  /* Search Bar - Reduced Size */
   .search-container {
     position: relative;
-    max-width: 700px;
+    max-width: 600px;
     margin: 0 auto;
     z-index: 2;
     transition: var(--transition);
@@ -81,10 +109,10 @@
 
   .search-input {
     width: 100%;
-    padding: 1.5rem 2.5rem 1.5rem 1.8rem;
+    padding: 1rem 2rem 1rem 1.5rem;
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 50px;
-    font-size: 1.1rem;
+    font-size: 1rem;
     background-color: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(8px);
     color: white;
@@ -93,7 +121,7 @@
   }
 
   .search-input::placeholder {
-    color: rgba(255, 255, 255, 0.8);
+    color: #422D1C;
   }
 
   .search-input:focus {
@@ -105,14 +133,14 @@
 
   .search-btn {
     position: absolute;
-    right: 8px;
+    right: 6px;
     top: 50%;
     transform: translateY(-50%);
     background: var(--primary-color);
     border: none;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -128,10 +156,10 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   }
 
-  /* Topics Section */
+  /* Topics Section - White Background & Reduced Size */
   .topics-section {
-    padding: 6rem 0;
-    background-color: var(--light-bg);
+    padding: 3rem 0;
+    background-color: white;
     position: relative;
     overflow: hidden;
   }
@@ -139,9 +167,10 @@
   .section-title {
     text-align: center;
     color: var(--primary-color);
-    font-weight: 800;
-    font-size: 2.8rem;
-    margin-bottom: 5rem;
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 3rem;
+    margin-top: 3rem;
     position: relative;
     display: inline-block;
     left: 50%;
@@ -151,26 +180,27 @@
   .section-title::after {
     content: '';
     position: absolute;
-    bottom: -15px;
+    bottom: -10px;
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;
-    height: 4px;
+    width: 60px;
+    height: 3px;
     background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
     border-radius: 2px;
   }
 
   .topics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
     padding: 0 2rem;
   }
 
+  /* Topic Cards - Reduced Size */
   .topic-card {
     background: white;
-    border-radius: 20px;
-    padding: 3rem 2rem;
+    border-radius: 15px;
+    padding: 2rem 1.5rem;
     text-align: center;
     box-shadow: var(--shadow-md);
     transition: var(--transition);
@@ -187,44 +217,44 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 5px;
+    height: 4px;
     background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
     transition: var(--transition);
     z-index: -1;
   }
 
   .topic-card:hover {
-    transform: translateY(-10px) scale(1.02);
+    transform: translateY(-8px) scale(1.02);
     box-shadow: var(--shadow-lg);
   }
 
   .topic-card:hover .topic-icon {
-    transform: translateY(-5px) scale(1.1);
-    box-shadow: 0 15px 30px rgba(139, 69, 19, 0.3);
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 10px 20px rgba(139, 69, 19, 0.3);
   }
 
   .topic-icon {
-    width: 90px;
-    height: 90px;
-    margin: 0 auto 2rem;
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 1.5rem;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border-radius: 25px;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 2.5rem;
+    font-size: 2rem;
     transition: var(--transition);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   }
 
   .topic-title {
     color: var(--primary-color);
-    font-weight: 700;
-    font-size: 1.3rem;
-    margin-bottom: 1.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
     position: relative;
-    padding-bottom: 1rem;
+    padding-bottom: 0.8rem;
   }
 
   .topic-title::after {
@@ -233,15 +263,15 @@
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 50px;
+    width: 40px;
     height: 2px;
     background: linear-gradient(90deg, var(--primary-color), transparent);
   }
 
   .topic-description {
     color: #666;
-    font-size: 1rem;
-    line-height: 1.7;
+    font-size: 0.9rem;
+    line-height: 1.6;
     margin-bottom: 0;
   }
 
@@ -270,6 +300,7 @@
     border: 1px solid rgba(0, 0, 0, 0.05);
     box-shadow: var(--shadow-sm);
     text-decoration: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   }
 
   .article-item:hover {
@@ -303,23 +334,69 @@
     margin-left: 1.5rem;
   }
 
-  /* Contact Section */
+  /* FAQ Section */
+  .features-section {
+     background-color: white;
+     margin-bottom: 6rem;
+  }
+
+  .feature-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    height: 100%;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(66, 45, 28, 0.08);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(66, 45, 28, 0.05);
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.03), transparent);
+    transition: left 0.6s;
+  }
+
+  .feature-card:hover::before {
+    left: 100%;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 50px rgba(66, 45, 28, 0.15);
+    border-color: rgba(139, 69, 19, 0.15);
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .feature-card h5 {
+    color: #422D1C;
+    font-weight: 600;
+    margin-bottom: 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .feature-card i {
+    color: #8B4513;
+    font-size: 1.2rem;
+    margin-right: 0.75rem;
+  }
+
+  /* Contact Section - Remove Top Border */
   .contact-section {
-    padding: 6rem 0;
+    padding: 4rem 0;
     background: linear-gradient(135deg, #f8f9fa 0%, #f0e8dd 100%);
     text-align: center;
     position: relative;
     overflow: hidden;
-  }
-
-  .contact-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 10px;
-    background: rgba(98, 96, 96, 0.2);
   }
 
   .contact-content {
@@ -414,42 +491,43 @@
   /* Responsive Design */
   @media (max-width: 992px) {
     .hero-help h1 {
-      font-size: 3rem;
+      font-size: 2.2rem;
     }
 
     .section-title {
-      font-size: 2.5rem;
+      font-size: 1.8rem;
     }
   }
 
   @media (max-width: 768px) {
     .hero-help {
-      padding: 6rem 1rem;
+      padding: 4rem 1rem;
       background-attachment: scroll;
+      min-height: 250px;
     }
 
     .hero-help h1 {
-      font-size: 2.5rem;
+      font-size: 2rem;
     }
 
     .hero-help p {
-      font-size: 1.15rem;
+      font-size: 1rem;
       padding: 0 1rem;
     }
 
     .section-title {
-      font-size: 2.2rem;
-      margin-bottom: 4rem;
+      font-size: 1.6rem;
+      margin-bottom: 2.5rem;
     }
 
     .topics-grid {
       grid-template-columns: 1fr;
-      max-width: 500px;
+      max-width: 450px;
       margin: 0 auto;
     }
 
     .topic-card {
-      padding: 2.5rem 1.5rem;
+      padding: 1.8rem 1.2rem;
     }
 
     .article-item {
@@ -469,34 +547,34 @@
 
   @media (max-width: 576px) {
     .hero-help h1 {
-      font-size: 2rem;
+      font-size: 1.8rem;
       line-height: 1.3;
     }
 
     .hero-help p {
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
 
     .section-title {
-      font-size: 1.8rem;
+      font-size: 1.5rem;
     }
 
     .search-input {
-      padding: 1.2rem 1.8rem 1.2rem 1.5rem;
-      font-size: 1rem;
+      padding: 1rem 1.6rem 1rem 1.2rem;
+      font-size: 0.95rem;
     }
 
     .search-btn {
-      width: 45px;
-      height: 45px;
+      width: 38px;
+      height: 38px;
     }
 
     .contact-title {
-      font-size: 2rem;
+      font-size: 1.8rem;
     }
 
     .contact-description {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
     }
 
     .btn-contact {
@@ -518,7 +596,6 @@
 <div class="hero-help">
   <div class="container">
     <h1>Bagaimana Kami Bisa Membantu?</h1>
-    <p>Temukan solusi dan jawaban dari tim dukungan kami dengan cepat atau hubungi kami langsung</p>
     
     <div class="search-container">
       <input type="text" class="search-input" placeholder="Cari jawaban atau topik bantuan..." id="helpSearch">
@@ -568,46 +645,50 @@
   </div>
 </div>
 
-<!-- Featured Articles Section -->
-<div class="featured-articles">
+<!-- FAQ Section -->
+<div class="features-section">
   <div class="container">
-    <h2 class="section-title">Artikel Unggulan</h2>
-    
-    <div class="articles-container">
-      <a href="#" class="article-item" data-article="register">
-        <h5 class="article-title">Cara mendaftar akun NusantaraShop</h5>
-        <div class="article-arrow">
-          <i class="bi bi-arrow-right"></i>
+    <div class="text-center mb-5 mt-5">
+      <h2 style="color: #422D1C; font-weight: 700;">Pertanyaan Umum</h2>
+      <p style="color: #666; font-size: 1.1rem;">Temukan jawaban untuk pertanyaan yang sering diajukan</p>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-4">
+        <div class="feature-card" style="text-align: left; padding: 2rem;">
+          <h5 style="color: #422D1C; font-weight: 600; margin-bottom: 0;">
+            <i class="bi bi-question-circle-fill me-2" style="color: #8B4513;"></i>
+            Bagaimana cara perawatan batik?
+          </h5>
         </div>
-      </a>
+      </div>
       
-      <a href="#" class="article-item" data-article="payment">
-        <h5 class="article-title">Metode pembayaran yang tersedia</h5>
-        <div class="article-arrow">
-          <i class="bi bi-arrow-right"></i>
+      <div class="col-md-6 mb-4">
+        <div class="feature-card" style="text-align: left; padding: 2rem;">
+          <h5 style="color: #422D1C; font-weight: 600; margin-bottom: 0;">
+            <i class="bi bi-truck me-2" style="color: #8B4513;"></i>
+            Berapa lama waktu pengiriman?
+          </h5>
         </div>
-      </a>
+      </div>
       
-      <a href="#" class="article-item" data-article="tracking">
-        <h5 class="article-title">Cara melacak pesanan Anda</h5>
-        <div class="article-arrow">
-          <i class="bi bi-arrow-right"></i>
+      <div class="col-md-6 mb-4">
+        <div class="feature-card" style="text-align: left; padding: 2rem;">
+          <h5 style="color: #422D1C; font-weight: 600; margin-bottom: 0;">
+            <i class="bi bi-arrow-repeat me-2" style="color: #8B4513;"></i>
+            Apakah bisa return/tukar?
+          </h5>
         </div>
-      </a>
+      </div>
       
-      <a href="#" class="article-item" data-article="return">
-        <h5 class="article-title">Kebijakan pengembalian dan penukaran</h5>
-        <div class="article-arrow">
-          <i class="bi bi-arrow-right"></i>
+      <div class="col-md-6 mb-4">
+        <div class="feature-card" style="text-align: left; padding: 2rem;">
+          <h5 style="color: #422D1C; font-weight: 600; margin-bottom: 0;">
+            <i class="bi bi-shield-check me-2" style="color: #8B4513;"></i>
+            Apakah produk asli?
+          </h5>
         </div>
-      </a>
-      
-      <a href="#" class="article-item" data-article="sizing">
-        <h5 class="article-title">Panduan ukuran baju batik</h5>
-        <div class="article-arrow">
-          <i class="bi bi-arrow-right"></i>
-        </div>
-      </a>
+      </div>
     </div>
   </div>
 </div>

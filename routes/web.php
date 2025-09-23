@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ArtikelController;
 use App\Http\Controllers\Admin\MessageController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 
 // Middleware untuk mencegah back history di seluruh aplikasi
 Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(function () {
@@ -35,15 +36,16 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
     Route::view('/contact', 'contact')->name('contact');
     Route::view('/help', 'help')->name('help');
 
+    Route::get('/search', [SearchController::class, 'search'])->name('search');
+    Route::get('/search-suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
+    Route::get('/advanced-search', [SearchController::class, 'advancedSearch'])->name('search.advanced');   
+
     // Products Resource (menggunakan controller publik yang benar)
     // Gunakan .except(['show', 'create', 'store', 'edit', 'update', 'destroy']) untuk hanya index
     Route::get('/products', [PublicProductController::class, 'index'])->name('products.index');
 
     // Rute kustom untuk show agar bisa menggunakan slug
     Route::get('/products/{product:slug}', [PublicProductController::class, 'show'])->name('products.show');
-    
-    // Route untuk pencarian dan filter produk
-    Route::get('/search', [PublicProductController::class, 'search'])->name('product.search');
 
     // API Routes untuk AJAX (jika ada)
     Route::prefix('api')->group(function () {
@@ -126,7 +128,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
         ->name('admin.')
         ->group(function () {
             // Admin Dashboard
-            Route::get('/dashboard', fn () => view('admin.dashboard'))->name('dashboard');
+           Route::get('/dashboard', [AdminOrderController::class, 'dashboard'])->name('dashboard');
 
             // Products
             Route::resource('products', AdminProductController::class);
@@ -147,7 +149,9 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::resource('artikel', ArtikelController::class);
            
             // Pesanan
-            Route::get('/pesanan', fn () => view('admin.pesanan'))->name('pesanan');
+            Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+            Route::get('/orders/{orderNumber}', [AdminOrderController::class, 'show'])->name('orders.show');
+            Route::patch('/orders/{orderNumber}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
 
             // Laporan Pendapatan
             Route::get('/pendapatan', fn () => view('admin.pendapatan'))->name('pendapatan');

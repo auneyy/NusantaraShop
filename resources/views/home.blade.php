@@ -2,112 +2,252 @@
 
 @section('content')
 <style>
-
-  .hero-section {
-    background: linear-gradient(135deg, #f8f9fa 0%, rgb(239, 229, 209) 100%);
-    padding: 0;
-    min-height: 650px;
-    display: flex;
-    align-items: center;
-    margin-bottom: 50px;
+  /* Hero Carousel Styles - Compact Version */
+  .hero-carousel {
+    position: relative;
+    height: 70vh;
+    overflow: hidden;
+    margin-bottom: 30px;
   }
 
-  .hero-content h1 {
-    color: #422D1C;
-    font-weight: 800;
-    font-size: 40px;
+  .hero-carousel .carousel-item {
+    height: 70vh;
+    position: relative;
+  }
+
+  .hero-carousel .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(1);
+  }
+
+  .hero-carousel .carousel-item.active img {
+    transform: scale(1.02);
+  }
+
+  /* Dark overlay for better text readability */
+  .hero-carousel .carousel-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+    transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Carousel caption styling - Compact */
+  .hero-carousel .carousel-caption {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    text-align: center;
+    width: 85%;
+    max-width: 600px;
+    padding: 15px;
+  }
+
+  .hero-carousel .carousel-caption h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    margin-bottom: 0.8rem;
     line-height: 1.2;
-    margin-bottom: 1.5rem;
   }
 
-  .hero-content h1 .highlight {
-    color: #8B4513;
+  .hero-carousel .carousel-caption p {
+    font-size: 1rem;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    margin-bottom: 1.2rem;
+    font-weight: 400;
+    line-height: 1.5;
   }
 
-  .hero-content p {
-    color: #666;
-    font-weight: 600;
-    font-size: 20px;
-    line-height: 1.6;
-    margin-bottom: 1rem;
-    max-width: 90%;
-  }
-
+  /* Custom button styles - Compact with smoother animations */
   .btn-primary-custom {
     background-color: #422D1C;
     border-color: #422D1C;
     color: white;
-    padding: 15px 35px;
+    padding: 10px 24px;
     font-weight: 600;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    margin-right: 15px;
+    border-radius: 6px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-right: 10px;
     text-decoration: none;
     display: inline-block;
-    font-size: 1rem;
+    font-size: 0.9rem;
+    box-shadow: 0 3px 10px rgba(66, 45, 28, 0.3);
   }
 
   .btn-primary-custom:hover {
     background-color: #8B4513;
     border-color: #8B4513;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     color: white;
+    box-shadow: 0 8px 20px rgba(139, 69, 19, 0.4);
   }
 
   .btn-outline-custom {
     background-color: transparent;
-    border: 2px solid #422D1C;
-    color: #422D1C;
-    padding: 13px 35px;
+    border: 2px solid white;
+    color: white;
+    padding: 8px 24px;
     font-weight: 600;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+    border-radius: 6px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
     display: inline-block;
-    font-size: 1rem;
+    font-size: 0.9rem;
+    margin-left: 8px;
   }
 
   .btn-outline-custom:hover {
-    background-color: #422D1C;
+    background-color: white;
+    color: #422D1C;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+  }
+
+  .btn-secondary-custom {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.8);
     color: white;
-    transform: translateY(-2px);
+    padding: 8px 24px;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    display: inline-block;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
   }
 
-  .hero-image {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .btn-secondary-custom:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #422D1C;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
   }
 
-  .hero-image img {
-    width: 100%;
-    height: 650px;
-    object-fit: cover;
+  /* Custom carousel controls - Compact with smoother animations */
+  .hero-carousel .carousel-control-prev,
+  .hero-carousel .carousel-control-next {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    top: 50%;
+    transform: translateY(-50%);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .hero-section .row {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    flex-wrap: wrap;
-    margin: 0;
+  .hero-carousel .carousel-control-prev {
+    left: 20px;
   }
 
-  .hero-section .hero-content {
-    flex: 1;
-    min-width: 300px;
-    padding: 60px 40px;
+  .hero-carousel .carousel-control-next {
+    right: 20px;
   }
 
-  .hero-section .hero-image {
-    flex: 1;
-    padding: 0;
+  .hero-carousel .carousel-control-prev:hover,
+  .hero-carousel .carousel-control-next:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-50%) scale(1.08);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
   }
 
+  .hero-carousel .carousel-control-prev-icon,
+  .hero-carousel .carousel-control-next-icon {
+    width: 16px;
+    height: 16px;
+    background-size: contain;
+  }
+
+  /* Custom carousel indicators - Compact with smoother animations */
+  .hero-carousel .carousel-indicators {
+    bottom: 20px;
+    margin-bottom: 0;
+  }
+
+  .hero-carousel .carousel-indicators button {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 0 4px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hero-carousel .carousel-indicators button.active {
+    background-color: white;
+    transform: scale(1.4);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+  }
+
+  .hero-carousel .carousel-indicators button:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    transform: scale(1.2);
+  }
+
+  /* Animate.css integration - Smoother animations */
+  .carousel-caption .animate__animated {
+    animation-duration: 1.2s;
+    animation-delay: 0.2s;
+    animation-fill-mode: both;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .carousel-caption h1.animate__animated {
+    animation-delay: 0.2s;
+    animation-duration: 1s;
+  }
+
+  .carousel-caption p.animate__animated {
+    animation-delay: 0.2s;
+    animation-duration: 1s;
+  }
+
+  .carousel-caption .btn.animate__animated {
+    animation-delay: 0.2s;
+    animation-duration: 1s;
+  }
+
+  /* Additional smooth transitions with enhanced animations */
+  .carousel-fade .carousel-item {
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: none;
+  }
+
+  .carousel-fade .carousel-item.active,
+  .carousel-fade .carousel-item-next.carousel-item-start,
+  .carousel-fade .carousel-item-prev.carousel-item-end {
+    z-index: 1;
+    opacity: 1;
+  }
+
+  .carousel-fade .active.carousel-item-start,
+  .carousel-fade .active.carousel-item-end {
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0s 0.8s;
+  }
+
+  /* Features Section */
   .features-section {
     padding: 80px 0;
-    background-color: #f8f9fa;
   }
 
   .feature-card {
@@ -138,6 +278,7 @@
     margin-bottom: 1rem;
   }
 
+  /* CTA Section */
   .cta-section {
     background: linear-gradient(135deg, #f8f9fa 0%, rgb(239, 229, 209) 100%);
     color: #422D1C;
@@ -190,7 +331,7 @@
     transform: translateY(-2px);
   }
 
-  /* Improved Product Section Styles */
+  /* Product Section Styles */
   .products-section {
     padding: 20px 0;
     background-color: #ffffff;
@@ -204,31 +345,9 @@
     margin-bottom: 50px;
   }
 
-  .section-subtitle {
-    text-align: center;
-    color: #666;
-    font-size: 1.1rem;
-    margin-bottom: 50px;
-    margin-top: -30px;
-  }
-
-  /* Product Cards Container with better spacing */
   .products-container {
     max-width: 1200px;
     margin: 0 auto;
-  }
-
-  .product-row {
-    display: flex;
-    flex-wrap: wrap;
-    margin: -15px; /* Negative margin to offset column padding */
-    justify-content: center;
-  }
-
-  .product-col {
-    flex: 0 0 25%;
-    max-width: 25%;
-    padding: 15px; /* Consistent spacing around each product */
   }
 
   .product-card {
@@ -277,13 +396,6 @@
     margin-bottom: 15px;
   }
 
-  .product-price-original {
-    font-size: 1rem;
-    color: #999;
-    text-decoration: line-through;
-    margin-right: 10px;
-  }
-
   .btn-add-cart {
     background-color: #f8f9fa;
     color: #422D1C;
@@ -302,7 +414,7 @@
     transform: translateY(-2px);
   }
 
-.banner-discount {
+  .banner-discount {
     width: 100%;
     height: auto;
     margin: 50px auto;
@@ -318,20 +430,60 @@
   }
 
   /* Responsive Design */
-  @media (max-width: 1200px) {
-    .product-col {
-      flex: 0 0 33.333333%;
-      max-width: 33.333333%;
-    }
-  }
-
   @media (max-width: 768px) {
-    .hero-content h1 {
-      font-size: 2.2rem;
+    .hero-carousel {
+      height: 60vh;
     }
 
-    .hero-section {
-      padding: 60px 0;
+    .hero-carousel .carousel-item {
+      height: 60vh;
+    }
+
+    .hero-carousel .carousel-caption h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .hero-carousel .carousel-caption p {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn-primary-custom,
+    .btn-outline-custom,
+    .btn-secondary-custom {
+      display: block;
+      width: 70%;
+      margin: 8px auto;
+      text-align: center;
+      font-size: 0.85rem;
+      padding: 8px 20px;
+    }
+
+    .hero-carousel .carousel-control-prev,
+    .hero-carousel .carousel-control-next {
+      width: 35px;
+      height: 35px;
+    }
+
+    .hero-carousel .carousel-control-prev {
+      left: 15px;
+    }
+
+    .hero-carousel .carousel-control-next {
+      right: 15px;
+    }
+
+    .hero-carousel .carousel-control-prev-icon,
+    .hero-carousel .carousel-control-next-icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    .hero-carousel .carousel-indicators button {
+      width: 6px;
+      height: 6px;
+      margin: 0 3px;
     }
 
     .features-section {
@@ -342,16 +494,6 @@
       padding: 0 10px;
     }
 
-    .product-row {
-      margin: -10px;
-    }
-
-    .product-col {
-      flex: 0 0 50%;
-      max-width: 50%;
-      padding: 10px;
-    }
-
     .product-image {
       height: 220px;
     }
@@ -359,76 +501,112 @@
     .product-info {
       padding: 15px;
     }
-
-    .btn-primary-custom,
-    .btn-outline-custom {
-      display: block;
-      width: 100%;
-      margin-bottom: 15px;
-      margin-right: 0;
-      text-align: center;
-    }
-
-    .hero-section .row {
-      flex-direction: column;
-      gap: 0;
-      text-align: center;
-      margin: 0;
-    }
-
-    .hero-content {
-      min-width: auto;
-      padding: 20px 20px !important;
-      order: 2;
-    }
-
-    .hero-image {
-      min-width: auto;
-      order: 1; 
-      padding: 0 !important;
-    }
-
-    .hero-content p {
-      max-width: 100%;
-    }
   }
 
   @media (max-width: 576px) {
-    .product-col {
-      flex: 0 0 100%;
-      max-width: 100%;
+    .hero-carousel {
+      height: 55vh;
+    }
+
+    .hero-carousel .carousel-item {
+      height: 55vh;
+    }
+
+    .hero-carousel .carousel-caption h1 {
+      font-size: 1.5rem;
+    }
+
+    .hero-carousel .carousel-caption p {
+      font-size: 0.85rem;
+    }
+
+    .hero-carousel .carousel-caption {
+      width: 90%;
+    }
+
+    .btn-primary-custom,
+    .btn-outline-custom,
+    .btn-secondary-custom {
+      width: 80%;
+      font-size: 0.8rem;
+      padding: 8px 16px;
     }
   }
 </style>
 
-<!-- Hero Section -->
-<div class="hero-section">
-    <div class="container-fluid p-0">
-    <div class="row align-items-center">
-      <div class="col-lg-6 hero-content">
-    <h1>
-        Temukan baju batik yang cocok dengan dirimu di 
-        <span class="highlight">NusantaraShop</span>
-    </h1>
-    <p>
-        Kami menghadirkan koleksi baju batik pilihan yang dirancang untuk membuatmu 
-        terhubung dengan budaya lewat kenyamanan
-    </p>
+<!-- Include Animate.css CDN for animations -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
-    @guest
-        <a href="{{ route('register') }}" class="btn-primary-custom">Daftar Sekarang</a>
-        <a href="{{ route('login') }}" class="btn-outline-custom">Masuk</a>
-    @endguest
+<!-- Hero Slider -->
+<div id="heroCarousel" class="carousel slide carousel-fade hero-carousel" data-bs-ride="carousel" data-bs-interval="5000">
+  <div class="carousel-inner">
 
-    @auth
-        <a href="{{ url('/products') }}" class="btn-primary-custom">Beli Sekarang</a>
-    @endauth
-</div>
-        <div class="col-lg-6 hero-image">
-            <img src="{{ asset('storage/product_images/heroadat.png') }}" alt="Traditional Indonesian Clothing" class="img-fluid">
+    <!-- Slide 1 -->
+    <div class="carousel-item active">
+      <img src="{{ asset('storage/product_images/macambatik.jpg') }}" class="d-block w-100" alt="Elegant Batik Collection">
+      <div class="carousel-caption">
+        <h1 class="animate__animated animate__fadeInDown">Temukan baju adat yang cocok dengan dirimu di NusantaraShop</h1>
+        <p class="animate__animated animate__fadeInUp">Membuatmu terhubung dengan budaya lewat kenyamanan</p>
+        <div class="animate__animated animate__fadeInUp">
+          @guest
+            <a href="{{ route('register') }}" class="btn btn-primary-custom">Daftar Sekarang</a>
+            <a href="{{ route('login') }}" class="btn btn-outline-custom">Masuk</a>
+          @endguest
+          @auth
+            <a href="{{ url('/products') }}" class="btn btn-primary-custom">Beli Sekarang</a>
+          @endauth
         </div>
+      </div>
     </div>
+
+    <!-- Slide 2 -->
+    <div class="carousel-item">
+      <img src="{{ asset('storage/product_images/batik2.jpg') }}" class="d-block w-100" alt="Comfort and Style">
+      <div class="carousel-caption">
+        <h1 class="animate__animated animate__fadeInDown">Siap Menemani Momenmu</h1>
+        <p class="animate__animated animate__fadeInUp">Dibuat dari bahan pilihan yang lembut dan tahan lama, batik kami siap nemenin setiap momenmu.</p>
+      </div>
     </div>
+
+    <!-- Slide 3 -->
+    <!-- <div class="carousel-item">
+      <img src="{{ asset('storage/product_images/batik2.jpg') }}" class="d-block w-100" alt="Batik for Every Moment">
+      <div class="carousel-caption">
+        <h1 class="animate__animated animate__fadeInDown">Warna, Motif, dan Cerita</h1>
+        <p class="animate__animated animate__fadeInUp">Setiap goresan batik mempunyai makna, Setiap motif punya cerita, setiap helai membawa budaya.</p>
+      </div>
+    </div> -->
+
+    
+    <!-- Slide 4 -->
+    <div class="carousel-item">
+      <img src="{{ asset('storage/product_images/macambatik1.jpg') }}" class="d-block w-100" alt="Traditional Heritage">
+      <div class="carousel-caption">
+        <h1 class="animate__animated animate__fadeInDown">Saatnya Temukan Favoritmu</h1>
+        <p class="animate__animated animate__fadeInUp">Setiap orang punya gaya unik. Yuk, cari yang paling cocok buat kamu di sini.</p>
+      </div>
+    </div>
+
+
+  </div>
+
+  <!-- Controls -->
+  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+
+  <!-- Indicators -->
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <!-- <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button> -->
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 4"></button>
+  </div>
 </div>
     
 <!-- Products Section -->
@@ -458,8 +636,7 @@
     </div>
 @endif
 
-
-   <!-- Products Section -->
+<!-- Products Section -->
 <div class="products-section">
   <div class="products-container">
     <h2 class="section-title">Semua Produk</h2>
@@ -474,13 +651,11 @@
   </div>
 </div>
 
-
 <div class="load-more-section">
   <a href="{{ route('products.index') }}" class="btn btn-primary-custom btn-lg">
     Lihat Semua Produk
   </a>
 </div>
-
 
 <!-- Features Section -->
 <div class="features-section">

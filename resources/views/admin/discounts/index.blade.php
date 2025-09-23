@@ -5,7 +5,6 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Manajemen Diskon</h1>
         <a href="{{ route('admin.discounts.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Tambah Diskon
         </a>
@@ -21,7 +20,8 @@
     <div class="card shadow mb-4">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table">
+                {{-- Mengganti 'table table-bordered table' menjadi 'table table-bordered table-hover' --}}
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -41,8 +41,7 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>
                                     @if($discount->banner_image)
-                                        {{-- Mengambil URL gambar langsung dari database --}}
-                                        <img src="{{ $discount->banner_image }}" alt="Banner" style="max-width: 100px; max-height: 60px;">
+                                        <img src="{{ asset('storage/' . $discount->banner_image) }}" alt="Banner" style="max-width: 100px; max-height: 60px;" class="img-thumbnail">
                                     @else
                                         <span class="text-muted">Tidak ada gambar</span>
                                     @endif
@@ -53,11 +52,12 @@
                                 <td>{{ $discount->start_date->format('d M Y H:i') }}</td>
                                 <td>{{ $discount->end_date->format('d M Y H:i') }}</td>
                                 <td>
-                                    @if($discount->is_valid)
-                                        <span class="badge bg-success">Aktif</span>
-                                    @else
-                                        <span class="badge bg-secondary">Tidak Aktif</span>
-                                    @endif
+                                    @php
+                                        $statusClass = $discount->is_valid ? 'bg-success' : 'bg-secondary';
+                                    @endphp
+                                    <span class="badge {{ $statusClass }}">
+                                        {{ $discount->is_valid ? 'Active' : 'Inactive' }}
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="btn-group">
