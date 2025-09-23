@@ -1,74 +1,105 @@
 <style>
-    .elegant-category-sidebar {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+    .filter-sidebar {
         position: sticky;
         top: 20px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
-    .elegant-category-sidebar-title {
-        font-size: 1.1rem;
+    .filter-section {
+        border-bottom: 1px solid #eee;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+    }
+
+    .filter-header {
+        font-size: 1rem;
         font-weight: 600;
         color: #222;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #e0e0e0;
-        margin-bottom: 1rem;
-    }
-
-    .elegant-category-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 12px 0;
-        color: #555;
+        cursor: pointer;
+        padding: 8px 0;
+    }
+
+    .filter-header:hover {
+        color: #422D1C;
+    }
+
+    .filter-options {
+        margin-top: 8px;
+        display: none;
+        padding-left: 5px;
+    }
+
+    .filter-options.show {
+        display: block;
+    }
+
+    .filter-option {
+        display: block;
+        font-size: 0.9rem;
+        color: #444;
+        margin: 6px 0;
+        cursor: pointer;
         text-decoration: none;
-        transition: all 0.3s ease;
-        font-weight: 400;
-        font-size: 0.95rem;
-        border-bottom: 1px solid #f0f0f0;
     }
 
-    .elegant-category-item:hover {
-        background-color: #f7f7f7;
-        color: #222;
-        padding-left: 10px;
+    .filter-option:hover {
+        color: #422D1C;
     }
 
-    .elegant-category-item.active {
-        background-color: #eaeaea;
-        color: #222;
-        font-weight: 500;
-    }
-
-    .elegant-category-item:last-child {
-        border-bottom: none;
-    }
-
-    .elegant-category-badge {
-        background: #ececec !important;
-        color: #422D1C !important;
-        padding: 4px 8px;
-        font-size: 0.75rem;
-        font-weight: 500;
-        min-width: 25px;
-        text-align: center;
-        border-radius: 12px;
-        transition: all 0.2s ease;
+    .filter-option.active {
+        font-weight: 600;
+        color: #422D1C;
     }
 </style>
 
-<div class="elegant-category-sidebar">
-    <h5 class="elegant-category-sidebar-title">Kategori</h5>
-    <ul class="list-group list-group-flush">
-        @foreach($categories->sortBy('name') as $category)
-            <a
-                href="{{ route('products.index') }}?category={{ $category->slug }}"
-                class="elegant-category-item list-group-item-action {{ request('category') == $category->slug ? 'active' : '' }}"
-            >
-                {{ $category->name }}
-                <span class="elegant-category-badge">{{ $category->products_count }}</span>
+<div class="filter-sidebar">
+
+    <!-- Filter Kategori -->
+    <div class="filter-section">
+        <div class="filter-header" onclick="toggleFilter('categoryFilter')">
+            Kategori <span>+</span>
+        </div>
+        <div id="categoryFilter" class="filter-options">
+            <a href="{{ route('products.index') }}" 
+               class="filter-option {{ request('category') ? '' : 'active' }}">
+               Semua
             </a>
-        @endforeach
-    </ul>
+            @foreach($categories->sortBy('name') as $category)
+                <a href="{{ route('products.index', ['category' => $category->slug]) }}"
+                   class="filter-option {{ request('category') == $category->slug ? 'active' : '' }}">
+                   {{ $category->name }} ({{ $category->products_count }})
+                </a>
+            @endforeach
+        </div>
+    </div>
+
+    <!-- Filter Harga -->
+    <div class="filter-section">
+        <div class="filter-header" onclick="toggleFilter('priceFilter')">
+            Harga <span>+</span>
+        </div>
+        <div id="priceFilter" class="filter-options">
+            <a href="{{ route('products.index', ['sort' => 'asc']) }}"
+               class="filter-option {{ request('sort') == 'asc' ? 'active' : '' }}">
+               Harga Terendah
+            </a>
+            <a href="{{ route('products.index', ['sort' => 'desc']) }}"
+               class="filter-option {{ request('sort') == 'desc' ? 'active' : '' }}">
+               Harga Tertinggi
+            </a>
+        </div>
+    </div>
+
 </div>
+
+<script>
+    function toggleFilter(id) {
+        document.getElementById(id).classList.toggle('show');
+    }
+</script>

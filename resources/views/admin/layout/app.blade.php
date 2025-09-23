@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="icon" href="{{ asset('product_images/logoaja.png') }}">
     <style>
         :root {
             --primary-color: #422D1C;
@@ -386,7 +387,7 @@
                     </li>
 
                     <li class="nav-item">
-                          <a href="{{ route('admin.pesanan') }}" class="nav-link {{ request()->routeIs('admin.pesanan') ? 'active' : '' }}">
+                          <a href="{{ route('admin.orders.index') }}" class="nav-link {{ request()->routeIs('admin.orders.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-shopping-cart"></i>
                             Pesanan
                         </a>
@@ -453,8 +454,8 @@
                         <div class="col-md-6">
                             <div class="d-flex align-items-center justify-content-end gap-3">
                                 <div class="search-container">
-                                    <i class="search-icon fas fa-search"></i>
-                                    <input type="text" class="search-input form-control" placeholder="Cari produk, pesanan, atau pengguna...">
+                                    <!-- <i class="search-icon fas fa-search"></i>
+                                    <input type="text" class="search-input form-control" placeholder="Cari produk, pesanan, atau pengguna..."> -->
                                 </div>
                                 
                                 <div class="user-profile" id="userProfile">
@@ -471,14 +472,14 @@
                                             <div class="user-email">{{ Auth::user()->email }}</div>
                                         </div>
                                         <div class="dropdown-menu-custom">
-                                            <a href="#profile" class="dropdown-item">
+                                            <!-- <a href="#profile" class="dropdown-item">
                                                 <i class="fas fa-user"></i>
                                                 Profil Saya
                                             </a>
                                             <a href="#settings" class="dropdown-item">
                                                 <i class="fas fa-cog"></i>
                                                 Pengaturan
-                                            </a>
+                                            </a> -->
 <a href="#" class="dropdown-item"
    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
    <i class="fas fa-sign-out-alt"></i> Keluar

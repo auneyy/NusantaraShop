@@ -13,7 +13,8 @@
     <div class="card shadow mb-4">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                {{-- Mengganti 'hover' dengan 'table-hover' --}}
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -47,10 +48,19 @@
                             <td>Rp {{ number_format($product->harga, 0, ',', '.') }}</td>
                             <td>{{ $product->stock_kuantitas }}</td>
                             <td>
-                           <span class="badge {{ $product->status == 'tersedia' ? 'text-bg-success' : ($product->status == 'habis' ? 'text-bg-secondary' : 'text-bg-info') }}">
-    {{ ucfirst($product->status) }}
-</span>
-</td>
+                                {{-- Mengganti 'text-bg-*' dengan 'bg-*' --}}
+                                @php
+                                    $statusClass = 'bg-info'; // Default
+                                    if ($product->status == 'tersedia') {
+                                        $statusClass = 'bg-success';
+                                    } elseif ($product->status == 'habis') {
+                                        $statusClass = 'bg-secondary';
+                                    }
+                                @endphp
+                                <span class="badge {{ $statusClass }}">
+                                    {{ ucfirst($product->status) }}
+                                </span>
+                            </td>
                             <td>
                                 <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-sm btn-info">
                                     <i class="fas fa-eye"></i>

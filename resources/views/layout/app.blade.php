@@ -19,12 +19,14 @@
       background-color: #fff;
     }
 
-    .navbar {
-      background-color: #fff !important;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      padding: 1rem 0;
-      z-index: 1000;
-    }
+.navbar {
+  background-color: #fff !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  padding: 1rem 0;
+  z-index: 1000;
+  position: sticky;
+  top: 0;
+}
 
     .logonusantara {
       height: 50px;
@@ -354,6 +356,15 @@
         justify-content: center;
       }
     }
+
+    .btn-primary{
+      background-color: #422D1C;
+      border: none;
+    }
+
+    .btn-primary:hover{
+      background-color: #8B4513;
+    }
 </style>
 
   <script>
@@ -565,15 +576,15 @@
           <h6 class="mb-4">Hubungi Kami</h6>
           <div class="contact-info">
             <i class="bi bi-envelope-fill"></i>
-            <p class="contact-text">info@nusantarashop.com</p>
+            <p class="contact-text">nusantarashop@gmail.com</p>
           </div>
           <div class="contact-info">
             <i class="bi bi-telephone-fill"></i>
-            <p class="contact-text">(021) 123-4567</p>
+            <p class="contact-text">+62 895 4036 50987</p>
           </div>
           <div class="contact-info">
             <i class="bi bi-geo-alt-fill"></i>
-            <p class="contact-text">Jakarta, Indonesia<br>Jl. Batik Nusantara No. 123</p>
+            <p class="contact-text">Jl. Kalimasada Nomor 30, <br>Polehan, Kec. Blimbing, <br>Kota Malang, Jawa Timur 65121</p>
           </div>
         </div>
       </div>
