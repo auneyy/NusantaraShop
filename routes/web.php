@@ -6,7 +6,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\OrderController; // Added import
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\RajaOngkirController;
 use App\Http\Controllers\ProductController as PublicProductController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\DiscountController;
@@ -42,16 +43,21 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
     Route::get('/advanced-search', [SearchController::class, 'advancedSearch'])->name('search.advanced');   
 
     // Products Resource (menggunakan controller publik yang benar)
-    // Gunakan .except(['show', 'create', 'store', 'edit', 'update', 'destroy']) untuk hanya index
     Route::get('/products', [PublicProductController::class, 'index'])->name('products.index');
-
-    // Rute kustom untuk show agar bisa menggunakan slug
     Route::get('/products/{product:slug}', [PublicProductController::class, 'show'])->name('products.show');
 
     // API Routes untuk AJAX (jika ada)
     Route::prefix('api')->group(function () {
         Route::get('/product/{id}', [PublicProductController::class, 'getProduct'])->name('api.product');
         Route::get('/products', [PublicProductController::class, 'getAllProducts'])->name('api.products');
+    });
+
+    // RajaOngkir API Routes (dapat diakses publik untuk keperluan checkout)
+    Route::prefix('rajaongkir')->name('rajaongkir.')->group(function () {
+        Route::get('/provinces', [RajaOngkirController::class, 'index'])->name('provinces');
+        Route::get('/cities/{provinceId}', [RajaOngkirController::class, 'getCities'])->name('cities');
+        Route::get('/districts/{cityId}', [RajaOngkirController::class, 'getDistricts'])->name('districts');
+        Route::post('/check-ongkir', [RajaOngkirController::class, 'checkOngkir'])->name('check-ongkir');
     });
 
     // ==========================
@@ -90,14 +96,11 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::get('/count', [CartController::class, 'getCart'])->name('count');
         });
         
-        // Orders Routes - Added this section
+        // Orders Routes
         Route::prefix('orders')->name('orders.')->group(function () {
             Route::get('/', [OrderController::class, 'index'])->name('index');
             Route::get('/{orderNumber}', [OrderController::class, 'show'])->name('show');
-            
-            // PERBAIKAN: Support both POST and DELETE methods for cancellation
             Route::match(['POST', 'DELETE'], '/{orderNumber}/cancel', [OrderController::class, 'cancel'])->name('cancel');
-            
             Route::get('/{orderNumber}/check-payment-status', [OrderController::class, 'checkPaymentStatus'])->name('check-payment-status');
         });
         
@@ -107,9 +110,55 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::post('/process', [CheckoutController::class, 'process'])->name('process');
             Route::get('/success', [CheckoutController::class, 'success'])->name('success');
             Route::get('/check-payment-status/{orderNumber}', [CheckoutController::class, 'checkPaymentStatus'])->name('check-payment-status');
-            // FIXED: Route untuk notifikasi Midtrans
             Route::post('/midtrans/notification', [CheckoutController::class, 'midtransNotification'])->name('midtrans.notification');
         });
+
+        // File: routes/web.php
+        // Tambahkan route ini untuk testing
+
+// TEMPORARY DEBUG ROUTE
+// Tambahkan ini di routes/web.php untuk testing
+// HAPUS setelah selesai debugging!
+
+Route::get('/test-rajaongkir', function() {
+    // Test dengan parameter yang sama seperti di checkout
+    $testDistrictId = request()->get('district_id', 3942); // Default ke Diwek
+    $testWeight = request()->get('weight', 1000); // Default 1kg
+    $testCourier = request()->get('courier', 'jne'); // Default JNE
+    
+    $response = Http::withOptions([
+        'verify' => false, // Sesuaikan dengan setting Anda
+    ])->asForm()->withHeaders([
+        'Accept' => 'application/json',
+        'key' => config('rajaongkir.api_key'),
+    ])->post('https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
+        'origin' => 3942, // Diwek
+        'destination' => $testDistrictId,
+        'weight' => $testWeight,
+        'courier' => $testCourier,
+    ]);
+
+    $data = $response->json();
+    
+    return response()->json([
+        'request_params' => [
+            'origin' => 3942,
+            'destination' => $testDistrictId,
+            'weight' => $testWeight,
+            'courier' => $testCourier,
+        ],
+        'api_status' => $response->status(),
+        'api_successful' => $response->successful(),
+        'full_response' => $data,
+        'rajaongkir_status' => $data['rajaongkir']['status'] ?? null,
+        'rajaongkir_results' => $data['rajaongkir']['results'] ?? null,
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
+// Usage:
+// http://localhost/test-rajaongkir
+// http://localhost/test-rajaongkir?courier=pos&weight=2000
+// http://localhost/test-rajaongkir?district_id=3942&courier=tiki&weight=500
 
         // Profile Routes
         Route::middleware('auth')->group(function () {
@@ -124,7 +173,6 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::post('/profile/settings/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.settings.preferences');
             Route::delete('/profile/delete', [ProfileController::class, 'deleteAccount'])->name('profile.delete');
             Route::patch('/orders/{order}/cancel', [ProfileController::class, 'cancelOrder'])->name('orders.cancel');
-             
         });
 
         Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
@@ -145,7 +193,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
         ->name('admin.')
         ->group(function () {
             // Admin Dashboard
-           Route::get('/dashboard', [AdminOrderController::class, 'dashboard'])->name('dashboard');
+            Route::get('/dashboard', [AdminOrderController::class, 'dashboard'])->name('dashboard');
 
             // Products
             Route::resource('products', AdminProductController::class);
@@ -159,10 +207,10 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::patch('/discounts/{discount}/toggle-status', [DiscountController::class, 'toggleStatus'])
                 ->name('discounts.toggle-status');
 
-             // Kategori
+            // Kategori
             Route::resource('categories', CategoryController::class)->except(['show']);
 
-             // Artikel
+            // Artikel
             Route::resource('artikel', ArtikelController::class);
            
             // Pesanan
@@ -173,10 +221,10 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             // Laporan Pendapatan
             Route::get('/pendapatan', fn () => view('admin.pendapatan'))->name('pendapatan');
 
-             // Pesan Masuk
+            // Pesan Masuk
             Route::resource('admin/messages', MessageController::class)->only(['index','show']);
                 
-            // Admin Logout (pindahkan ke dalam middleware admin)
+            // Admin Logout
             Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
         });
 });

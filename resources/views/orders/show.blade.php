@@ -529,19 +529,26 @@
                             @endforeach
 
                             <!-- Order Summary -->
-                            <div class="order-info mt-3">
-                                <div class="info-row">
-                                    <span class="info-label">Subtotal</span>
-                                    <span class="info-value">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
-                                </div>
-                                <div class="info-row">
-                                    <span class="info-label">Ongkos Kirim</span>
-                                    <span class="info-value">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
-                                </div>
-                                <div class="info-row" style="border-top: 2px solid #dee2e6; padding-top: 1rem; margin-top: 1rem; font-weight: 600; font-size: 1.1rem; color: #422D1C;">
-                                    <span class="info-label">Total</span>
-                                    <span class="info-value">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span>
-                                </div>
+                        <div class="order-info mt-3">
+                            <div class="info-row">
+                                <span class="info-label">Subtotal</span>
+                                <span class="info-value">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Total Berat</span>
+                                <span class="info-value">
+                                    {{ number_format($order->orderItems->sum(function($item) {
+                                        return $item->product->berat * $item->quantity;
+                                    }), 0, ',', '.') }} gram
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Ongkos Kirim</span>
+                                <span class="info-value">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="info-row" style="border-top: 2px solid #dee2e6; padding-top: 1rem; margin-top: 1rem; font-weight: 600; font-size: 1.1rem; color: #422D1C;">
+                                <span class="info-label">Total</span>
+                                <span class="info-value">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span>
                             </div>
                         </div>
 

@@ -35,6 +35,8 @@ class CheckoutController extends Controller
             ];
             
             $total = $checkoutItems[0]['subtotal'];
+            // Hitung total berat
+            $totalWeight = $product->berat * ($request->quantity ?? 1);
             $source = 'direct';
         } else {
             // Ambil dari keranjang (session)
@@ -46,6 +48,7 @@ class CheckoutController extends Controller
             
             $checkoutItems = [];
             $total = 0;
+            $totalWeight = 0;
             
             foreach ($cartItems as $key => $item) {
                 $checkoutItems[] = [
@@ -55,12 +58,16 @@ class CheckoutController extends Controller
                     'subtotal' => $item['subtotal']
                 ];
                 $total += $item['subtotal'];
+                $totalWeight += $item['product']->berat * $item['quantity'];
             }
             
             $source = 'cart';
         }
 
-        return view('checkout.index', compact('checkoutItems', 'total', 'source'));
+        // Get user data for autofill
+        $user = Auth::user();
+
+        return view('checkout.index', compact('checkoutItems', 'total', 'totalWeight', 'source', 'user'));
     }
 
     public function process(Request $request)
@@ -70,8 +77,13 @@ class CheckoutController extends Controller
             'shipping_phone' => 'required|string|max:20',
             'shipping_email' => 'required|email|max:255',
             'shipping_address' => 'required|string',
+            'shipping_province' => 'required|string|max:100',
             'shipping_city' => 'required|string|max:100',
+            'shipping_district' => 'required|string|max:100',
             'shipping_postal_code' => 'required|string|max:10',
+            'courier_service' => 'required|string',
+            'courier_name' => 'required|string',
+            'shipping_cost' => 'required|numeric|min:0',
             'payment_method' => 'required|in:bank_transfer,cod,ewallet,midtrans',
             'items' => 'required|array',
             'items.*.product_id' => 'required|exists:products,id',
@@ -83,22 +95,29 @@ class CheckoutController extends Controller
         DB::beginTransaction();
         
         try {
+            $shippingCost = $request->shipping_cost;
+            $grandTotal = $request->total_amount + $shippingCost;
+
             // Membuat order baru
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'order_number' => $this->generateOrderNumber(),
                 'status' => 'pending',
                 'total_amount' => $request->total_amount,
-                'shipping_cost' => 15000,
-                'grand_total' => $request->total_amount + 15000,
+                'shipping_cost' => $shippingCost,
+                'grand_total' => $grandTotal,
                 'payment_method' => $request->payment_method,
                 'payment_status' => 'pending',
                 'shipping_name' => $request->shipping_name,
                 'shipping_phone' => $request->shipping_phone,
                 'shipping_email' => $request->shipping_email,
                 'shipping_address' => $request->shipping_address,
+                'shipping_province' => $request->shipping_province,
                 'shipping_city' => $request->shipping_city,
+                'shipping_district' => $request->shipping_district,
                 'shipping_postal_code' => $request->shipping_postal_code,
+                'courier_name' => $request->courier_name,
+                'courier_service' => $request->courier_service,
                 'notes' => $request->notes,
                 'order_date' => now(),
             ]);
@@ -135,7 +154,7 @@ class CheckoutController extends Controller
                 if ($snapToken) {
                     $order->update([
                         'midtrans_transaction_id' => $snapToken,
-                        'midtrans_snap_token' => $snapToken // Add this field to store snap token separately
+                        'midtrans_snap_token' => $snapToken
                     ]);
                 }
             }
@@ -147,22 +166,20 @@ class CheckoutController extends Controller
                 Session::forget('cart');
             }
 
-          // Add this at the end of the process method, replace the existing redirect logic
+            // Always return JSON for AJAX requests
+            if ($request->ajax() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'snap_token' => $snapToken,
+                    'order_number' => $order->order_number,
+                    'payment_method' => $request->payment_method,
+                    'redirect_url' => route('orders.show', $order->order_number)
+                ]);
+            }
 
-        // Always return JSON for AJAX requests
-        if ($request->ajax() || $request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'snap_token' => $snapToken,
-                'order_number' => $order->order_number,
-                'payment_method' => $request->payment_method,
-                'redirect_url' => route('orders.show', $order->order_number) // Changed from checkout.success
-            ]);
-        }
-
-        // Fallback for non-AJAX requests - redirect directly to orders
-        return redirect()->route('orders.show', $order->order_number)
-                        ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran untuk melanjutkan.');
+            // Fallback for non-AJAX requests - redirect directly to orders
+            return redirect()->route('orders.show', $order->order_number)
+                            ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran untuk melanjutkan.');
 
         } catch (\Exception $e) {
             DB::rollback();
@@ -182,59 +199,57 @@ class CheckoutController extends Controller
         }
     }
 
-// Add this method or update existing success method in CheckoutController.php
-
-/**
- * Enhanced success method with better status handling and redirect options
- */
-public function success(Request $request)
-{
-    $orderNumber = $request->get('order');
-    $status = $request->get('status', 'pending');
-    $redirect = $request->get('redirect', 'success'); // success or orders
-    
-    if (!$orderNumber) {
-        return redirect()->route('home')->with('error', 'Pesanan tidak ditemukan.');
-    }
-
-    $order = Order::where('order_number', $orderNumber)
-                 ->where('user_id', Auth::id())
-                 ->with(['orderItems.product.images'])
-                 ->first();
-
-    if (!$order) {
-        return redirect()->route('home')->with('error', 'Pesanan tidak ditemukan.');
-    }
-
-    // Update payment status if coming from success callback
-    if ($status === 'success') {
-        $this->updateOrderPaymentStatus($order, 'settlement');
-    }
-
-    // If redirect to orders is requested, go to orders page
-    if ($redirect === 'orders') {
-        return redirect()->route('orders.show', $orderNumber)
-                        ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran untuk melanjutkan.');
-    }
-
-    // Generate new snap token if payment is still pending and using Midtrans
-    $snapToken = null;
-    if ($this->isPaymentPending($order) && $order->payment_method === 'midtrans') {
-        try {
-            $snapToken = $this->createMidtransTransaction($order);
-            if ($snapToken) {
-                $order->update(['midtrans_snap_token' => $snapToken]);
-            }
-        } catch (\Exception $e) {
-            Log::error('Failed to generate snap token for existing order', [
-                'order_number' => $order->order_number,
-                'error' => $e->getMessage()
-            ]);
+    /**
+     * Enhanced success method with better status handling and redirect options
+     */
+    public function success(Request $request)
+    {
+        $orderNumber = $request->get('order');
+        $status = $request->get('status', 'pending');
+        $redirect = $request->get('redirect', 'success');
+        
+        if (!$orderNumber) {
+            return redirect()->route('home')->with('error', 'Pesanan tidak ditemukan.');
         }
-    }
 
-    return view('checkout.success', compact('order', 'snapToken'));
-}
+        $order = Order::where('order_number', $orderNumber)
+                     ->where('user_id', Auth::id())
+                     ->with(['orderItems.product.images'])
+                     ->first();
+
+        if (!$order) {
+            return redirect()->route('home')->with('error', 'Pesanan tidak ditemukan.');
+        }
+
+        // Update payment status if coming from success callback
+        if ($status === 'success') {
+            $this->updateOrderPaymentStatus($order, 'settlement');
+        }
+
+        // If redirect to orders is requested, go to orders page
+        if ($redirect === 'orders') {
+            return redirect()->route('orders.show', $orderNumber)
+                            ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran untuk melanjutkan.');
+        }
+
+        // Generate new snap token if payment is still pending and using Midtrans
+        $snapToken = null;
+        if ($this->isPaymentPending($order) && $order->payment_method === 'midtrans') {
+            try {
+                $snapToken = $this->createMidtransTransaction($order);
+                if ($snapToken) {
+                    $order->update(['midtrans_snap_token' => $snapToken]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to generate snap token for existing order', [
+                    'order_number' => $order->order_number,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
+
+        return view('checkout.success', compact('order', 'snapToken'));
+    }
 
     /**
      * Enhanced Midtrans transaction creation
@@ -270,7 +285,7 @@ public function success(Request $request)
                         'first_name' => $order->shipping_name,
                         'email' => $order->shipping_email,
                         'phone' => $order->shipping_phone,
-                        'address' => substr($order->shipping_address, 0, 200), // Limit length
+                        'address' => substr($order->shipping_address, 0, 200),
                         'city' => $order->shipping_city,
                         'postal_code' => $order->shipping_postal_code,
                         'country_code' => 'IDN'
@@ -279,7 +294,7 @@ public function success(Request $request)
                         'first_name' => $order->shipping_name,
                         'email' => $order->shipping_email,
                         'phone' => $order->shipping_phone,
-                        'address' => substr($order->shipping_address, 0, 200), // Limit length
+                        'address' => substr($order->shipping_address, 0, 200),
                         'city' => $order->shipping_city,
                         'postal_code' => $order->shipping_postal_code,
                         'country_code' => 'IDN'
