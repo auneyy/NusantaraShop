@@ -121,7 +121,7 @@ html, body {
   }
 
   .search-input::placeholder {
-    color: #422D1C;
+    color: #ffffff
   }
 
   .search-input:focus {

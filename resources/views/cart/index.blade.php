@@ -360,6 +360,195 @@
     text-decoration: none;
 }
 
+    /* Modern Alert Styles */
+    .modern-alert-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .modern-alert-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modern-alert-box {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        transform: scale(0.9) translateY(20px);
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .modern-alert-overlay.show .modern-alert-box {
+        transform: scale(1) translateY(0);
+    }
+
+    .alert-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .alert-icon.warning {
+        background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+        color: white;
+    }
+
+    .alert-icon.success {
+        background: linear-gradient(135deg, #51cf66, #69db7c);
+        color: white;
+    }
+
+    .alert-icon.error {
+        background: linear-gradient(135deg, #ff6b6b, #ff5252);
+        color: white;
+    }
+
+    .alert-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.5rem;
+    }
+
+    .alert-message {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .alert-buttons {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+    }
+
+    .alert-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+    }
+
+    .alert-btn.primary {
+        background: #dc3545;
+        color: white;
+    }
+
+    .alert-btn.primary:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+    }
+
+    .alert-btn.secondary {
+        background: #f8f9fa;
+        color: #495057;
+        border: 1px solid #e9ecef;
+    }
+
+    .alert-btn.secondary:hover {
+        background: #e9ecef;
+        transform: translateY(-2px);
+    }
+
+    /* Toast Notification */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+    }
+
+    .toast-notification {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #28a745;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transform: translateX(400px);
+        opacity: 0;
+        transition: all 0.3s ease;
+        max-width: 350px;
+    }
+
+    .toast-notification.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .toast-notification.success {
+        border-left-color: #28a745;
+    }
+
+    .toast-notification.error {
+        border-left-color: #dc3545;
+    }
+
+    .toast-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .toast-icon.success {
+        background: #28a745;
+    }
+
+    .toast-icon.error {
+        background: #dc3545;
+    }
+
+    .toast-content {
+        flex: 1;
+    }
+
+    .toast-title {
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
+    }
+
+    .toast-message {
+        color: #6c757d;
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+
     @media (max-width: 768px) {
         .cart-container {
             padding: 1rem 0;
@@ -399,8 +588,40 @@
             margin-right: 1rem;
             color: #495057;
         }
+
+        .modern-alert-box {
+            padding: 1.5rem;
+        }
+
+        .toast-container {
+            top: 10px;
+            right: 10px;
+            left: 10px;
+        }
+
+        .toast-notification {
+            max-width: none;
+        }
     }
 </style>
+
+<!-- Modern Alert HTML -->
+<div class="modern-alert-overlay" id="modernAlert">
+    <div class="modern-alert-box">
+        <div class="alert-icon warning" id="alertIcon">
+            ⚠️
+        </div>
+        <h3 class="alert-title" id="alertTitle">Konfirmasi</h3>
+        <p class="alert-message" id="alertMessage">Apakah Anda yakin ingin melanjutkan?</p>
+        <div class="alert-buttons">
+            <button class="alert-btn secondary" id="alertCancel">Batal</button>
+            <button class="alert-btn primary" id="alertConfirm">Ya, Hapus</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
 
 <div class="cart-container">
     <div class="container">
@@ -451,7 +672,7 @@
                                         <span id="item-total-{{ $key }}">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</span>
                                     </td>
                                     <td>
-                                        <button class="delete-btn" onclick="removeItem('{{ $key }}')">
+                                        <button class="delete-btn" onclick="confirmRemoveItem('{{ $key }}', '{{ $item['product']->name }}')">
                                             <span style="color: red; font-weight: bold;">Hapus</span>
                                         </button>
                                     </td>
@@ -515,6 +736,105 @@
 </div>
 
 <script>
+// Modern Alert Functions
+let currentCartKey = null;
+
+function showModernAlert(title, message, type = 'warning', onConfirm = null) {
+    const overlay = document.getElementById('modernAlert');
+    const alertIcon = document.getElementById('alertIcon');
+    const alertTitle = document.getElementById('alertTitle');
+    const alertMessage = document.getElementById('alertMessage');
+    const confirmBtn = document.getElementById('alertConfirm');
+    const cancelBtn = document.getElementById('alertCancel');
+
+    // Set icon based on type
+    const icons = {
+        warning: '⚠️',
+        success: '✅',
+        error: '❌',
+        info: 'ℹ️'
+    };
+
+    alertIcon.textContent = icons[type] || icons.warning;
+    alertIcon.className = `alert-icon ${type}`;
+    alertTitle.textContent = title;
+    alertMessage.textContent = message;
+
+    // Show alert
+    overlay.classList.add('show');
+
+    // Handle confirm button
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    if (onConfirm) {
+        newConfirmBtn.onclick = () => {
+            hideModernAlert();
+            onConfirm();
+        };
+    }
+
+    // Handle cancel button
+    const newCancelBtn = cancelBtn.cloneNode(true);
+    cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+    newCancelBtn.onclick = hideModernAlert;
+
+    // Close on overlay click
+    overlay.onclick = (e) => {
+        if (e.target === overlay) {
+            hideModernAlert();
+        }
+    };
+}
+
+function hideModernAlert() {
+    const overlay = document.getElementById('modernAlert');
+    overlay.classList.remove('show');
+}
+
+function showToast(title, message, type = 'success', duration = 4000) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${type}`;
+    
+    const icon = type === 'success' ? '✓' : '✗';
+    
+    toast.innerHTML = `
+        <div class="toast-icon ${type}">${icon}</div>
+        <div class="toast-content">
+            <div class="toast-title">${title}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+    `;
+
+    container.appendChild(toast);
+
+    // Show toast
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100);
+
+    // Hide and remove toast
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (container.contains(toast)) {
+                container.removeChild(toast);
+            }
+        }, 300);
+    }, duration);
+}
+
+function confirmRemoveItem(cartKey, productName) {
+    currentCartKey = cartKey;
+    showModernAlert(
+        'Hapus Produk',
+        `Apakah Anda yakin ingin menghapus "${productName}" dari keranjang?`,
+        'warning',
+        () => removeItem(cartKey)
+    );
+}
+
 function updateQuantity(cartKey, change) {
     const qtyInput = document.getElementById('qty-' + cartKey);
     const currentQty = parseInt(qtyInput.value);
@@ -548,23 +868,22 @@ function updateQuantity(cartKey, change) {
             
             // Update cart total
             updateCartSummary(data.cart_total);
+            
+            // Show success toast
+            showToast('Berhasil!', 'Jumlah produk berhasil diupdate', 'success', 3000);
         } else {
-            alert(data.message);
+            showToast('Error!', data.message, 'error');
         }
         cartItem.style.opacity = '1';
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Terjadi kesalahan saat mengupdate keranjang');
+        showToast('Error!', 'Terjadi kesalahan saat mengupdate keranjang', 'error');
         cartItem.style.opacity = '1';
     });
 }
 
 function removeItem(cartKey) {
-    if (!confirm('Apakah Anda yakin ingin menghapus item ini dari keranjang?')) {
-        return;
-    }
-    
     fetch('/cart/remove', {
         method: 'POST',
         headers: {
@@ -579,47 +898,63 @@ function removeItem(cartKey) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            document.getElementById('cart-item-' + cartKey).remove();
+            // Animate item removal
+            const cartItem = document.getElementById('cart-item-' + cartKey);
+            cartItem.style.transform = 'translateX(-100%)';
+            cartItem.style.opacity = '0';
             
-            if (data.cart_count === 0) {
-                location.reload(); // Reload to show empty cart
-            } else {
-                updateCartSummary(data.cart_total);
-            }
+            setTimeout(() => {
+                cartItem.remove();
+                
+                if (data.cart_count === 0) {
+                    location.reload(); // Reload to show empty cart
+                } else {
+                    updateCartSummary(data.cart_total);
+                }
+                
+                // Show success toast
+                showToast('Berhasil!', 'Produk berhasil dihapus dari keranjang', 'success');
+            }, 300);
         } else {
-            alert(data.message);
+            showToast('Error!', data.message, 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Terjadi kesalahan saat menghapus item');
+        showToast('Error!', 'Terjadi kesalahan saat menghapus item', 'error');
     });
 }
 
 function clearCart() {
-    if (!confirm('Apakah Anda yakin ingin mengosongkan seluruh keranjang?')) {
-        return;
-    }
-    
-    fetch('/cart/clear', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            'X-Requested-With': 'XMLHttpRequest'
+    showModernAlert(
+        'Kosongkan Keranjang',
+        'Apakah Anda yakin ingin mengosongkan seluruh keranjang belanja?',
+        'warning',
+        () => {
+            fetch('/cart/clear', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Berhasil!', 'Keranjang berhasil dikosongkan', 'success');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    showToast('Error!', 'Gagal mengosongkan keranjang', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error!', 'Terjadi kesalahan', 'error');
+            });
         }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert('Gagal mengosongkan keranjang');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Terjadi kesalahan');
-    });
+    );
 }
 
 function updateCartSummary(newTotal) {
@@ -631,5 +966,12 @@ function updateCartSummary(newTotal) {
         totalElement.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(newTotal + 15000);
     }
 }
+
+// Close alert with Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        hideModernAlert();
+    }
+});
 </script>
 @endsection

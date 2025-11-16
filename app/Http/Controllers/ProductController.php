@@ -85,4 +85,5 @@ class ProductController extends Controller
             }])
             ->get();
     }
+
 }

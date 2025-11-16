@@ -5,13 +5,13 @@
   /* Hero Carousel Styles - Compact Version */
   .hero-carousel {
     position: relative;
-    height: 70vh;
+    height: 85vh;
     overflow: hidden;
     margin-bottom: 30px;
   }
 
   .hero-carousel .carousel-item {
-    height: 70vh;
+    height: 85vh;
     position: relative;
   }
 

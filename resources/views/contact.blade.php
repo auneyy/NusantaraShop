@@ -6,69 +6,48 @@
     box-sizing: border-box;
   }
 
-/* Hero Section */
-.contact-hero {
-  position: relative;
-  display: flex;
-  flex-direction: column; /* supaya teks tersusun vertikal */
-  align-items: center;
-  justify-content: center;
-  min-height: 450px;
-  text-align: center;
-  overflow: hidden;
-}
+  /* Hero Section - Enhanced */
+  .contact-hero {
+    background-image: url('/storage/product_images/kontak.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    padding: 180px 0 120px 0;
+    height: 70vh;
+    min-height: 600px;
+    text-align: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
 
-/* Gambar hero (tidak nge-zoom) */
-.hero-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* selalu penuh */
-  object-position: center top; /* fokus ke bagian atas/tengah gambar */
-  z-index: 0;
-}
+  .contact-hero h1 {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 3.2rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    position: relative;
+    z-index: 2;
+    letter-spacing: -0.02em;
+  }
 
-/* Overlay di atas gambar */
-.contact-hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* hitam transparan */
-  z-index: 1;
-}
+  .contact-hero p {
+    color:#422D1C;  
+    font-size: 1.25rem;
+    font-weight:400;
+    max-width: 650px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+    line-height: 1.7;
+  }
 
-/* Teks di atas overlay */
-.contact-hero h1,
-.contact-hero p {
-  position: relative;
-  z-index: 2;
-}
-
-.contact-hero h1 {
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  letter-spacing: -0.02em;
-}
-
-.contact-hero p {
-  color: rgba(248, 249, 250, 0.95);
-  font-size: 1.1rem;
-  font-weight: 600;
-  max-width: 600px;
-  margin: 0 auto;
-  line-height: 1.7;
-}
-
-  /* Contact Section - Reduced */
+  /* Contact Section - Enhanced */
   .contact-section {
-    padding: 50px 0;
+    padding: 100px 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #f1f3f4 100%);
     min-height: auto;
     position: relative;
   }
@@ -81,6 +60,9 @@
     left: 0;
     right: 0;
     bottom: 0;
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(139, 69, 19, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(66, 45, 28, 0.02) 0%, transparent 50%);
     pointer-events: none;
   }
 
@@ -88,25 +70,26 @@
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     box-shadow: 
-      0 20px 40px rgba(66, 45, 28, 0.1),
+      0 25px 50px rgba(66, 45, 28, 0.1),
       0 0 0 1px rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
     overflow: hidden;
-    max-width: 900px;
+    max-width: 1100px;
     margin: 0 auto;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
   }
 
   .contact-container:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px);
     box-shadow: 
-      0 25px 50px rgba(66, 45, 28, 0.15),
+      0 35px 70px rgba(66, 45, 28, 0.15),
       0 0 0 1px rgba(255, 255, 255, 0.3);
   }
 
-  /* Form Section Styling - Reduced */
+  /* Form Section Styling */
   .contact-form-section {
-    padding: 40px;
+    padding: 60px;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%);
     position: relative;
   }
@@ -114,7 +97,7 @@
   /* Info Section - Enhanced Gradient */
   .contact-info-section {
     background: linear-gradient(135deg, #422D1C 0%, #5D3522 25%, #8B4513 75%, #A0522D 100%);
-    padding: 40px;
+    padding: 60px;
     color: white;
     position: relative;
     overflow: hidden;
@@ -152,8 +135,8 @@
   .section-title {
     color: #422D1C;
     font-weight: 700;
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+    margin-bottom: 2.5rem;
     position: relative;
     display: inline-block;
     letter-spacing: -0.02em;
@@ -162,10 +145,10 @@
   .section-title::after {
     content: '';
     position: absolute;
-    bottom: -8px;
+    bottom: -12px;
     left: 0;
-    width: 50px;
-    height: 3px;
+    width: 60px;
+    height: 4px;
     background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
     border-radius: 2px;
   }
@@ -178,28 +161,28 @@
     background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
   }
 
-  /* Form Styling - Reduced Size */
+  /* Form Styling - Enhanced */
   .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     position: relative;
   }
 
   .form-label {
     color: #422D1C;
     font-weight: 600;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.8rem;
     display: block;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     letter-spacing: 0.3px;
     transition: all 0.3s ease;
   }
 
   .form-control {
     width: 100%;
-    padding: 14px 16px;
+    padding: 18px 20px;
     border: 2px solid rgba(66, 45, 28, 0.12);
-    border-radius: 12px;
-    font-size: 0.95rem;
+    border-radius: 16px;
+    font-size: 1rem;
     font-weight: 400;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     background: rgba(248, 249, 250, 0.8);
@@ -218,9 +201,9 @@
     border-color: #8B4513;
     background: rgba(255, 255, 255, 0.95);
     box-shadow: 
-      0 0 0 3px rgba(139, 69, 19, 0.1),
-      0 6px 20px rgba(66, 45, 28, 0.15);
-    transform: translateY(-1px);
+      0 0 0 4px rgba(139, 69, 19, 0.1),
+      0 8px 25px rgba(66, 45, 28, 0.15);
+    transform: translateY(-2px);
   }
 
   .form-control:hover:not(:focus) {
@@ -229,7 +212,7 @@
   }
 
   .form-control.textarea {
-    min-height: 120px;
+    min-height: 140px;
     resize: vertical;
     line-height: 1.6;
   }
@@ -239,10 +222,10 @@
     background: linear-gradient(135deg, #422D1C 0%, #5D3522 25%, #8B4513 75%, #A0522D 100%);
     color: white;
     border: none;
-    padding: 14px 35px;
-    border-radius: 12px;
+    padding: 18px 45px;
+    border-radius: 16px;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 1.1rem;
     letter-spacing: 0.5px;
     cursor: pointer;
     width: 100%;
@@ -268,41 +251,41 @@
   }
 
   .btn-send:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(66, 45, 28, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(66, 45, 28, 0.4);
   }
 
   .btn-send:active {
     transform: translateY(-1px);
   }
 
-  /* Contact Info Items - Reduced Size */
+  /* Contact Info Items - Enhanced */
   .contact-info-item {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 1.8rem;
-    padding: 15px 0;
+    margin-bottom: 2.5rem;
+    padding: 20px 0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 10px;
+    border-radius: 12px;
   }
 
   .contact-info-item:hover {
-    transform: translateX(8px);
+    transform: translateX(10px);
     background: rgba(255, 255, 255, 0.05);
-    padding-left: 12px;
+    padding-left: 15px;
   }
 
   .contact-icon {
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 20px;
-    font-size: 1.2rem;
+    margin-right: 25px;
+    font-size: 1.4rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -311,28 +294,27 @@
   .contact-info-item:hover .contact-icon {
     background: rgba(255, 255, 255, 0.25);
     transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   }
 
   .contact-details h5 {
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
 
   .contact-details p {
     margin: 0;
     opacity: 0.9;
-    line-height: 1.5;
+    line-height: 1.6;
     font-weight: 300;
-    font-size: 0.95rem;
   }
 
-  /* Social Links - Reduced Size */
+  /* Social Links - Enhanced */
   .social-links {
     display: flex;
-    gap: 15px;
-    margin-top: 30px;
+    gap: 20px;
+    margin-top: 40px;
     justify-content: flex-start;
   }
 
@@ -340,15 +322,15 @@
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     color: white;
-    width: 45px;
-    height: 45px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     border: 1px solid rgba(255, 255, 255, 0.2);
     position: relative;
     overflow: hidden;
@@ -374,13 +356,14 @@
 
   .social-link:hover {
     background: rgba(255, 255, 255, 0.25);
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   }
 
-  /* Map Section - Reduced Size */
+  /* Map Section - Enhanced and Responsive */
   .map-section {
-    padding: 60px 0;
+    padding: 100px 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #f1f3f4 100%);
     position: relative;
   }
 
@@ -399,7 +382,7 @@
 
   .map-section-title {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 4rem;
     position: relative;
     z-index: 2;
   }
@@ -407,8 +390,8 @@
   .map-section-title h2 {
     color: #422D1C;
     font-weight: 700;
-    font-size: 2rem;
-    margin-bottom: 0.8rem;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
     position: relative;
     display: inline-block;
   }
@@ -416,47 +399,47 @@
   .map-section-title h2::after {
     content: '';
     position: absolute;
-    bottom: -6px;
+    bottom: -8px;
     left: 50%;
     transform: translateX(-50%);
-    width: 50px;
-    height: 3px;
+    width: 60px;
+    height: 4px;
     background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
     border-radius: 2px;
   }
 
   .map-section-title p {
     color: #666;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 300;
-    max-width: 500px;
+    max-width: 600px;
     margin: 0 auto;
     line-height: 1.6;
   }
 
   .map-wrapper {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 0 20px;
   }
 
   .map-container {
-    border-radius: 20px;
+    border-radius: 24px;
     overflow: hidden;
     box-shadow: 
-      0 20px 40px rgba(66, 45, 28, 0.1),
+      0 25px 50px rgba(66, 45, 28, 0.1),
       0 0 0 1px rgba(255, 255, 255, 0.3);
     background: white;
     position: relative;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     aspect-ratio: 16/9;
-    min-height: 300px;
+    min-height: 400px;
   }
 
   .map-container:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px);
     box-shadow: 
-      0 25px 50px rgba(66, 45, 28, 0.15),
+      0 35px 70px rgba(66, 45, 28, 0.15),
       0 0 0 1px rgba(255, 255, 255, 0.4);
   }
 
@@ -467,7 +450,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    border-radius: 20px;
+    border-radius: 24px;
   }
 
   .map-placeholder {
@@ -482,37 +465,101 @@
     justify-content: center;
     background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
     color: #666;
-    font-size: 1rem;
+    font-size: 1.1rem;
     z-index: 1;
-    border-radius: 20px;
+    border-radius: 24px;
   }
 
   .map-placeholder i {
-    font-size: 3rem;
+    font-size: 4rem;
     color: #422D1C;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     opacity: 0.7;
   }
 
   .map-placeholder p {
-    margin: 0.4rem 0;
+    margin: 0.5rem 0;
     text-align: center;
     line-height: 1.5;
   }
 
   .map-placeholder .map-address {
     background: rgba(66, 45, 28, 0.05);
-    padding: 0.8rem 1.5rem;
-    border-radius: 12px;
-    margin-top: 0.8rem;
-    border-left: 3px solid #8B4513;
+    padding: 1rem 2rem;
+    border-radius: 16px;
+    margin-top: 1rem;
+    border-left: 4px solid #8B4513;
+  }
+
+  /* Features Section - Enhanced */
+  .features-section {
+    padding: 100px 0;
+    background: white;
+    position: relative;
+  }
+
+  .feature-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2.5rem;
+    height: 100%;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(66, 45, 28, 0.08);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(66, 45, 28, 0.05);
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.03), transparent);
+    transition: left 0.6s;
+  }
+
+  .feature-card:hover::before {
+    left: 100%;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 50px rgba(66, 45, 28, 0.15);
+    border-color: rgba(139, 69, 19, 0.15);
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .feature-card h5 {
+    color: #422D1C;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .feature-card p {
+    color: #666;
+    line-height: 1.7;
+    font-weight: 300;
+    margin: 0;
+  }
+
+  .feature-card i {
+    color: #8B4513;
+    font-size: 1.3rem;
+    margin-right: 0.75rem;
   }
 
   /* Alert Enhancements */
   .alert {
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 1.5rem;
+    border-radius: 16px;
+    padding: 20px 25px;
+    margin-bottom: 2rem;
     border: none;
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -521,60 +568,165 @@
   .alert-success {
     background: linear-gradient(135deg, rgba(40, 167, 69, 0.15) 0%, rgba(40, 167, 69, 0.08) 100%);
     color: #155724;
-    border-left: 3px solid #28a745;
+    border-left: 4px solid #28a745;
   }
 
   /* Invalid feedback styling */
   .is-invalid {
     border-color: #dc3545 !important;
-    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1) !important;
   }
 
   .invalid-feedback {
     display: none;
     color: #dc3545;
     font-size: 0.875rem;
-    margin-top: 0.4rem;
+    margin-top: 0.5rem;
     font-weight: 500;
   }
-  
 
   /* Responsive Design */
   @media (max-width: 1200px) {
     .map-container {
-      min-height: 280px;
+      min-height: 350px;
     }
     
     .map-wrapper {
-      padding: 0 25px;
+      padding: 0 30px;
     }
   }
 
   @media (max-width: 992px) {
     .map-container {
-      min-height: 250px;
-      border-radius: 16px;
+      min-height: 300px;
+      border-radius: 20px;
     }
     
     .map-container iframe {
-      border-radius: 16px;
+      border-radius: 20px;
     }
     
     .map-placeholder {
-      border-radius: 16px;
+      border-radius: 20px;
     }
     
     .map-section-title h2 {
-      font-size: 1.8rem;
+      font-size: 2.2rem;
     }
   }
 
   @media (max-width: 768px) {
     .contact-hero {
-      padding: 60px 0 40px 0;
-      height: 50vh;
-      min-height: 400px;
+      padding: 80px 0 60px 0;
+      height: 60vh;
+      min-height: 500px;
       background-attachment: scroll;
+    }
+
+    .contact-hero h1 {
+      font-size: 2.5rem;
+    }
+
+    .contact-hero p {
+      font-size: 1.1rem;
+    }
+
+    .contact-section {
+      padding: 60px 0;
+    }
+
+    .contact-container {
+      margin: 0 20px;
+      border-radius: 20px;
+    }
+
+    .contact-form-section,
+    .contact-info-section {
+      padding: 40px;
+    }
+
+    .section-title {
+      font-size: 2rem;
+    }
+
+    .contact-info-item {
+      margin-bottom: 2rem;
+    }
+
+    .contact-icon {
+      width: 50px;
+      height: 50px;
+      margin-right: 20px;
+      font-size: 1.2rem;
+    }
+
+    .social-links {
+      justify-content: center;
+    }
+
+    .map-section {
+      padding: 80px 0;
+    }
+
+    .map-wrapper {
+      padding: 0 20px;
+    }
+
+    .map-container {
+      height: 280px;
+      min-height: 280px;
+      border-radius: 16px;
+    }
+
+    .map-container iframe {
+      border-radius: 16px;
+    }
+
+    .map-placeholder {
+      border-radius: 16px;
+    }
+
+    .map-placeholder i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .map-placeholder .map-address {
+      padding: 0.75rem 1.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .map-section-title {
+      margin-bottom: 3rem;
+    }
+
+    .map-section-title h2 {
+      font-size: 2rem;
+    }
+
+    .map-section-title p {
+      font-size: 1rem;
+      padding: 0 20px;
+    }
+
+    .features-section {
+      padding: 80px 0;
+    }
+
+    .feature-card {
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .contact-form-section,
+    .contact-info-section {
+      padding: 30px;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
     }
 
     .contact-hero h1 {
@@ -585,110 +737,17 @@
       font-size: 1rem;
     }
 
-    .contact-section {
-      padding: 40px 0;
-    }
-
-    .contact-container {
-      margin: 0 20px;
-      border-radius: 16px;
-    }
-
-    .contact-form-section,
-    .contact-info-section {
-      padding: 30px;
-    }
-
-    .section-title {
-      font-size: 1.6rem;
-    }
-
-    .contact-info-item {
-      margin-bottom: 1.5rem;
-    }
-
-    .contact-icon {
-      width: 45px;
-      height: 45px;
-      margin-right: 16px;
-      font-size: 1.1rem;
-    }
-
-    .social-links {
-      justify-content: center;
-    }
-
-    .map-section {
-      padding: 50px 0;
-    }
-
-    .map-wrapper {
-      padding: 0 20px;
-    }
-
-    .map-container {
-      height: 220px;
-      min-height: 220px;
-      border-radius: 14px;
-    }
-
-    .map-container iframe {
-      border-radius: 14px;
-    }
-
-    .map-placeholder {
-      border-radius: 14px;
-    }
-
-    .map-placeholder i {
-      font-size: 2.5rem;
-      margin-bottom: 0.8rem;
-    }
-
-    .map-placeholder .map-address {
-      padding: 0.6rem 1.2rem;
-      margin-top: 0.6rem;
-    }
-
-    .map-section-title {
-      margin-bottom: 2rem;
-    }
-
-    .map-section-title h2 {
-      font-size: 1.6rem;
-    }
-
-    .map-section-title p {
-      font-size: 0.95rem;
-      padding: 0 20px;
-    }
-  }
-
-  @media (max-width: 576px) {
-    .contact-form-section,
-    .contact-info-section {
-      padding: 25px;
-    }
-
-    .section-title {
-      font-size: 1.5rem;
-    }
-
-    .contact-hero h1 {
-      font-size: 1.8rem;
-    }
-
-    .contact-hero p {
-      font-size: 0.95rem;
-    }
-
     .form-control {
-      padding: 12px 14px;
+      padding: 15px 18px;
     }
 
     .btn-send {
-      padding: 12px 30px;
-      font-size: 0.95rem;
+      padding: 15px 35px;
+      font-size: 1rem;
+    }
+
+    .feature-card {
+      padding: 1.5rem;
     }
 
     .contact-info-item:hover {
@@ -697,8 +756,8 @@
     }
 
     .map-container {
-      height: 200px;
-      min-height: 200px;
+      height: 250px;
+      min-height: 250px;
       border-radius: 12px;
     }
 
@@ -708,11 +767,11 @@
 
     .map-placeholder {
       border-radius: 12px;
-      padding: 16px;
+      padding: 20px;
     }
 
     .map-section-title h2 {
-      font-size: 1.5rem;
+      font-size: 1.8rem;
     }
 
     .map-wrapper {
@@ -741,13 +800,11 @@
 
 <!-- Hero Section -->
 <div class="contact-hero">
-  <img src="/storage/product_images/batikpramisoloc.jpg" alt="Hero Image" class="hero-bg">
-  <div class="hero-overlay">
+  <div class="container">
     <h1>Hubungi Kami</h1>
     <p>Kami siap membantu Anda dengan pertanyaan apapun tentang produk batik tradisional Indonesia kami</p>
   </div>
 </div>
-
 
 <!-- Contact Section -->
 <div class="contact-section">
@@ -847,7 +904,9 @@
               </div>
               <div class="contact-details">
                 <h5>Alamat Toko</h5>
-                <p>Jl. Kalimasada Nomor 30, <br>Polehan, Kec. Blimbing, <br>Kota Malang, Jawa Timur 65121</p>
+                <p>Jl. Raya Malang No. 123<br>
+                Kecamatan Klojen, Malang<br>
+                Jawa Timur 65111</p>
               </div>
             </div>
             
@@ -857,8 +916,8 @@
               </div>
               <div class="contact-details">
                 <h5>Email</h5>
-                <p>nusantarashop@gmail.com<br>
-                nusantara@gmail.com</p>
+                <p>info@nusantarashop.com<br>
+                support@nusantarashop.com</p>
               </div>
             </div>
             
@@ -868,8 +927,8 @@
               </div>
               <div class="contact-details">
                 <h5>Telepon</h5>
-                <p>+62 895 4036 50987<br>
-                WhatsApp: +62 895 4036 50987</p>
+                <p>+62 341 123 4567<br>
+                WhatsApp: +62 812 3456 7890</p>
               </div>
             </div>
             
@@ -913,7 +972,7 @@
   <div class="container">
     <div class="map-section-title">
       <h2>Lokasi Toko Kami</h2>
-      <p>Kunjungi showroom kami untuk melihat langsung koleksi batik terbaik dengan kualitas premium</p>
+      <p>Kunjungi showroom kami untuk melihat langsung koleksi batik terbaik dengan kualitas premium dan desain autentik</p>
     </div>
     
     <div class="map-wrapper">
@@ -942,6 +1001,58 @@
               <i class="bi bi-clock me-1"></i> Buka: Senin-Sabtu 08:00-17:00
             </p>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ Section -->
+<div class="features-section">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 style="color: #422D1C; font-weight: 700;">Pertanyaan Umum</h2>
+      <p style="color: #666; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Temukan jawaban untuk pertanyaan yang sering diajukan pelanggan tentang produk dan layanan kami</p>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-4">
+        <div class="feature-card">
+          <h5>
+            <i class="bi bi-question-circle-fill"></i>
+            Bagaimana cara perawatan batik?
+          </h5>
+          <p>Cuci dengan air dingin, hindari deterjen keras, dan jemur di tempat teduh untuk menjaga kualitas warna dan kain. Setrika dengan suhu sedang.</p>
+        </div>
+      </div>
+      
+      <div class="col-md-6 mb-4">
+        <div class="feature-card">
+          <h5>
+            <i class="bi bi-truck"></i>
+            Berapa lama waktu pengiriman?
+          </h5>
+          <p>Pengiriman dalam kota 1-2 hari, luar kota 3-5 hari kerja. Gratis ongkir untuk pembelian di atas Rp 500.000 ke seluruh Indonesia.</p>
+        </div>
+      </div>
+      
+      <div class="col-md-6 mb-4">
+        <div class="feature-card">
+          <h5>
+            <i class="bi bi-arrow-repeat"></i>
+            Apakah bisa return/tukar?
+          </h5>
+          <p>Ya, kami menerima return/tukar dalam 7 hari dengan kondisi produk masih dalam keadaan baik, belum dicuci, dan dengan kemasan asli.</p>
+        </div>
+      </div>
+      
+      <div class="col-md-6 mb-4">
+        <div class="feature-card">
+          <h5>
+            <i class="bi bi-shield-check"></i>
+            Apakah produk asli?
+          </h5>
+          <p>Semua produk batik kami adalah produk asli dari pengrajin terpercaya dengan sertifikat keaslian dan jaminan kualitas terbaik.</p>
         </div>
       </div>
     </div>

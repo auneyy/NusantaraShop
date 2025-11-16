@@ -12,6 +12,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <link rel="icon" href="{{ asset('storage/product_images/logobos.png') }}">
+  @stack('styles')
   
   <style>
      body {
@@ -325,6 +326,14 @@
       line-height: 1.6;
     }
 
+    .dropdown-item {
+      font-size: 18px;
+    }
+
+    .dropdown-item a{
+      font-size: 15px;
+    }
+
     /* Responsive */
     @media (max-width: 991px) {
       .navbar-icons {
@@ -486,7 +495,7 @@
               <i class="bi bi-person-circle"></i>
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">{{ Auth::user()->name }}</a></li>
+            <li><a class="dropdown-item" href="{{ route('profile.index') }}">{{ Auth::user()->name }}</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="{{ route('orders.index') }}">Pesanan Saya</a></li>
               <li>

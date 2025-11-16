@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\ArtikelController;
 use App\Http\Controllers\Admin\MessageController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\ProfileController;
 
 // Middleware untuk mencegah back history di seluruh aplikasi
 Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(function () {
@@ -108,6 +109,22 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::get('/check-payment-status/{orderNumber}', [CheckoutController::class, 'checkPaymentStatus'])->name('check-payment-status');
             // FIXED: Route untuk notifikasi Midtrans
             Route::post('/midtrans/notification', [CheckoutController::class, 'midtransNotification'])->name('midtrans.notification');
+        });
+
+        // Profile Routes
+        Route::middleware('auth')->group(function () {
+            Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');   
+            Route::get('/profile/orders', [ProfileController::class, 'orders'])->name('profile.orders');
+            Route::get('/profile/settings', [ProfileController::class, 'settings'])->name('profile.settings');
+            Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');  
+            Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+            Route::get('/profile/change-password', [ProfileController::class, 'showChangePassword'])->name('password.change');
+            Route::put('/profile/change-password', [ProfileController::class, 'updatePassword'])->name('password.update');
+            Route::post('/profile/settings/notifications', [ProfileController::class, 'updateNotifications'])->name('profile.settings.notifications');
+            Route::post('/profile/settings/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.settings.preferences');
+            Route::delete('/profile/delete', [ProfileController::class, 'deleteAccount'])->name('profile.delete');
+            Route::patch('/orders/{order}/cancel', [ProfileController::class, 'cancelOrder'])->name('orders.cancel');
+             
         });
 
         Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
