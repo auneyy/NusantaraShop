@@ -7,20 +7,39 @@
   }
 
   /* Hero Section - Enhanced */
-  .contact-hero {
-    background-image: url('/storage/product_images/kontak.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    padding: 180px 0 120px 0;
-    height: 70vh;
-    min-height: 600px;
-    text-align: center;
-    position: relative;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-  }
+.contact-hero {
+  background-image: url('/storage/product_images/batikpramisoloc.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  padding: 180px 0 120px 0;
+  min-height: 450px;
+  text-align: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* biar teks di tengah */
+  overflow: hidden;
+  color: white; /* teksnya biar kontras */
+}
+
+/* overlay hitam transparan */
+.contact-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* 0.5 = transparansi, bisa diubah 0.3–0.7 */
+  z-index: 1;
+}
+
+/* isi di atas overlay */
+.contact-hero > * {
+  position: relative;
+  z-index: 2;
+}
 
   .contact-hero h1 {
     color: #ffffff;
@@ -34,9 +53,9 @@
   }
 
   .contact-hero p {
-    color:#422D1C;  
+    color:rgb(228, 228, 228);
     font-size: 1.25rem;
-    font-weight:400;
+    font-weight: 300;
     max-width: 650px;
     margin: 0 auto;
     position: relative;
@@ -47,7 +66,7 @@
   /* Contact Section - Enhanced */
   .contact-section {
     padding: 100px 0;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #f1f3f4 100%);
+    background: ;
     min-height: auto;
     position: relative;
   }
@@ -363,7 +382,7 @@
   /* Map Section - Enhanced and Responsive */
   .map-section {
     padding: 100px 0;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #f1f3f4 100%);
+    background: ;
     position: relative;
   }
 

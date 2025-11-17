@@ -95,6 +95,15 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::post('/clear', [CartController::class, 'clear'])->name('clear');
             Route::get('/count', [CartController::class, 'getCart'])->name('count');
         });
+
+Route::prefix('profile')->name('profile.')->middleware('auth')->group(function () {
+    Route::get('/', [ProfileController::class, 'index'])->name('index');
+    Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+    Route::put('/update', [ProfileController::class, 'update'])->name('update');
+    Route::get('/orders', [ProfileController::class, 'orders'])->name('orders');
+    Route::get('/password', [ProfileController::class, 'showChangePassword'])->name('password');
+    Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('update-password');
+});
         
         // Orders Routes
         Route::prefix('orders')->name('orders.')->group(function () {

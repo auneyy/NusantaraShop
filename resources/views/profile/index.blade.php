@@ -8,7 +8,7 @@
         /* Reset dan Base Styles */
         .profile-container {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-            background-color: #f5f5f5 !important;
+            background-color: white !important;
             min-height: 100vh;
             padding: 0 !important;
             margin: 0 !important;
@@ -467,7 +467,7 @@
 
                     <div class="profile-main-actions">
                         <a href="{{ route('profile.edit') }}" class="profile-btn profile-btn-primary">Edit Profil</a>
-                        <a href="{{ route('password.change') }}" class="profile-btn profile-btn-secondary">Ubah Password</a>
+                        <a href="{{ route('profile.password') }}" class="profile-btn profile-btn-secondary">Ubah Password</a>
                     </div>
                 </div>
 
@@ -507,30 +507,33 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($orders as $index => $order)
-                                        <tr>
-                                            <td>{{ $index + 1 }}</td>
-                                            <td>{{ $order->product_name }}</td>
-                                            <td>{{ $order->created_at->format('d-m-Y') }}</td>
-                                            <td>{{ $order->quantity }}</td>
-                                            <td>Rp{{ number_format($order->total_price, 0, ',', '.') }}</td>
-                                            <td>
-                                                <span class="profile-status-badge 
-                                                        @if($order->status == 'Selesai') profile-status-selesai
-                                                        @elseif($order->status == 'Dalam Proses') profile-status-dalam-proses
-                                                        @else profile-status-delivered
-                                                        @endif">
-                                                    {{ $order->status }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="6" class="profile-empty-state">
-                                                Belum ada riwayat pembelian
-                                            </td>
-                                        </tr>
-                                    @endforelse
+                               @forelse ($orders as $index => $order)
+    @foreach ($order->orderItems as $item)
+        <tr>
+            <td>{{ $index + 1 }}</td>
+            <td>{{ $item->product->name }}</td>
+            <td>{{ $order->created_at->format('d-m-Y') }}</td>
+            <td>{{ $item->quantity }}</td>
+            <td>Rp{{ number_format($item->total_price, 0, ',', '.') }}</td>
+            <td>
+                <span class="profile-status-badge 
+                        @if($order->status == 'Selesai') profile-status-selesai
+                        @elseif($order->status == 'Dalam Proses') profile-status-dalam-proses
+                        @else profile-status-delivered
+                        @endif">
+                    {{ $order->status }}
+                </span>
+            </td>
+        </tr>
+    @endforeach
+@empty
+    <tr>
+        <td colspan="6" class="profile-empty-state">
+            Belum ada riwayat pembelian
+        </td>
+    </tr>
+@endforelse
+
                                 </tbody>
                             </table>
                         </div>

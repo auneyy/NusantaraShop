@@ -222,8 +222,6 @@
 </form>
 </div>
 
-
-
             <div class="products-grid">
                 @foreach($discountedProducts as $product)
                     {{-- Panggil partials product-card --}}

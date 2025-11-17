@@ -8,7 +8,6 @@
     /* Reset dan Base Styles */
     .edit-profile-container {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-        background-color: #f5f5f5 !important;
         min-height: 100vh;
         padding: 0 !important;
         margin: 0 !important;

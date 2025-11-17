@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Models\Order;
 
-
 class ProfileController extends Controller
 {
     public function __construct()
@@ -28,7 +27,6 @@ class ProfileController extends Controller
                       ->paginate(10);
 
         return view('profile.index', compact('user', 'orders'));
-
     }
 
     /**
@@ -60,14 +58,11 @@ class ProfileController extends Controller
         $user->phone = $request->phone;
         $user->address = $request->address;
 
-        // Handle profile image upload
         if ($request->hasFile('profile_image')) {
-            // Delete old image if exists
             if ($user->profile_image) {
                 Storage::delete('public/' . $user->profile_image);
             }
 
-            // Store new image
             $imagePath = $request->file('profile_image')->store('profile_images', 'public');
             $user->profile_image = $imagePath;
         }
@@ -80,44 +75,37 @@ class ProfileController extends Controller
     /**
      * Show the orders page.
      */
-    public function orders(Request $request)
-    {
-        $user = Auth::user();
-        $query = Order::where('user_id', $user->id);
+  public function orders(Request $request)
+{
+    $user = Auth::user();
 
-        // Apply filters
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
+    $query = Order::where('user_id', $user->id)
+                  ->with(['orderItems.product']); // 🔥 tambahkan ini
 
-        if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->date_from);
-        }
-
-        if ($request->filled('date_to')) {
-            $query->whereDate('created_at', '<=', $request->date_to);
-        }
-
-        $orders = $query->orderBy('created_at', 'desc')->paginate(10);
-
-        return view('profile.orders', compact('user', 'orders'));
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
     }
 
-    /**
-     * Show the settings page.
-     */
-    public function settings()
-    {
-        $user = Auth::user();
-        return view('update.profile', compact('user'));
+    if ($request->filled('date_from')) {
+        $query->whereDate('created_at', '>=', $request->date_from);
     }
+
+    if ($request->filled('date_to')) {
+        $query->whereDate('created_at', '<=', $request->date_to);
+    }
+
+    $orders = $query->orderBy('created_at', 'desc')->paginate(10);
+
+    return view('profile.orders', compact('user', 'orders'));
+}
 
     /**
      * Show the change password form.
      */
     public function showChangePassword()
     {
-        return view('profile.passwoard');
+        $user = Auth::user();
+        return view('profile.password', compact('user')); // Perbaiki typo: password
     }
 
     /**
@@ -140,61 +128,5 @@ class ProfileController extends Controller
         $user->save();
 
         return redirect()->route('profile.index')->with('success', 'Password berhasil diubah!');
-    }
-
-    /**
-     * Update notification settings.
-     */
-    public function updateNotifications(Request $request)
-    {
-        $user = Auth::user();
-        
-        $user->email_notifications = $request->has('email_notifications');
-        $user->sms_notifications = $request->has('sms_notifications');
-        $user->save();
-
-        return redirect()->route('profile.edit')->with('success', 'Pengaturan notifikasi berhasil diperbarui!');
-    }
-
-    /**
-     * Update app preferences.
-     */
-    public function updatePreferences(Request $request)
-    {
-        $request->validate([
-            'language' => 'required|in:id,en',
-            'theme' => 'required|in:light,dark,auto',
-            'timezone' => 'required|string',
-        ]);
-
-        $user = Auth::user();
-        
-        $user->language = $request->language;
-        $user->theme = $request->theme;
-        $user->timezone = $request->timezone;
-        $user->save();
-
-        return redirect()->route('profile.edit')->with('success', 'Preferensi aplikasi berhasil diperbarui!');
-    }
-
-    /**
-     * Delete user account.
-     */
-    public function deleteAccount()
-    {
-        $user = Auth::user();
-        
-        // Delete user's profile image if exists
-        if ($user->profile_image) {
-            Storage::delete('public/' . $user->profile_image);
-        }
-        
-        // Logout user
-        Auth::logout();
-        
-        // Delete user account
-        $user->delete();
-        
-        return redirect()->route('home')->with('success', 'Akun berhasil dihapus.');
     }
 }

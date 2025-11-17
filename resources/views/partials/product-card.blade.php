@@ -25,7 +25,7 @@
     box-shadow: 
         0 4px 20px rgba(0, 0, 0, 0.05),
         0 1px 3px rgba(0, 0, 0, 0.1);
-    border-radius: 20px;
+    border-radius: 15px;
 }
 
 .minimalist-product-card:hover {
