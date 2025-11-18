@@ -2,275 +2,393 @@
 
 @section('content')
 <style>
+    body {
+        background-color: #f8f9fa;
+    }
+
     .orders-container {
         padding: 2rem 0;
         min-height: 80vh;
     }
 
     .orders-header {
-        background: linear-gradient(135deg, #EFA942 0%, #8B4513 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 12px;
         margin-bottom: 2rem;
-        text-align: center;
     }
 
-    .orders-header h2 {
-        margin: 0 0 0.5rem 0;
-        font-weight: 600;
+    .orders-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 1.5rem;
     }
 
+    /* Filter Tabs */
     .filter-tabs {
         background: white;
         border-radius: 12px;
-        padding: 1rem;
+        padding: 0.5rem;
         margin-bottom: 2rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    .nav-pills .nav-link {
-        color: #8B4513;
-        border-radius: 8px;
-        padding: 0.75rem 1.5rem;
-        margin: 0 0.25rem;
-        transition: all 0.3s ease;
-        font-weight: 500;
-        border: none;
-        background: none;
-        cursor: pointer;
-    }
-
-    .nav-pills .nav-link:hover {
-        background: rgba(66, 45, 28, 0.1);
-    }
-
-    .nav-pills .nav-link.active {
-        background: #EFA942;
-        color: white;
-    }
-
-    .order-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
-        overflow: hidden;
-        transition: transform 0.2s ease;
-    }
-
-    .order-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 25px rgba(0,0,0,0.15);
-    }
-
-    .order-card-header {
-        background: #f8f9fa;
-        padding: 1.5rem;
-        border-bottom: 1px solid #dee2e6;
-    }
-
-    .order-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    .order-number {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #422D1C;
-        margin-bottom: 0.5rem;
-    }
-
-    .order-date {
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
-
-    .status-badge {
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        margin-bottom: 0.5rem;
-        display: inline-block;
-    }
-
-    .status-pending { background: #fff3cd; color: #856404; }
-    .status-processing { background: #d4edda; color: #155724; }
-    .status-shipped { background: #cce7ff; color: #004085; }
-    .status-delivered { background: #d1ecf1; color: #0c5460; }
-    .status-cancelled { background: #f8d7da; color: #721c24; }
-
-    .payment-status {
-        font-size: 0.8rem;
-        color: #6c757d;
-    }
-
-    .order-card-body {
-        padding: 1.5rem;
-    }
-
-    .order-item {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem 0;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .order-item:last-child {
-        border-bottom: none;
-    }
-
-    .item-image {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 6px;
-        margin-right: 1rem;
-    }
-
-    .item-details {
-        flex: 1;
-    }
-
-    .item-name {
-        font-weight: 500;
-        margin-bottom: 0.25rem;
-    }
-
-    .item-specs {
-        color: #6c757d;
-        font-size: 0.85rem;
-    }
-
-    .item-price {
-        font-weight: 600;
-        color: #422D1C;
-    }
-
-    .order-summary {
-        background: #f8f9fa;
-        padding: 1rem;
-        border-radius: 8px;
-        margin: 1rem 0;
-    }
-
-    .summary-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-        font-size: 0.9rem;
-    }
-
-    .summary-row.total {
-        font-weight: 600;
-        font-size: 1rem;
-        color: #422D1C;
-        border-top: 1px solid #dee2e6;
-        padding-top: 0.5rem;
-        margin-top: 0.5rem;
-    }
-
-    .order-actions {
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         display: flex;
         gap: 0.5rem;
         flex-wrap: wrap;
     }
 
-    .btn-action {
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 0.85rem;
-        font-weight: 500;
-        transition: all 0.2s ease;
+    .tab-button {
+        padding: 0.75rem 1.5rem;
         border: none;
-        cursor: pointer;
-    }
-
-    .btn-primary-action {
-        background: #EFA942;
-        color: white;
-    }
-
-    .btn-primary-action:hover {
-        background:rgb(222, 140, 17);
-        color: white;
-        text-decoration: none;
-    }
-
-    .btn-outline-action {
         background: transparent;
-        color: #EFA942;
-        border: 1px solid #EFA942;
+        color: #6c757d;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
     }
 
-    .btn-outline-action:hover {
-        background: #EFA942;
+    .tab-button:hover {
+        background: rgba(66, 45, 28, 0.05);
+        color: #422D1C;
+    }
+
+    .tab-button.active {
+        background: linear-gradient(135deg, #422D1C 0%, #8B4513 100%);
+        color: white;
+    }
+
+    .tab-count {
+        margin-left: 0.5rem;
+        padding: 0.2rem 0.6rem;
+        background: rgba(255,255,255,0.2);
+        border-radius: 12px;
+        font-size: 0.85rem;
+    }
+
+    .tab-button:not(.active) .tab-count {
+        background: #e9ecef;
+        color: #6c757d;
+    }
+
+    /* Orders Table */
+    .orders-table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .orders-table thead {
+        background: #f8f9fa;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .orders-table th {
+        padding: 1.25rem 1.5rem;
+        text-align: left;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #495057;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .orders-table tbody tr {
+        border-bottom: 1px solid #f1f3f5;
+        transition: background 0.2s ease;
+    }
+
+    .orders-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .orders-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .orders-table td {
+        padding: 1.5rem 1.5rem;
+        vertical-align: middle;
+    }
+
+    /* Item Column */
+    .item-cell {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-width: 300px;
+    }
+
+    .item-image {
+        width: 70px;
+        height: 70px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        flex-shrink: 0;
+    }
+
+    .item-info {
+        flex: 1;
+    }
+
+    .item-name {
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.25rem;
+        font-size: 0.95rem;
+    }
+
+    .item-meta {
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+
+    .order-number {
+        color: #6c757d;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Status Column */
+    .status-cell {
+        min-width: 150px;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-processing {
+        background: #cfe2ff;
+        color: #084298;
+    }
+
+    .status-shipped {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-delivered {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .payment-badge {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    /* Total Column */
+    .total-cell {
+        font-weight: 700;
+        color: #422D1C;
+        font-size: 1.05rem;
+        min-width: 120px;
+    }
+
+    /* Details Column */
+    .details-cell {
+        text-align: right;
+        min-width: 150px;
+    }
+
+    .btn-details {
+        padding: 0.6rem 1.5rem;
+        background: linear-gradient(135deg, #EFA942 0%, #d68910 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-details:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         color: white;
         text-decoration: none;
     }
 
-    .btn-danger-action {
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .btn-pay {
+        padding: 0.5rem 1rem;
+        background: #4f46e5;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-pay:hover {
+        background: #d68910;
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-cancel {
+        padding: 0.5rem 1rem;
+        background: transparent;
+        color: #dc3545;
+        border: 1px solid #dc3545;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-cancel:hover {
         background: #dc3545;
         color: white;
     }
 
-    .btn-danger-action:hover {
-        background: #c82333;
+    /* Top Actions */
+    .top-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .btn-invoice,
+    .btn-view-order {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        border: none;
+    }
+
+    .btn-invoice {
+        background: white;
+        color: #422D1C;
+        border: 2px solid #e9ecef;
+    }
+
+    .btn-invoice:hover {
+        border-color: #422D1C;
+        color: #422D1C;
+        text-decoration: none;
+    }
+
+    .btn-view-order {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+    }
+
+    .btn-view-order:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         color: white;
         text-decoration: none;
     }
 
+    /* Empty State */
     .empty-state {
         text-align: center;
-        padding: 3rem 2rem;
+        padding: 4rem 2rem;
         background: white;
         border-radius: 12px;
-        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 15px rgba(0,0,0,0.08);
     }
 
     .empty-icon {
         font-size: 4rem;
-        color: #dee2e6;
         margin-bottom: 1rem;
+        opacity: 0.5;
     }
 
     .empty-title {
         font-size: 1.5rem;
         font-weight: 600;
-        color: #6c757d;
+        color: #495057;
         margin-bottom: 0.5rem;
     }
 
+    .empty-text {
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+
     .btn-shop {
-        background: #EFA942;
-        color: white;
         padding: 0.75rem 2rem;
+        background: linear-gradient(135deg, #422D1C 0%, #8B4513 100%);
+        color: white;
+        border: none;
         border-radius: 8px;
-        text-decoration: none;
-        font-weight: 500;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
         transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
     }
 
     .btn-shop:hover {
-        background: rgb(222, 140, 17);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(66, 45, 28, 0.3);
         color: white;
         text-decoration: none;
     }
 
-    .more-items {
+    /* No Results */
+    .no-results {
         text-align: center;
-        padding: 0.75rem;
+        padding: 3rem 2rem;
+        background: white;
+        border-radius: 12px;
         color: #6c757d;
-        font-size: 0.85rem;
-        background: rgba(108, 117, 125, 0.1);
-        border-radius: 6px;
-        margin-top: 0.5rem;
+    }
+
+    .no-results-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
     }
 
     /* Custom Modal */
@@ -285,7 +403,7 @@
         justify-content: center;
         align-items: center;
         z-index: 1000;
-        animation: fadeIn 0.3s ease;
+        backdrop-filter: blur(5px);
     }
 
     .modal-overlay.show {
@@ -294,13 +412,23 @@
 
     .modal-content {
         background: white;
-        border-radius: 12px;
+        border-radius: 15px;
         padding: 2rem;
         max-width: 400px;
         width: 90%;
         text-align: center;
-        transform: scale(0.8);
-        animation: modalShow 0.3s ease forwards;
+        animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
     }
 
     .modal-icon {
@@ -310,8 +438,8 @@
     }
 
     .modal-title {
-        font-size: 1.25rem;
-        font-weight: 600;
+        font-size: 1.3rem;
+        font-weight: 700;
         color: #212529;
         margin-bottom: 0.5rem;
     }
@@ -319,7 +447,7 @@
     .modal-text {
         color: #6c757d;
         margin-bottom: 2rem;
-        line-height: 1.5;
+        line-height: 1.6;
     }
 
     .modal-buttons {
@@ -332,11 +460,9 @@
         padding: 0.75rem 1.5rem;
         border: none;
         border-radius: 8px;
-        font-weight: 500;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.2s ease;
-        text-decoration: none;
-        display: inline-block;
         min-width: 100px;
     }
 
@@ -358,7 +484,7 @@
         background: #c82333;
     }
 
-    /* Toast Notification */
+    /* Toast */
     .toast-container {
         position: fixed;
         top: 20px;
@@ -368,7 +494,7 @@
 
     .toast {
         background: white;
-        border-radius: 8px;
+        border-radius: 10px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         padding: 1rem 1.5rem;
         margin-bottom: 0.5rem;
@@ -400,18 +526,6 @@
         font-size: 1.25rem;
     }
 
-    .toast-success .toast-icon {
-        color: #28a745;
-    }
-
-    .toast-error .toast-icon {
-        color: #dc3545;
-    }
-
-    .toast-info .toast-icon {
-        color: #17a2b8;
-    }
-
     .toast-content {
         flex: 1;
     }
@@ -434,42 +548,9 @@
         color: #6c757d;
         cursor: pointer;
         padding: 0;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
-    .toast-close:hover {
-        color: #495057;
-    }
-
-    /* Hidden class for filtering */
-    .order-card.hidden {
-        display: none !important;
-    }
-
-    /* Filter result message */
-    .filter-result {
-        text-align: center;
-        padding: 2rem;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-        color: #6c757d;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    @keyframes modalShow {
-        to { transform: scale(1); }
-    }
-
-    /* Custom Pagination */
+    /* Pagination */
     .pagination {
         display: flex;
         justify-content: center;
@@ -494,6 +575,7 @@
         text-decoration: none;
         transition: all 0.2s ease;
         background: white;
+        font-weight: 600;
     }
 
     .pagination .page-link:hover {
@@ -503,9 +585,9 @@
     }
 
     .pagination .page-item.active .page-link {
-        background: #EFA942;
+        background: linear-gradient(135deg, #422D1C 0%, #8B4513 100%);
         color: white;
-        border-color: #EFA942;
+        border-color: #422D1C;
     }
 
     .pagination .page-item.disabled .page-link {
@@ -514,7 +596,6 @@
         background: #f8f9fa;
     }
 
-    /* Pagination SVG Icons */
     .pagination-icon {
         width: 16px;
         height: 16px;
@@ -522,41 +603,44 @@
     }
 
     /* Responsive */
+    @media (max-width: 1024px) {
+        .orders-table-container {
+            overflow-x: auto;
+        }
+
+        .orders-table {
+            min-width: 900px;
+        }
+    }
+
     @media (max-width: 768px) {
         .orders-container {
             padding: 1rem 0;
         }
-        
-        .orders-header {
-            padding: 1.5rem 1rem;
+
+        .orders-title {
+            font-size: 1.5rem;
         }
-        
-        .order-info {
+
+        .filter-tabs {
+            overflow-x: auto;
+            flex-wrap: nowrap;
+        }
+
+        .tab-button {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+        }
+
+        .top-actions {
             flex-direction: column;
-            gap: 0.5rem;
+            align-items: stretch;
         }
-        
-        .order-item {
-            flex-wrap: wrap;
-        }
-        
-        .item-image {
-            width: 50px;
-            height: 50px;
-        }
-        
-        .order-actions {
-            justify-content: center;
-        }
-        
-        .nav-pills {
-            flex-wrap: wrap;
-        }
-        
-        .nav-pills .nav-link {
-            margin: 0.25rem;
-            padding: 0.5rem 1rem;
-            font-size: 0.85rem;
+
+        .btn-invoice,
+        .btn-view-order {
+            width: 100%;
+            text-align: center;
         }
     }
 </style>
@@ -565,240 +649,187 @@
     <div class="container">
         <!-- Header -->
         <div class="orders-header">
-            <h2>📋 Pesanan Saya</h2>
-            <p class="mb-0">Kelola dan pantau semua pesanan Anda</p>
+            <h2 class="orders-title">Riwayat Pesanan</h2>
         </div>
 
         @if($orders->count() > 0)
         <!-- Filter Tabs -->
         <div class="filter-tabs">
-            <ul class="nav nav-pills justify-content-center" id="orderTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" data-filter="all" type="button">
-                        Semua ({{ $orders->total() }})
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-filter="pending" type="button">
-                        Pending ({{ $orders->where('status', 'pending')->count() }})
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-filter="processing" type="button">
-                        Diproses ({{ $orders->where('status', 'processing')->count() }})
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-filter="shipped" type="button">
-                        Dikirim ({{ $orders->where('status', 'shipped')->count() }})
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" data-filter="delivered" type="button">
-                        Selesai ({{ $orders->where('status', 'delivered')->count() }})
-                    </button>
-                </li>
-            </ul>
+            <button class="tab-button active" data-filter="all">
+                Semua Pesanan<span class="tab-count">{{ $orders->total() }}</span>
+            </button>
+            <button class="tab-button" data-filter="pending">
+                Pending<span class="tab-count">{{ $orders->where('status', 'pending')->count() }}</span>
+            </button>
+            <button class="tab-button" data-filter="processing">
+                Diproses<span class="tab-count">{{ $orders->where('status', 'processing')->count() }}</span>
+            </button>
+            <button class="tab-button" data-filter="delivered">
+                Selesai<span class="tab-count">{{ $orders->where('status', 'delivered')->count() }}</span>
+            </button>
+            <button class="tab-button" data-filter="cancelled">
+                Dibatalkan<span class="tab-count">{{ $orders->where('status', 'cancelled')->count() }}</span>
+            </button>
         </div>
 
-        <!-- Orders List -->
-        <div id="ordersContainer">
-            @foreach($orders as $order)
-            <div class="order-card" data-status="{{ $order->status }}" data-payment-status="{{ $order->payment_status ?? 'pending' }}">
-                <div class="order-card-header">
-                    <div class="order-info">
-                        <div>
-                            <div class="order-number">{{ $order->order_number }}</div>
-                            <div class="order-date">{{ $order->order_date->format('d F Y, H:i') }} WIB</div>
-                        </div>
-                        <div class="order-status">
-                            <div class="status-badge status-{{ $order->status }}">
-                                @switch($order->status)
-                                    @case('pending')
-                                        Menunggu Pembayaran
-                                        @break
-                                    @case('processing')
-                                        Diproses
-                                        @break
-                                    @case('shipped')
-                                        Dikirim
-                                        @break
-                                    @case('delivered')
-                                        Selesai
-                                        @break
-                                    @case('cancelled')
-                                        Dibatalkan
-                                        @break
-                                    @default
-                                        {{ ucfirst($order->status) }}
-                                @endswitch
-                            </div>
-                            <div class="payment-status">
-                                💳 
-                                @switch($order->payment_status ?? 'pending')
-                                    @case('pending')
-                                        Belum Dibayar
-                                        @break
-                                    @case('paid')
-                                        Sudah Dibayar
-                                        @break
-                                    @case('failed')
-                                        Pembayaran Gagal
-                                        @break
-                                    @case('expired')
-                                        Kedaluwarsa
-                                        @break
-                                    @default
-                                        {{ ucfirst($order->payment_status ?? 'pending') }}
-                                @endswitch
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="order-card-body">
-                    <!-- Order Items Preview (max 3) -->
-                    <div class="order-items">
-                        @foreach($order->orderItems->take(3) as $item)
-                        <div class="order-item">
-                            <img src="{{ $item->product->images->first()->image_path ?? 'https://via.placeholder.com/60x60?text=No+Image' }}" 
-                                 alt="{{ $item->product_name }}" class="item-image">
-                            <div class="item-details">
-                                <div class="item-name">{{ $item->product_name }}</div>
-                                <div class="item-specs">
-                                    Ukuran: {{ $item->size }} | Qty: {{ $item->quantity }}
+        <!-- Orders Table -->
+        <div class="orders-table-container">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    @foreach($orders as $order)
+                    <tr class="order-row" data-status="{{ $order->status }}">
+                        <td>
+                            <div class="item-cell">
+                                @php
+                                    $firstItem = $order->orderItems->first();
+                                @endphp
+                                <img src="{{ $firstItem->product->images->first()->image_path ?? 'https://via.placeholder.com/70x70?text=No+Image' }}" 
+                                     alt="{{ $firstItem->product_name }}" 
+                                     class="item-image">
+                                <div class="item-info">
+                                    <div class="item-name">{{ $firstItem->product_name }}</div>
+                                    <div class="item-meta">Qty: {{ $order->orderItems->sum('quantity') }}</div>
+                                    <div class="order-number">{{ $order->order_number }}</div>
                                 </div>
                             </div>
-                            <div class="item-price">
-                                Rp {{ number_format($item->subtotal, 0, ',', '.') }}
+                        </td>
+                        <td class="status-cell">
+                            <div>
+                                <span class="status-badge status-{{ $order->status }}">
+                                    @switch($order->status)
+                                        @case('pending')
+                                            Pending
+                                            @break
+                                        @case('processing')
+                                            Diproses
+                                            @break
+                                        @case('shipped')
+                                            Dikirim
+                                            @break
+                                        @case('delivered')
+                                            Selesai
+                                            @break
+                                        @case('cancelled')
+                                            Dibatalkan
+                                            @break
+                                        @default
+                                            {{ ucfirst($order->status) }}
+                                    @endswitch
+                                </span>
+                                <span class="payment-badge">
+                                    {{ $order->order_date->diffForHumans() }}
+                                </span>
                             </div>
-                        </div>
-                        @endforeach
-                        
-                        @if($order->orderItems->count() > 3)
-                            <div class="more-items">
-                                +{{ $order->orderItems->count() - 3 }} produk lainnya
+                        </td>
+                        <td class="total-cell">
+                            Rp {{ number_format($order->grand_total, 0, ',', '.') }}
+                        </td>
+                        <td class="details-cell">
+                            <div class="action-buttons">
+                                <a href="{{ route('orders.show', $order->order_number) }}" class="btn-details">
+                                    Order Details
+                                </a>
+                                
+                                @if($order->payment_method === 'midtrans' && ($order->payment_status === 'pending' || !isset($order->payment_status)) && $order->status !== 'cancelled')
+                                    <a href="{{ route('orders.show', $order->order_number) }}" class="btn-pay">
+                                        Bayar
+                                    </a>
+                                @endif
+                                
+                                @if(($order->payment_status === 'pending' || !isset($order->payment_status)) && $order->status !== 'cancelled')
+                                    <form action="{{ route('orders.cancel', $order->order_number) }}" method="POST" style="display: inline;" 
+                                          class="cancel-form" data-order-number="{{ $order->order_number }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-cancel">
+                                            Batalkan
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
-                        @endif
-                    </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
 
-                    <!-- Order Summary -->
-                    <div class="order-summary">
-                        <div class="summary-row">
-                            <span>Subtotal</span>
-                            <span>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Ongkos Kirim</span>
-                            <span>Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
-                        </div>
-                        <div class="summary-row total">
-                            <span>Total</span>
-                            <span>Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="order-actions">
-                        <a href="{{ route('orders.show', $order->order_number) }}" class="btn-action btn-primary-action">
-                            Detail Pesanan
-                        </a>
-                        
-                        @if($order->payment_method === 'midtrans' && ($order->payment_status === 'pending' || !isset($order->payment_status)) && $order->status !== 'cancelled')
-                            <a href="{{ route('orders.show', $order->order_number) }}" class="btn-action btn-outline-action">
-                                Bayar Sekarang
-                            </a>
-                        @endif
-                        
-                        @if(($order->payment_status === 'pending' || !isset($order->payment_status)) && $order->status !== 'cancelled')
-                            <form action="{{ route('orders.cancel', $order->order_number) }}" method="POST" style="display: inline;" 
-                                  class="cancel-form" data-order-number="{{ $order->order_number }}">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn-action btn-danger-action">
-                                    Batalkan
-                                </button>
-                            </form>
-                        @endif
-                    </div>
-                </div>
-            </div>
-            @endforeach
-
-            <!-- No results message (initially hidden) -->
-            <div id="noResultsMessage" class="filter-result" style="display: none;">
-                <div style="font-size: 2rem; margin-bottom: 1rem;">📋</div>
+            <!-- No Results Message -->
+            <div id="noResultsMessage" class="no-results" style="display: none;">
+                <div class="no-results-icon">📋</div>
                 <h4>Tidak ada pesanan</h4>
                 <p>Tidak ada pesanan dengan status yang dipilih.</p>
             </div>
         </div>
 
-        <!-- Custom Pagination -->
-        <div class="d-flex justify-content-center mt-4">
-            @if ($orders->hasPages())
-                <nav aria-label="Pagination Navigation">
-                    <ul class="pagination">
-                        {{-- Previous Page Link --}}
-                        @if ($orders->onFirstPage())
-                            <li class="page-item disabled">
-                                <span class="page-link">
-                                    <svg class="pagination-icon" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                </span>
+        <!-- Pagination -->
+        @if ($orders->hasPages())
+            <nav aria-label="Pagination Navigation">
+                <ul class="pagination">
+                    @if ($orders->onFirstPage())
+                        <li class="page-item disabled">
+                            <span class="page-link">
+                                <svg class="pagination-icon" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </span>
+                        </li>
+                    @else
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $orders->previousPageUrl() }}">
+                                <svg class="pagination-icon" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </a>
+                        </li>
+                    @endif
+
+                    @foreach ($orders->getUrlRange(1, $orders->lastPage()) as $page => $url)
+                        @if ($page == $orders->currentPage())
+                            <li class="page-item active">
+                                <span class="page-link">{{ $page }}</span>
                             </li>
                         @else
                             <li class="page-item">
-                                <a class="page-link" href="{{ $orders->previousPageUrl() }}">
-                                    <svg class="pagination-icon" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                </a>
+                                <a class="page-link" href="{{ $url }}">{{ $page }}</a>
                             </li>
                         @endif
+                    @endforeach
 
-                        {{-- Pagination Elements --}}
-                        @foreach ($orders->getUrlRange(1, $orders->lastPage()) as $page => $url)
-                            @if ($page == $orders->currentPage())
-                                <li class="page-item active">
-                                    <span class="page-link">{{ $page }}</span>
-                                </li>
-                            @else
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                                </li>
-                            @endif
-                        @endforeach
-
-                        {{-- Next Page Link --}}
-                        @if ($orders->hasMorePages())
-                            <li class="page-item">
-                                <a class="page-link" href="{{ $orders->nextPageUrl() }}">
-                                    <svg class="pagination-icon" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                </a>
-                            </li>
-                        @else
-                            <li class="page-item disabled">
-                                <span class="page-link">
-                                    <svg class="pagination-icon" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                </span>
-                            </li>
-                        @endif
-                    </ul>
-                </nav>
-            @endif
-        </div>
+                    @if ($orders->hasMorePages())
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $orders->nextPageUrl() }}">
+                                <svg class="pagination-icon" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </a>
+                        </li>
+                    @else
+                        <li class="page-item disabled">
+                            <span class="page-link">
+                                <svg class="pagination-icon" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </span>
+                        </li>
+                    @endif
+                </ul>
+            </nav>
+        @endif
         
         @else
         <!-- Empty State -->
         <div class="empty-state">
             <div class="empty-icon">📦</div>
             <h3 class="empty-title">Belum Ada Pesanan</h3>
-            <p class="empty-text">Anda belum memiliki pesanan. Mulai berbelanja sekarang untuk melihat pesanan Anda di sini.</p>
+            <p class="empty-text">Anda belum memiliki pesanan. Mulai berbelanja sekarang!</p>
             <a href="{{ route('products.index') }}" class="btn-shop">
                 Mulai Belanja
             </a>
@@ -807,7 +838,7 @@
     </div>
 </div>
 
-<!-- Custom Modal for Cancel Confirmation -->
+<!-- Cancel Modal -->
 <div id="cancelModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-icon">⚠️</div>
@@ -832,191 +863,141 @@ let currentCancelForm = null;
 let currentFilter = 'all';
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize filter tabs
     initializeFilterTabs();
-    
-    // Initialize cancel forms
     initializeCancelForms();
-    
-    // Auto-refresh payment status for pending orders
-    const pendingOrders = document.querySelectorAll('[data-status="pending"]');
-    if (pendingOrders.length > 0) {
+
+    // Auto-refresh for pending orders
+    const pendingRows = document.querySelectorAll('[data-status="pending"]');
+    if (pendingRows.length > 0) {
         setInterval(() => {
-            pendingOrders.forEach(orderCard => {
-                const orderNumber = orderCard.querySelector('.order-number').textContent.trim();
+            pendingRows.forEach(row => {
+                const orderNumber = row.querySelector('.order-number').textContent.trim();
                 checkOrderPaymentStatus(orderNumber);
             });
         }, 30000);
     }
 
-    // Close modal when clicking outside
+    // Close modal handlers
     document.getElementById('cancelModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            hideCancelModal();
-        }
+        if (e.target === this) hideCancelModal();
     });
 
-    // Close modal with Escape key
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            hideCancelModal();
-        }
+        if (e.key === 'Escape') hideCancelModal();
     });
 });
 
 function initializeFilterTabs() {
-    const tabs = document.querySelectorAll('#orderTabs button[data-filter]');
+    const tabs = document.querySelectorAll('.tab-button');
     
     tabs.forEach(tab => {
         tab.addEventListener('click', function() {
             const filter = this.getAttribute('data-filter');
             
-            // Update active tab
             tabs.forEach(t => t.classList.remove('active'));
             this.classList.add('active');
             
-            // Filter orders
             filterOrders(filter);
             currentFilter = filter;
         });
     });
 }
 
-function initializeCancelForms() {
-    const cancelForms = document.querySelectorAll('.cancel-form');
+function filterOrders(filter) {
+    const rows = document.querySelectorAll('.order-row');
+    const noResults = document.getElementById('noResultsMessage');
+    const tbody = document.getElementById('ordersTableBody');
+    let visibleCount = 0;
     
-    cancelForms.forEach(form => {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
+    rows.forEach(row => {
+        const status = row.getAttribute('data-status');
+        const shouldShow = filter === 'all' || status === filter;
+        
+        row.style.display = shouldShow ? '' : 'none';
+        if (shouldShow) visibleCount++;
+    });
+    
+    if (visibleCount === 0) {
+        tbody.style.display = 'none';
+        noResults.style.display = 'block';
+    } else {
+        tbody.style.display = '';
+        noResults.style.display = 'none';
+    }
+}
+
+function initializeCancelForms() {
+    const forms = document.querySelectorAll('.cancel-form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
             showCancelModal(this);
         });
     });
 }
 
-function filterOrders(filter) {
-    const orderCards = document.querySelectorAll('.order-card');
-    const noResultsMessage = document.getElementById('noResultsMessage');
-    let visibleCount = 0;
-    
-    orderCards.forEach(card => {
-        const cardStatus = card.getAttribute('data-status');
-        let shouldShow = false;
-        
-        if (filter === 'all') {
-            shouldShow = true;
-        } else if (filter === 'delivered' && cardStatus === 'delivered') {
-            shouldShow = true;
-        } else if (cardStatus === filter) {
-            shouldShow = true;
-        }
-        
-        if (shouldShow) {
-            card.classList.remove('hidden');
-            visibleCount++;
-        } else {
-            card.classList.add('hidden');
-        }
-    });
-    
-    // Show/hide no results message
-    if (visibleCount === 0 && filter !== 'all') {
-        noResultsMessage.style.display = 'block';
-    } else {
-        noResultsMessage.style.display = 'none';
-    }
-}
-
 function showCancelModal(form) {
     currentCancelForm = form;
-    const modal = document.getElementById('cancelModal');
-    modal.classList.add('show');
+    document.getElementById('cancelModal').classList.add('show');
 }
 
 function hideCancelModal() {
-    const modal = document.getElementById('cancelModal');
-    modal.classList.remove('show');
+    document.getElementById('cancelModal').classList.remove('show');
     currentCancelForm = null;
 }
 
 function confirmCancel() {
-    if (currentCancelForm) {
-        const submitButton = currentCancelForm.querySelector('button[type="submit"]');
-        const originalContent = submitButton.innerHTML;
-        
-        // Add loading state
-        submitButton.innerHTML = '<span style="display: inline-flex; align-items: center; gap: 0.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Membatalkan...</span>';
-        submitButton.disabled = true;
-        
-        // Hide modal
-        hideCancelModal();
-        
-        // Show processing toast
-        showToast('Sedang memproses pembatalan...', 'info');
-        
-        // Get order number for removal after success
-        const orderNumber = currentCancelForm.getAttribute('data-order-number');
-        
-        // Submit form via AJAX to handle response
-        const formData = new FormData(currentCancelForm);
-        const action = currentCancelForm.getAttribute('action');
-        
-        fetch(action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Remove the order card from DOM
-                const orderCard = currentCancelForm.closest('.order-card');
-                if (orderCard) {
-                    orderCard.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-                    orderCard.style.opacity = '0';
-                    orderCard.style.transform = 'translateY(-20px)';
-                    
-                    setTimeout(() => {
-                        orderCard.remove();
-                        
-                        // Update tab counts
-                        updateTabCounts();
-                        
-                        // Reapply current filter
-                        filterOrders(currentFilter);
-                        
-                        // Check if no orders left
-                        checkEmptyState();
-                    }, 300);
-                }
+    if (!currentCancelForm) return;
+    
+    const formData = new FormData(currentCancelForm);
+    const action = currentCancelForm.getAttribute('action');
+    const orderNumber = currentCancelForm.getAttribute('data-order-number');
+    
+    hideCancelModal();
+    showToast('Sedang memproses pembatalan...', 'info');
+    
+    fetch(action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const row = currentCancelForm.closest('.order-row');
+            if (row) {
+                row.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(-20px)';
                 
-                showToast(data.message || 'Pesanan berhasil dibatalkan', 'success');
-            } else {
-                showToast(data.message || 'Gagal membatalkan pesanan', 'error');
-                // Restore button
-                submitButton.innerHTML = originalContent;
-                submitButton.disabled = false;
+                setTimeout(() => {
+                    row.remove();
+                    updateTabCounts();
+                    filterOrders(currentFilter);
+                    checkEmptyState();
+                }, 300);
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('Terjadi kesalahan saat membatalkan pesanan', 'error');
-            // Restore button
-            submitButton.innerHTML = originalContent;
-            submitButton.disabled = false;
-        });
-    }
+            
+            showToast(data.message || 'Pesanan berhasil dibatalkan', 'success');
+        } else {
+            showToast(data.message || 'Gagal membatalkan pesanan', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Terjadi kesalahan saat membatalkan pesanan', 'error');
+    });
 }
 
 function updateTabCounts() {
-    const tabs = document.querySelectorAll('#orderTabs button[data-filter]');
-    const orderCards = document.querySelectorAll('.order-card');
+    const tabs = document.querySelectorAll('.tab-button');
+    const rows = document.querySelectorAll('.order-row');
     
-    // Count orders by status
     const counts = {
-        all: orderCards.length,
+        all: rows.length,
         pending: 0,
         processing: 0,
         shipped: 0,
@@ -1024,56 +1005,37 @@ function updateTabCounts() {
         cancelled: 0
     };
     
-    orderCards.forEach(card => {
-        const status = card.getAttribute('data-status');
+    rows.forEach(row => {
+        const status = row.getAttribute('data-status');
         if (counts.hasOwnProperty(status)) {
             counts[status]++;
         }
     });
     
-    // Update tab text
     tabs.forEach(tab => {
         const filter = tab.getAttribute('data-filter');
         const count = counts[filter] || 0;
+        const countSpan = tab.querySelector('.tab-count');
         
-        let label = '';
-        switch(filter) {
-            case 'all':
-                label = `Semua (${count})`;
-                break;
-            case 'pending':
-                label = `Pending (${count})`;
-                break;
-            case 'processing':
-                label = `Diproses (${count})`;
-                break;
-            case 'shipped':
-                label = `Dikirim (${count})`;
-                break;
-            case 'delivered':
-                label = `Selesai (${count})`;
-                break;
+        if (countSpan) {
+            countSpan.textContent = count;
         }
-        
-        tab.textContent = label;
     });
 }
 
 function checkEmptyState() {
-    const orderCards = document.querySelectorAll('.order-card');
-    const container = document.querySelector('.orders-container .container');
+    const rows = document.querySelectorAll('.order-row');
     
-    if (orderCards.length === 0) {
-        // Replace entire content with empty state
+    if (rows.length === 0) {
+        const container = document.querySelector('.orders-container .container');
         container.innerHTML = `
             <div class="orders-header">
-                <h2>📋 Pesanan Saya</h2>
-                <p class="mb-0">Kelola dan pantau semua pesanan Anda</p>
+                <h2 class="orders-title">Riwayat Pesanan</h2>
             </div>
             <div class="empty-state">
                 <div class="empty-icon">📦</div>
                 <h3 class="empty-title">Belum Ada Pesanan</h3>
-                <p class="empty-text">Anda belum memiliki pesanan. Mulai berbelanja sekarang untuk melihat pesanan Anda di sini.</p>
+                <p class="empty-text">Anda belum memiliki pesanan. Mulai berbelanja sekarang!</p>
                 <a href="${window.location.origin}/products" class="btn-shop">
                     Mulai Belanja
                 </a>
@@ -1083,7 +1045,7 @@ function checkEmptyState() {
 }
 
 function showToast(message, type = 'success') {
-    const toastContainer = document.getElementById('toastContainer');
+    const container = document.getElementById('toastContainer');
     
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
@@ -1115,26 +1077,17 @@ function showToast(message, type = 'success') {
         <button class="toast-close" onclick="closeToast(this)">×</button>
     `;
     
-    toastContainer.appendChild(toast);
+    container.appendChild(toast);
     
-    // Show toast
-    setTimeout(() => {
-        toast.classList.add('show');
-    }, 100);
-    
-    // Auto hide after 5 seconds
-    setTimeout(() => {
-        closeToast(toast.querySelector('.toast-close'));
-    }, 5000);
+    setTimeout(() => toast.classList.add('show'), 100);
+    setTimeout(() => closeToast(toast.querySelector('.toast-close')), 5000);
 }
 
 function closeToast(button) {
     const toast = button.closest('.toast');
     if (toast) {
         toast.classList.remove('show');
-        setTimeout(() => {
-            toast.remove();
-        }, 300);
+        setTimeout(() => toast.remove(), 300);
     }
 }
 
@@ -1144,9 +1097,7 @@ function checkOrderPaymentStatus(orderNumber) {
         .then(data => {
             if (data.status && data.status !== 'pending') {
                 showToast('Status pembayaran telah diperbarui!', 'success');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
+                setTimeout(() => window.location.reload(), 2000);
             }
         })
         .catch(error => {

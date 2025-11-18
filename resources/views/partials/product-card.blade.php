@@ -1,8 +1,33 @@
+@php
+// Cek apakah produk memiliki diskon aktif
+$hasActiveDiscount = false;
+$discountPercentage = 0;
+$discountedPrice = $product->harga;
+$discountEndDate = null;
+$discountId = null;
+
+if (isset($activeDiscounts)) {
+    foreach ($activeDiscounts as $discount) {
+        if ($discount->products->contains('id', $product->id) && $discount->is_valid) {
+            $hasActiveDiscount = true;
+            $discountPercentage = $discount->percentage;
+            $discountedPrice = $product->harga - ($product->harga * $discount->percentage / 100);
+            $discountEndDate = $discount->end_date->toIso8601String();
+            $discountId = $discount->id;
+            break;
+        }
+    }
+}
+
+$primaryImage = $product->images->firstWhere('is_primary', true);
+$secondaryImage = $product->images->firstWhere('is_primary', false);
+$displayImage = $primaryImage ?? $product->images->first();
+@endphp
+
 <style>
 .product-card-wrapper {
     max-width: 280px;
     margin: 0 auto;
-    max-height: 600px;
 }
 
 .product-card-link {
@@ -110,7 +135,7 @@
     position: absolute;
     top: 16px;
     left: 16px;
-    background: linear-gradient(135deg,rgb(229, 98, 62) 0%,rgb(224, 13, 6) 100%);
+    background: linear-gradient(135deg, rgb(229, 98, 62) 0%, rgb(224, 13, 6) 100%);
     color: white;
     font-size: 11px;
     font-weight: 700;
@@ -119,7 +144,54 @@
     z-index: 10;
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+}
+
+.countdown-timer {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    z-index: 10;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.countdown-timer .time-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 30px;
+}
+
+.countdown-timer .time-value {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+
+.countdown-timer .time-label {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+.countdown-timer .separator {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 0 2px;
 }
 
 .price-container {
@@ -130,7 +202,6 @@
     margin-top: 4px;
 }
 
-/* Additional modern touches */
 .minimalist-product-card::before {
     content: '';
     position: absolute;
@@ -147,7 +218,6 @@
     opacity: 1;
 }
 
-/* Smooth loading animation */
 .minimalist-product-card {
     animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.320, 1);
 }
@@ -163,7 +233,6 @@
     }
 }
 
-/* Enhanced placeholder image styling */
 .d-flex.align-items-center.justify-content-center.bg-light {
     background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%) !important;
     width: 100%;
@@ -176,7 +245,6 @@
     font-size: 48px !important;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .product-card-wrapper {
         max-width: 250px;
@@ -194,42 +262,49 @@
     .discount-price {
         font-size: 15px;
     }
+    
+    .countdown-timer {
+        padding: 6px 12px;
+        font-size: 10px;
+    }
+    
+    .countdown-timer .time-value {
+        font-size: 12px;
+    }
 }
-</style>    
-
-@php
-// Pastikan Anda mengirimkan data diskon dari controller
-// Contoh: $activeDiscounts = $discountController->getActiveDiscountsForProducts($products);
-@endphp
+</style>
 
 <a href="{{ route('products.show', $product->slug) }}" class="product-card-link">
     <div class="product-card-wrapper">
         <div class="minimalist-product-card">
             <div class="product-image-container">
-                @php
-                    $primaryImage = $product->images->firstWhere('is_primary', true);
-                    $secondaryImage = $product->images->firstWhere('is_primary', false);
-                    $displayImage = $primaryImage ?? $product->images->first();
-                    
-                    // Cek apakah produk memiliki diskon aktif
-                    $hasActiveDiscount = false;
-                    $discountPercentage = 0;
-                    $discountedPrice = $product->harga;
-                    
-                    if (isset($activeDiscounts)) {
-                        foreach ($activeDiscounts as $discount) {
-                            if ($discount->products->contains('id', $product->id)) {
-                                $hasActiveDiscount = true;
-                                $discountPercentage = $discount->percentage;
-                                $discountedPrice = $product->harga - ($product->harga * $discount->percentage / 100);
-                                break;
-                            }
-                        }
-                    }
-                @endphp
-                
                 @if($hasActiveDiscount)
                     <div class="discount-badge">-{{ $discountPercentage }}%</div>
+                    
+                    <div class="countdown-timer" 
+                         data-end-date="{{ $discountEndDate }}"
+                         data-product-id="{{ $product->id }}"
+                         data-discount-id="{{ $discountId }}">
+                        <div class="time-unit">
+                            <span class="time-value days">00</span>
+                            <span class="time-label">Hari</span>
+                        </div>
+                        <span class="separator">:</span>
+                        <div class="time-unit">
+                            <span class="time-value hours">00</span>
+                            <span class="time-label">Jam</span>
+                        </div>
+                        <span class="separator">:</span>
+                        <div class="time-unit">
+                            <span class="time-value minutes">00</span>
+                            <span class="time-label">Menit</span>
+                        </div>
+                        <span class="separator">:</span>
+                        <div class="time-unit">
+                            <span class="time-value seconds">00</span>
+                            <span class="time-label">Detik</span>
+                        </div>
+                    </div>
                 @endif
                 
                 @if($displayImage)
@@ -262,3 +337,49 @@
         </div>
     </div>
 </a>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const timers = document.querySelectorAll('.countdown-timer');
+    
+    timers.forEach(timer => {
+        const endDate = new Date(timer.dataset.endDate).getTime();
+        const productId = timer.dataset.productId;
+        const discountId = timer.dataset.discountId;
+        
+        const daysEl = timer.querySelector('.days');
+        const hoursEl = timer.querySelector('.hours');
+        const minutesEl = timer.querySelector('.minutes');
+        const secondsEl = timer.querySelector('.seconds');
+        
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = endDate - now;
+            
+            if (distance < 0) {
+                // Discount sudah expired, reload halaman
+                location.reload();
+                return;
+            }
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            daysEl.textContent = String(days).padStart(2, '0');
+            hoursEl.textContent = String(hours).padStart(2, '0');
+            minutesEl.textContent = String(minutes).padStart(2, '0');
+            secondsEl.textContent = String(seconds).padStart(2, '0');
+        }
+        
+        // Update immediately
+        updateCountdown();
+        
+        // Update every second
+        setInterval(updateCountdown, 1000);
+    });
+});
+</script>
+@endpush

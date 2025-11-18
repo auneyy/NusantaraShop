@@ -2,7 +2,6 @@
 
 @section('content')
 <style>
-    /* Reuse most styles from success.blade.php */
     body {
         background-color: #f8f9fa;
     }
@@ -10,273 +9,6 @@
     .order-container {
         padding: 2rem 0;
         min-height: 80vh;
-    }
-
-    .order-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 30px rgba(0,0,0,0.1);
-        overflow: hidden;
-    }
-
-    .order-header {
-        background: linear-gradient(135deg, #EFA942 0%, #8B4513 100%);
-        color: white;
-        padding: 2rem;
-        text-align: center;
-    }
-
-    .order-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-    }
-
-    .order-content {
-        padding: 2rem;
-    }
-
-    .order-info {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 1.5rem;
-        margin: 1.5rem 0;
-    }
-
-    .info-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-        padding: 0.5rem 0;
-    }
-
-    .info-row:last-child {
-        margin-bottom: 0;
-    }
-
-    .info-label {
-        font-weight: 600;
-        color: #495057;
-    }
-
-    .info-value {
-        color: #212529;
-    }
-
-    .order-items {
-        margin: 1.5rem 0;
-    }
-
-    .item-card {
-        border: 1px solid #e9ecef;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        background: white;
-    }
-
-    .item-details {
-        display: flex;
-        align-items: center;
-    }
-
-    .item-image {
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-        border-radius: 6px;
-        margin-right: 1rem;
-    }
-
-    .item-info {
-        flex: 1;
-    }
-
-    .item-name {
-        font-weight: 600;
-        color: #212529;
-        margin-bottom: 0.25rem;
-    }
-
-    .item-specs {
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
-
-    .item-price {
-        font-weight: 600;
-        color: #422D1C;
-    }
-
-    .payment-info {
-        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-        border: 1px solid #2196f3;
-        border-radius: 10px;
-        padding: 1.5rem;
-        margin: 1.5rem 0;
-        text-align: center;
-    }
-
-    .payment-status {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .status-badge {
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-
-    .status-pending {
-        background-color: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeaa7;
-    }
-
-    .status-paid {
-        background-color: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-
-    .status-failed {
-        background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-
-    .action-buttons {
-        text-align: center;
-        margin-top: 2rem;
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .btn-primary-custom {
-        background: linear-gradient(135deg, #422D1C 0%, #8B4513 100%);
-        border: none;
-        color: white;
-        padding: 0.75rem 2rem;
-        border-radius: 8px;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s ease;
-        font-weight: 500;
-    }
-
-    .btn-primary-custom:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(66, 45, 28, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-
-    .btn-outline-custom {
-        border: 2px solid #422D1C;
-        color: #422D1C;
-        background: transparent;
-        padding: 0.75rem 2rem;
-        border-radius: 8px;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s ease;
-        font-weight: 500;
-    }
-
-    .btn-outline-custom:hover {
-        background: #422D1C;
-        color: white;
-        text-decoration: none;
-    }
-
-    .btn-midtrans {
-        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
-        border: none;
-        color: white;
-        padding: 0.75rem 2rem;
-        border-radius: 8px;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        font-weight: 500;
-    }
-
-    .btn-midtrans:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-
-    .btn-danger-custom {
-        background: #dc3545;
-        border: none;
-        color: white;
-        padding: 0.75rem 2rem;
-        border-radius: 8px;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        font-weight: 500;
-    }
-
-    .btn-danger-custom:hover {
-        background: #c82333;
-        color: white;
-        text-decoration: none;
-    }
-
-    .timeline {
-        margin: 1.5rem 0;
-    }
-
-    .timeline-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-    }
-
-    .timeline-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 1rem;
-        font-size: 1.2rem;
-    }
-
-    .timeline-icon.active {
-        background: #28a745;
-        color: white;
-    }
-
-    .timeline-icon.pending {
-        background: #ffc107;
-        color: white;
-    }
-
-    .timeline-icon.inactive {
-        background: #e9ecef;
-        color: #6c757d;
-    }
-
-    .timeline-content h6 {
-        margin-bottom: 0.25rem;
-        color: #212529;
-    }
-
-    .timeline-content small {
-        color: #6c757d;
     }
 
     .back-button {
@@ -302,7 +34,451 @@
         text-decoration: none;
     }
 
-    /* Custom Modal Styles */
+    /* Two Column Layout */
+    .order-layout {
+        display: grid;
+        grid-template-columns: 1fr 420px;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    /* Shopping Cart Card */
+    .shopping-cart-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+        padding: 2.5rem;
+    }
+
+    .cart-header {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 2rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Product Table */
+    .product-table {
+        width: 100%;
+        margin-bottom: 2rem;
+    }
+
+    .product-table thead {
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .product-table th {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        text-align: left;
+        letter-spacing: 0.5px;
+    }
+
+    .product-table tbody tr {
+        border-bottom: 1px solid #f1f3f5;
+        transition: background 0.2s;
+    }
+
+    .product-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .product-table td {
+        padding: 1.5rem 0.5rem;
+        vertical-align: middle;
+    }
+
+    .product-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .product-image {
+        width: 75px;
+        height: 75px;
+        object-fit: cover;
+        border-radius: 8px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+    }
+
+    .product-details {
+        flex: 1;
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.3rem;
+        font-size: 0.95rem;
+    }
+
+    .product-meta {
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+
+    .size-badge {
+        padding: 0.4rem 0.8rem;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        background: #f8f9fa;
+        color: #495057;
+        font-weight: 500;
+    }
+
+    .quantity-display {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .price {
+        font-weight: 600;
+        color: #422D1C;
+        font-size: 1rem;
+    }
+
+    /* Cart Summary */
+    .cart-summary {
+        border-top: 2px solid #e9ecef;
+        padding-top: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .summary-label {
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .summary-value {
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 1rem;
+        margin-top: 0.5rem;
+        border-top: 2px solid #422D1C;
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    .total-label {
+        color: #212529;
+    }
+
+    .total-value {
+        color: #422D1C;
+        font-size: 1.4rem;
+    }
+
+    .continue-shopping {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #422D1C;
+        text-decoration: none;
+        font-weight: 500;
+        margin-top: 1rem;
+        transition: all 0.2s;
+    }
+
+    .continue-shopping:hover {
+        color: #2d1f14;
+        text-decoration: none;
+        transform: translateX(-4px);
+    }
+
+    /* Payment Info Card */
+    .payment-card {
+        background: linear-gradient(135deg, #422D1C 0%, #8B4513 100%);
+        border-radius: 15px;
+        box-shadow: 0 8px 40px rgba(66, 45, 28, 0.3);
+        padding: 2rem;
+        color: white;
+        position: sticky;
+        top: 2rem;
+    }
+
+    .payment-header {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Order Information */
+    .order-info-section {
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .info-label {
+        color: rgba(255,255,255,0.8);
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .info-value {
+        color: white;
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .status-badge {
+        padding: 0.4rem 0.9rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-pending {
+        background: #ffc107;
+        color: #856404;
+    }
+
+    .status-paid {
+        background: #28a745;
+        color: white;
+    }
+
+    /* Payment Status Display */
+    .payment-status-display {
+        background: rgba(255,255,255,0.15);
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 10px;
+        padding: 1.2rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .payment-method-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255,255,255,0.2);
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .payment-status-text {
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.9);
+        margin-top: 0.5rem;
+    }
+
+    /* Timeline */
+    .timeline {
+        margin-bottom: 1.5rem;
+    }
+
+    .timeline-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        position: relative;
+        padding-left: 0;
+    }
+
+    .timeline-item:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        left: 19px;
+        top: 45px;
+        width: 2px;
+        height: calc(100% - 15px);
+        background: rgba(255,255,255,0.2);
+    }
+
+    .timeline-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .timeline-icon.active {
+        background: #EFA942;
+        color: white;
+        box-shadow: 0 0 0 4px rgba(239, 169, 66, 0.3);
+    }
+
+    .timeline-icon.pending {
+        background: #ffc107;
+        color: white;
+        box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.3);
+    }
+
+    .timeline-icon.inactive {
+        background: rgba(255,255,255,0.1);
+        color: rgba(255,255,255,0.5);
+    }
+
+    .timeline-content {
+        flex: 1;
+    }
+
+    .timeline-content h6 {
+        margin-bottom: 0.25rem;
+        color: white;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .timeline-content small {
+        color: rgba(255,255,255,0.7);
+        font-size: 0.85rem;
+    }
+
+    /* Buttons */
+    .checkout-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #EFA942 0%, #D68910 100%);
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(239, 169, 66, 0.3);
+        margin-bottom: 0.75rem;
+    }
+
+    .checkout-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(239, 169, 66, 0.4);
+    }
+
+    .checkout-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .cancel-btn {
+        width: 100%;
+        background: rgba(220, 53, 69, 0.9);
+        color: white;
+        border: 2px solid rgba(255,255,255,0.3);
+        padding: 0.85rem;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .cancel-btn:hover {
+        background: #dc3545;
+        border-color: rgba(255,255,255,0.5);
+    }
+
+    /* Shipping Info */
+    .shipping-info-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+
+    .shipping-header {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .shipping-details {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .shipping-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .shipping-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .shipping-value {
+        color: #212529;
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+
+    /* Help Section */
+    .help-section {
+        background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        border-left: 4px solid #EFA942;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .help-section strong {
+        color: #422D1C;
+    }
+
+    /* Custom Modal */
     .custom-modal {
         display: none;
         position: fixed;
@@ -377,17 +553,19 @@
     }
 
     .btn-modal {
-        background: #007bff;
+        background: #422D1C;
         color: white;
         border: none;
-        padding: 0.5rem 1.5rem;
+        padding: 0.6rem 1.8rem;
         border-radius: 8px;
         cursor: pointer;
         margin: 0.25rem;
+        font-weight: 600;
+        transition: all 0.2s;
     }
 
     .btn-modal:hover {
-        background: #0056b3;
+        background: #2d1f14;
     }
 
     .btn-modal.secondary {
@@ -398,7 +576,6 @@
         background: #495057;
     }
 
-    /* Loading Spinner */
     .spinner {
         width: 20px;
         height: 20px;
@@ -415,46 +592,45 @@
         100% { transform: rotate(360deg); }
     }
 
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .order-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .payment-card {
+            position: static;
+        }
+    }
+
     @media (max-width: 768px) {
         .order-container {
             padding: 1rem 0;
         }
-        
-        .order-content {
+
+        .shopping-cart-card,
+        .payment-card,
+        .shipping-info-card {
             padding: 1.5rem;
         }
-        
-        .info-row {
-            flex-direction: column;
-            gap: 0.25rem;
+
+        .cart-header,
+        .payment-header {
+            font-size: 1.5rem;
         }
-        
-        .item-details {
+
+        .product-table {
+            display: block;
+            overflow-x: auto;
+        }
+
+        .product-item {
             flex-direction: column;
             text-align: center;
         }
-        
-        .item-image {
-            margin-right: 0;
-            margin-bottom: 1rem;
-        }
-        
-        .action-buttons {
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .btn-primary-custom,
-        .btn-outline-custom,
-        .btn-midtrans,
-        .btn-danger-custom {
-            width: 100%;
-            max-width: 300px;
-        }
 
-        .modal-content {
-            width: 95%;
-            margin: 10% auto;
+        .product-image {
+            margin-bottom: 0.5rem;
         }
     }
 </style>
@@ -468,248 +644,261 @@
             </a>
         </div>
 
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="order-card">
-                    <!-- Header -->
-                    <div class="order-header">
-                        <div class="order-icon">📦</div>
-                        <h2 class="mb-2">Detail Pesanan</h2>
-                        <p class="mb-0">{{ $order->order_number }}</p>
-                    </div>
+        <div class="order-layout">
+            <!-- Left Column: Shopping Cart -->
+            <div>
+                <div class="shopping-cart-card">
+                    <h2 class="cart-header">Keranjang Belanja</h2>
 
-                    <div class="order-content">
-                        <!-- Informasi Pesanan -->
-                        <div class="order-info">
-                            <h5 class="mb-3">📋 Informasi Pesanan</h5>
-                            <div class="info-row">
-                                <span class="info-label">Nomor Pesanan:</span>
-                                <span class="info-value"><strong>{{ $order->order_number }}</strong></span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Tanggal Pesanan:</span>
-                                <span class="info-value">{{ $order->order_date->format('d F Y, H:i') }} WIB</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Status:</span>
-                                <span class="info-value">
-                                    <span class="badge bg-warning text-dark" id="order-status-badge">{{ $order->status_label }}</span>
-                                </span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Metode Pembayaran:</span>
-                                <span class="info-value">{{ $order->payment_method_label }}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Total Pembayaran:</span>
-                                <span class="info-value"><strong>Rp {{ number_format($order->grand_total, 0, ',', '.') }}</strong></span>
-                            </div>
-                        </div>
-
-                        <!-- Items yang dibeli -->
-                        <div class="order-items">
-                            <h5 class="mb-3">🛍️ Produk yang Dipesan</h5>
+                    <!-- Product Table -->
+                    <table class="product-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50%;">Produk</th>
+                                <th style="width: 15%;">Ukuran</th>
+                                <th style="width: 15%;">Jumlah</th>
+                                <th style="width: 20%;">Harga Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             @foreach($order->orderItems as $item)
-                            <div class="item-card">
-                                <div class="item-details">
-                                    <img src="{{ $item->product->images->first()->image_path ?? 'path/to/placeholder.jpg' }}" 
-                                         alt="{{ $item->product_name }}" class="item-image">
-                                    <div class="item-info">
-                                        <div class="item-name">{{ $item->product_name }}</div>
-                                        <!-- <div class="item-specs">
-                                            Ukuran: {{ $item->size }} | Qty: {{ $item->quantity }} | 
-                                            @{{ number_format($item->product_price, 0, ',', '.') }}
+                            <tr>
+                                <td>
+                                    <div class="product-item">
+                                        <img src="{{ $item->product->images->first()->image_path ?? 'path/to/placeholder.jpg' }}" 
+                                             alt="{{ $item->product_name }}" 
+                                             class="product-image">
+                                        <div class="product-details">
+                                            <div class="product-name">{{ $item->product_name }}</div>
+                                            <div class="product-meta">{{ $item->product->kategori->nama_kategori ?? 'Fashion' }}</div>
                                         </div>
                                     </div>
-                                    <div class="item-price">
-                                        Rp {{ number_format($item->subtotal, 0, ',', '.') }}
-                                    </div> -->
-                                </div>
-                            </div>
+                                </td>
+                                <td>
+                                    <span class="size-badge">{{ $item->size ?? 'M' }}</span>
+                                </td>
+                                <td>
+                                    <div class="quantity-display">
+                                        <span>{{ $item->quantity }} pcs</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="price">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</div>
+                                </td>
+                            </tr>
                             @endforeach
+                        </tbody>
+                    </table>
 
-                            <!-- Order Summary -->
-                        <div class="order-info mt-3">
-                            <div class="info-row">
-                                <span class="info-label">Subtotal</span>
-                                <span class="info-value">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Total Berat</span>
-                                <span class="info-value">
-                                    {{ number_format($order->orderItems->sum(function($item) {
-                                        return $item->product->berat * $item->quantity;
-                                    }), 0, ',', '.') }} gram
-                                </span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Ongkos Kirim</span>
-                                <span class="info-value">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
-                            </div>
-                            <div class="info-row" style="border-top: 2px solid #dee2e6; padding-top: 1rem; margin-top: 1rem; font-weight: 600; font-size: 1.1rem; color: #422D1C;">
-                                <span class="info-label">Total</span>
-                                <span class="info-value">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span>
-                            </div>
+                    <!-- Cart Summary -->
+                    <div class="cart-summary">
+                        <div class="summary-row">
+                            <span class="summary-label">Subtotal</span>
+                            <span class="summary-value">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
                         </div>
-
-                        <!-- Informasi Pengiriman -->
-                        <div class="order-info">
-                            <h5 class="mb-3">📦 Informasi Pengiriman</h5>
-                            <div class="info-row">
-                                <span class="info-label">Nama Penerima:</span>
-                                <span class="info-value">{{ $order->shipping_name }}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">No. Telepon:</span>
-                                <span class="info-value">{{ $order->shipping_phone }}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Email:</span>
-                                <span class="info-value">{{ $order->shipping_email }}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">Alamat:</span>
-                                <span class="info-value">
-                                    {{ $order->shipping_address }}, {{ $order->shipping_city }} {{ $order->shipping_postal_code }}
-                                </span>
-                            </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Berat Total</span>
+                            <span class="summary-value">
+                                {{ number_format($order->orderItems->sum(function($item) {
+                                    return $item->product->berat * $item->quantity;
+                                }), 0, ',', '.') }} gram
+                            </span>
                         </div>
-
-                        <!-- Informasi Pembayaran -->
-                        @if($order->payment_method === 'midtrans')
-                        <div class="payment-info">
-                            <h5 class="mb-3">💳 Status Pembayaran</h5>
-                            
-                            <div class="payment-status" id="payment-status-container">
-                                @if(!isset($order->payment_status) || $order->payment_status === 'pending')
-                                    <span class="status-badge status-pending">
-                                        ⏳ Menunggu Pembayaran
-                                    </span>
-                                @elseif($order->payment_status === 'settlement' || $order->payment_status === 'capture')
-                                    <span class="status-badge status-paid">
-                                        ✅ Pembayaran Berhasil
-                                    </span>
-                                @else
-                                    <span class="status-badge status-failed">
-                                        ❌ {{ $order->payment_status_label }}
-                                    </span>
-                                @endif
-                            </div>
-
-                            @if((!isset($order->payment_status) || $order->payment_status === 'pending') && isset($snapToken))
-                            <div class="text-center mt-3">
-                                <button class="btn-midtrans" id="pay-button">
-                                    💳 Bayar Sekarang - Rp {{ number_format($order->grand_total, 0, ',', '.') }}
-                                </button>
-                            </div>
-                            @endif
+                        <div class="summary-row">
+                            <span class="summary-label">Ongkos Kirim</span>
+                            <span class="summary-value">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
                         </div>
-                        @endif
-
-                        <!-- Timeline Pesanan -->
-                        <div class="timeline" id="order-timeline">
-                            <h5 class="mb-3">⏱️ Timeline Pesanan</h5>
-                            
-                            <div class="timeline-item">
-                                <div class="timeline-icon active">✅</div>
-                                <div class="timeline-content">
-                                    <h6>Pesanan Diterima</h6>
-                                    <small>{{ $order->order_date->format('d M Y, H:i') }} WIB</small>
-                                </div>
-                            </div>
-                            
-                            <div class="timeline-item">
-                                <div class="timeline-icon {{ (!isset($order->payment_status) || $order->payment_status === 'pending') ? 'pending' : (($order->payment_status === 'settlement' || $order->payment_status === 'capture') ? 'active' : 'inactive') }}" id="payment-timeline-icon">
-                                    {{ (!isset($order->payment_status) || $order->payment_status === 'pending') ? '⏳' : (($order->payment_status === 'settlement' || $order->payment_status === 'capture') ? '✅' : '❌') }}
-                                </div>
-                                <div class="timeline-content">
-                                    <h6>Pembayaran</h6>
-                                    <small id="payment-timeline-text">
-                                        @if(!isset($order->payment_status) || $order->payment_status === 'pending')
-                                            Menunggu pembayaran
-                                        @elseif($order->payment_status === 'settlement' || $order->payment_status === 'capture')
-                                            Pembayaran berhasil
-                                            @if($order->payment_completed_at)
-                                                - {{ $order->payment_completed_at->format('d M Y, H:i') }} WIB
-                                            @endif
-                                        @else
-                                            Pembayaran gagal/dibatalkan
-                                        @endif
-                                    </small>
-                                </div>
-                            </div>
-                            
-                            <div class="timeline-item">
-                                <div class="timeline-icon {{ $order->status === 'processing' ? 'active' : (in_array($order->status, ['shipped', 'delivered']) ? 'active' : 'inactive') }}" id="processing-timeline-icon">📦</div>
-                                <div class="timeline-content">
-                                    <h6>Pesanan Diproses</h6>
-                                    <small>
-                                        @if(in_array($order->status, ['processing', 'shipped', 'delivered']))
-                                            Pesanan sedang diproses
-                                        @else
-                                            Setelah pembayaran dikonfirmasi
-                                        @endif
-                                    </small>
-                                </div>
-                            </div>
-                            
-                            <div class="timeline-item">
-                                <div class="timeline-icon {{ $order->status === 'shipped' ? 'active' : ($order->status === 'delivered' ? 'active' : 'inactive') }}">🚚</div>
-                                <div class="timeline-content">
-                                    <h6>Pesanan Dikirim</h6>
-                                    <small>
-                                        @if($order->shipped_date)
-                                            {{ $order->shipped_date->format('d M Y, H:i') }} WIB
-                                        @else
-                                            Estimasi 2-3 hari kerja setelah pembayaran
-                                        @endif
-                                    </small>
-                                </div>
-                            </div>
-                            
-                            <div class="timeline-item">
-                                <div class="timeline-icon {{ $order->status === 'delivered' ? 'active' : 'inactive' }}">✨</div>
-                                <div class="timeline-content">
-                                    <h6>Pesanan Diterima</h6>
-                                    <small>
-                                        @if($order->delivered_date)
-                                            {{ $order->delivered_date->format('d M Y, H:i') }} WIB
-                                        @else
-                                            Selamat menikmati produk Anda!
-                                        @endif
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="action-buttons">
-                            <a href="{{ route('orders.index') }}" class="btn-primary-custom">
-                                ← Kembali ke Daftar Pesanan
-                            </a>
-                            <a href="{{ route('products.index') }}" class="btn-outline-custom">
-                                🛍️ Belanja Lagi
-                            </a>
-                            
-                            @if($order->status === 'pending' && (!isset($order->payment_status) || $order->payment_status === 'pending'))
-                            <form action="{{ route('orders.cancel', $order->order_number) }}" method="POST" style="display: inline-block;" 
-                                  onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn-danger-custom">
-                                    ❌ Batalkan Pesanan
-                                </button>
-                            </form>
-                            @endif
-                        </div>
-
-                        <!-- Info Tambahan -->
-                        <div class="alert alert-info mt-4">
-                            <strong>📞 Butuh Bantuan?</strong><br>
-                            Jika ada pertanyaan mengenai pesanan atau pembayaran Anda, silakan hubungi customer service kami di WhatsApp <strong>+62 812-3456-7890</strong> 
-                            atau email <strong>cs@tokofashion.com</strong> dengan menyertakan nomor pesanan <strong>{{ $order->order_number }}</strong>
+                        <div class="total-row">
+                            <span class="total-label">Total Pembayaran</span>
+                            <span class="total-value">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span>
                         </div>
                     </div>
+
+                    <a href="{{ route('products.index') }}" class="continue-shopping">
+                        ← Lanjut Belanja
+                    </a>
+                </div>
+
+                <!-- Shipping Information -->
+                <div class="shipping-info-card">
+                    <h3 class="shipping-header">📦 Informasi Pengiriman</h3>
+                    <div class="shipping-details">
+                        <div class="shipping-item">
+                            <span class="shipping-label">Nama Penerima</span>
+                            <span class="shipping-value">{{ $order->shipping_name }}</span>
+                        </div>
+                        <div class="shipping-item">
+                            <span class="shipping-label">No. Telepon</span>
+                            <span class="shipping-value">{{ $order->shipping_phone }}</span>
+                        </div>
+                        <div class="shipping-item">
+                            <span class="shipping-label">Email</span>
+                            <span class="shipping-value">{{ $order->shipping_email }}</span>
+                        </div>
+                        <div class="shipping-item">
+                            <span class="shipping-label">Alamat Lengkap</span>
+                            <span class="shipping-value">
+                                {{ $order->shipping_address }}, {{ $order->shipping_city }} {{ $order->shipping_postal_code }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Section -->
+                <div class="help-section">
+                    <strong>📞 Butuh Bantuan?</strong><br>
+                    Jika ada pertanyaan mengenai pesanan atau pembayaran Anda, silakan hubungi customer service kami di WhatsApp <strong>+62 812-3456-7890</strong> 
+                    atau email <strong>cs@tokofashion.com</strong> dengan menyertakan nomor pesanan <strong>{{ $order->order_number }}</strong>
+                </div>
+            </div>
+
+            <!-- Right Column: Payment Info -->
+            <div>
+                <div class="payment-card">
+                    <h3 class="payment-header">Informasi Pembayaran</h3>
+
+                    <!-- Order Information -->
+                    <div class="order-info-section">
+                        <div class="info-item">
+                            <span class="info-label">Nomor Pesanan</span>
+                            <span class="info-value">{{ $order->order_number }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Tanggal Pesanan</span>
+                            <span class="info-value">{{ $order->order_date->format('d M Y, H:i') }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status Pesanan</span>
+                            <span class="info-value">
+                                <span class="status-badge status-{{ (!isset($order->payment_status) || $order->payment_status === 'pending') ? 'pending' : 'paid' }}" id="order-status-badge">
+                                    {{ $order->status_label }}
+                                </span>
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Total Pembayaran</span>
+                            <span class="info-value" style="font-size: 1.2rem; color: #EFA942;">
+                                Rp {{ number_format($order->grand_total, 0, ',', '.') }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Display -->
+                    <div class="payment-status-display">
+                        <div class="payment-method-badge">
+                            💳 {{ $order->payment_method_label }}
+                        </div>
+                        <div class="payment-status-text" id="payment-status-text">
+                            @if(!isset($order->payment_status) || $order->payment_status === 'pending')
+                                Menunggu pembayaran melalui Midtrans
+                            @elseif($order->payment_status === 'settlement' || $order->payment_status === 'capture')
+                                ✅ Pembayaran telah berhasil dikonfirmasi
+                            @else
+                                Status: {{ $order->payment_status_label }}
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Timeline -->
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-icon active">✅</div>
+                            <div class="timeline-content">
+                                <h6>Pesanan Diterima</h6>
+                                <small>{{ $order->order_date->format('d M Y, H:i') }}</small>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-icon {{ (!isset($order->payment_status) || $order->payment_status === 'pending') ? 'pending' : (($order->payment_status === 'settlement' || $order->payment_status === 'capture') ? 'active' : 'inactive') }}" id="payment-timeline-icon">
+                                {{ (!isset($order->payment_status) || $order->payment_status === 'pending') ? '⏳' : (($order->payment_status === 'settlement' || $order->payment_status === 'capture') ? '✅' : '❌') }}
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Pembayaran</h6>
+                                <small id="payment-timeline-text">
+                                    @if(!isset($order->payment_status) || $order->payment_status === 'pending')
+                                        Menunggu pembayaran
+                                    @elseif($order->payment_status === 'settlement' || $order->payment_status === 'capture')
+                                        Pembayaran berhasil
+                                        @if($order->payment_completed_at)
+                                            - {{ $order->payment_completed_at->format('d M Y, H:i') }}
+                                        @endif
+                                    @else
+                                        Pembayaran gagal/dibatalkan
+                                    @endif
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-icon {{ $order->status === 'processing' ? 'active' : (in_array($order->status, ['shipped', 'delivered']) ? 'active' : 'inactive') }}">📦</div>
+                            <div class="timeline-content">
+                                <h6>Pesanan Diproses</h6>
+                                <small>
+                                    @if(in_array($order->status, ['processing', 'shipped', 'delivered']))
+                                        Pesanan sedang diproses
+                                    @else
+                                        Setelah pembayaran dikonfirmasi
+                                    @endif
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-icon {{ $order->status === 'shipped' ? 'active' : ($order->status === 'delivered' ? 'active' : 'inactive') }}">🚚</div>
+                            <div class="timeline-content">
+                                <h6>Pesanan Dikirim</h6>
+                                <small>
+                                    @if($order->shipped_date)
+                                        {{ $order->shipped_date->format('d M Y, H:i') }}
+                                    @else
+                                        Estimasi 2-3 hari kerja
+                                    @endif
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-icon {{ $order->status === 'delivered' ? 'active' : 'inactive' }}">✨</div>
+                            <div class="timeline-content">
+                                <h6>Pesanan Diterima</h6>
+                                <small>
+                                    @if($order->delivered_date)
+                                        {{ $order->delivered_date->format('d M Y, H:i') }}
+                                    @else
+                                        Selamat menikmati produk!
+                                    @endif
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Button or Status -->
+                    @if((!isset($order->payment_status) || $order->payment_status === 'pending') && isset($snapToken))
+                    <button class="checkout-btn" id="pay-button">
+                        💳 Bayar Sekarang - Rp {{ number_format($order->grand_total, 0, ',', '.') }}
+                    </button>
+                    @elseif($order->payment_status === 'settlement' || $order->payment_status === 'capture')
+                    <button class="checkout-btn" disabled style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                        ✅ Pembayaran Selesai
+                    </button>
+                    @else
+                    <button class="checkout-btn" disabled style="background: #6c757d;">
+                        {{ $order->payment_status_label }}
+                    </button>
+                    @endif
+
+                    <!-- Cancel Order Button -->
+                    @if($order->status === 'pending' && (!isset($order->payment_status) || $order->payment_status === 'pending'))
+                    <form action="{{ route('orders.cancel', $order->order_number) }}" method="POST" 
+                          onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="cancel-btn">
+                            ❌ Batalkan Pesanan
+                        </button>
+                    </form>
+                    @endif
                 </div>
             </div>
         </div>
@@ -807,21 +996,37 @@
 
     // Update UI function
     function updatePaymentStatus(status) {
-        const statusContainer = document.getElementById('payment-status-container');
         const paymentTimelineIcon = document.getElementById('payment-timeline-icon');
         const paymentTimelineText = document.getElementById('payment-timeline-text');
-        const processingTimelineIcon = document.getElementById('processing-timeline-icon');
         const orderStatusBadge = document.getElementById('order-status-badge');
+        const paymentStatusText = document.getElementById('payment-status-text');
 
         switch(status) {
             case 'settlement':
             case 'capture':
-                statusContainer.innerHTML = `
-                    <span class="status-badge status-failed">
-                        ❌ Pembayaran Gagal
-                    </span>
-                `;
+                // Update timeline
+                if (paymentTimelineIcon) {
+                    paymentTimelineIcon.className = 'timeline-icon active';
+                    paymentTimelineIcon.textContent = '✅';
+                }
+                
+                if (paymentTimelineText) {
+                    paymentTimelineText.textContent = 'Pembayaran berhasil';
+                }
 
+                if (orderStatusBadge) {
+                    orderStatusBadge.className = 'status-badge status-paid';
+                    orderStatusBadge.textContent = 'Dibayar';
+                }
+
+                if (paymentStatusText) {
+                    paymentStatusText.textContent = '✅ Pembayaran telah berhasil dikonfirmasi';
+                }
+                break;
+
+            case 'failure':
+            case 'cancel':
+            case 'expire':
                 // Update timeline
                 if (paymentTimelineIcon) {
                     paymentTimelineIcon.className = 'timeline-icon inactive';
@@ -831,9 +1036,9 @@
                 if (paymentTimelineText) {
                     paymentTimelineText.textContent = 'Pembayaran gagal/dibatalkan';
                 }
-                
-                if (processingTimelineIcon) {
-                    processingTimelineIcon.className = 'timeline-icon inactive';
+
+                if (paymentStatusText) {
+                    paymentStatusText.textContent = '❌ Pembayaran gagal atau dibatalkan';
                 }
                 break;
         }
@@ -908,9 +1113,9 @@
                     
                     // Show status update modal
                     if (data.status === 'settlement' || data.status === 'capture') {
-                        showModal('success', 'Status Update', 'Pembayaran Anda telah berhasil dikonfirmasi!');
+                        showModal('success', 'Update Status', 'Pembayaran Anda telah berhasil dikonfirmasi!');
                     } else if (data.status === 'failure' || data.status === 'cancel' || data.status === 'expire') {
-                        showModal('error', 'Status Update', 'Status pembayaran telah diperbarui. Pembayaran tidak berhasil.');
+                        showModal('error', 'Update Status', 'Status pembayaran telah diperbarui. Pembayaran tidak berhasil.');
                     }
                 }
             })

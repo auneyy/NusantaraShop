@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Services\ImageKitService;
+use Carbon\Carbon;
 
 class DiscountController extends Controller
 {
@@ -20,26 +21,26 @@ class DiscountController extends Controller
 
     public function index()
     {
-        $discounts = Discount::with('products')->paginate(10);
+        $discounts = Discount::with('products')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
         return view('admin.discounts.index', compact('discounts'));
     }
 
     public function show(Discount $discount)
-{
-    $discount->load('products'); // Eager load the products relationship
-    return view('admin.discounts.show', compact('discount'));
-}
+    {
+        $discount->load('products');
+        return view('admin.discounts.show', compact('discount'));
+    }
 
-public function getActiveBanner()
-{
-    $currentDate = now()->format('Y-m-d');
-    
-    return Discount::where('start_date', '<=', $currentDate)
-        ->where('end_date', '>=', $currentDate)
-        ->whereNotNull('banner_image')
-        ->orderBy('created_at', 'desc')
-        ->first();
-}
+    // Method untuk mendapatkan banner aktif (real-time check)
+    public function getActiveBanner()
+    {
+        return Discount::active()
+            ->whereNotNull('banner_image')
+            ->orderBy('created_at', 'desc')
+            ->first();
+    }
 
     public function create()
     {
@@ -47,18 +48,16 @@ public function getActiveBanner()
         return view('admin.discounts.create', compact('products'));
     }
 
+    // Method untuk mendapatkan discount aktif untuk produk tertentu (real-time check)
     public function getActiveDiscountsForProducts($products)
-{
-    $currentDate = now()->format('Y-m-d');
-    
-    return Discount::where('start_date', '<=', $currentDate)
-        ->where('end_date', '>=', $currentDate)
-        ->whereHas('products', function($query) use ($products) {
-            $query->whereIn('products.id', $products->pluck('id'));
-        })
-        ->with('products')
-        ->get();
-}
+    {
+        return Discount::active()
+            ->whereHas('products', function($query) use ($products) {
+                $query->whereIn('products.id', $products->pluck('id'));
+            })
+            ->with('products')
+            ->get();
+    }
 
     public function store(Request $request)
     {
@@ -67,10 +66,14 @@ public function getActiveBanner()
             'subtitle' => 'nullable|string|max:255',
             'percentage' => 'required|integer|min:1|max:100',
             'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'end_date' => 'required|date|after:start_date',
             'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'products' => 'required|array|min:1',
             'products.*' => 'exists:products,id',
+        ], [
+            'end_date.after' => 'Tanggal berakhir harus setelah tanggal mulai.',
+            'products.required' => 'Pilih minimal 1 produk.',
+            'products.min' => 'Pilih minimal 1 produk.',
         ]);
 
         if ($validator->fails()) {
@@ -78,7 +81,6 @@ public function getActiveBanner()
         }
 
         $bannerUrl = null;
-        $fileId = null;
 
         if ($request->hasFile('banner_image')) {
             $fileName = 'discount_' . time() . '.' . $request->file('banner_image')->getClientOriginalExtension();
@@ -86,7 +88,6 @@ public function getActiveBanner()
 
             if ($uploadResult['success']) {
                 $bannerUrl = $uploadResult['url'];
-                $fileId = $uploadResult['fileId'];
             } else {
                 return redirect()->back()->with('error', 'Image upload failed: ' . $uploadResult['error']);
             }
@@ -103,7 +104,8 @@ public function getActiveBanner()
 
         $discount->products()->sync($request->products);
 
-        return redirect()->route('admin.discounts.index');
+        return redirect()->route('admin.discounts.index')
+            ->with('success', 'Diskon berhasil ditambahkan!');
     }
 
     public function edit(Discount $discount)
@@ -121,10 +123,14 @@ public function getActiveBanner()
             'subtitle' => 'nullable|string|max:255',
             'percentage' => 'required|integer|min:1|max:100',
             'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'end_date' => 'required|date|after:start_date',
             'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'products' => 'required|array|min:1',
             'products.*' => 'exists:products,id',
+        ], [
+            'end_date.after' => 'Tanggal berakhir harus setelah tanggal mulai.',
+            'products.required' => 'Pilih minimal 1 produk.',
+            'products.min' => 'Pilih minimal 1 produk.',
         ]);
 
         if ($validator->fails()) {
@@ -164,7 +170,8 @@ public function getActiveBanner()
         // Update associated products
         $discount->products()->sync($request->products);
 
-        return redirect()->route('admin.discounts.index');
+        return redirect()->route('admin.discounts.index')
+            ->with('success', 'Diskon berhasil diupdate!');
     }
 
     public function destroy(Discount $discount)
@@ -179,7 +186,8 @@ public function getActiveBanner()
         $discount->products()->detach();
         $discount->delete();
 
-        return redirect()->route('admin.discounts.index');
+        return redirect()->route('admin.discounts.index')
+            ->with('success', 'Diskon berhasil dihapus!');
     }
 
     private function extractFileIdFromUrl($url)
@@ -188,4 +196,29 @@ public function getActiveBanner()
         $parts = explode('/', $path);
         return end($parts);
     }
+
+    public function checkStatus(Request $request)
+{
+    $productIds = $request->input('product_ids', []);
+    
+    $activeDiscounts = Discount::active()
+        ->whereHas('products', function($query) use ($productIds) {
+            $query->whereIn('products.id', $productIds);
+        })
+        ->with('products')
+        ->get();
+    
+    return response()->json([
+        'success' => true,
+        'discounts' => $activeDiscounts->map(function($discount) {
+            return [
+                'id' => $discount->id,
+                'percentage' => $discount->percentage,
+                'end_date' => $discount->end_date->toIso8601String(),
+                'time_remaining' => $discount->time_remaining,
+                'product_ids' => $discount->products->pluck('id'),
+            ];
+        })
+    ]);
+}
 }

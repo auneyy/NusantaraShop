@@ -85,6 +85,9 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
     // ==========================
 
     Route::middleware('auth')->group(function () {
+
+        // Tambahkan di dalam Route::middleware('auth')->group(function () {
+        Route::get('/api/discounts/check-status', [DiscountController::class, 'checkStatus'])->name('api.discounts.check-status');
         
         // Cart Routes
         Route::prefix('cart')->name('cart.')->group(function () {
