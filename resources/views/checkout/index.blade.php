@@ -1,7 +1,6 @@
 @extends('layout.app')
 
 @section('content')
-<meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
     .checkout-container {
         padding: 2rem 0;
@@ -326,229 +325,224 @@
         </div>
         @endif
 
-        <form action="{{ route('checkout.process') }}" method="POST" id="checkout-form">
-            @csrf
-            
-            <div class="row">
-                <!-- Form Checkout -->
-                <div class="col-lg-8">
-                    <div class="checkout-card">
-                        <div class="form-section">
-                            <!-- Informasi Pengiriman -->
-                            <h5 class="section-title">📦 Informasi Pengiriman</h5>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="shipping_name">Nama Lengkap *</label>
-                                        <input type="text" class="form-control" id="shipping_name" 
-                                               name="shipping_name" value="{{ old('shipping_name', Auth::user()->name ?? '') }}" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="shipping_phone">Nomor Telepon *</label>
-                                      <input type="text" 
-                                        name="shipping_phone" 
-                                        value="{{ old('shipping_phone', Auth::user()->phone ?? '') }}" 
-                                        required 
-                                        class="form-control">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Email *</label>
-                            <input type="email" class="form-control" name="shipping_email" 
-                                   value="{{ $user->email ?? '' }}" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Alamat Lengkap *</label>
-                            <textarea class="form-control" name="shipping_address" rows="3" required 
-                                      placeholder="Nama jalan, nomor rumah, RT/RW, dll"></textarea>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Provinsi *</label>
-                                <select class="form-select" id="province" name="shipping_province" required>
-                                    <option value="">Pilih Provinsi</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Kota/Kabupaten *</label>
-                                <select class="form-select" id="city" name="shipping_city" required disabled>
-                                    <option value="">Pilih Kota/Kabupaten</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Kecamatan *</label>
-                                <select class="form-select" id="district" name="shipping_district" required disabled>
-                                    <option value="">Pilih Kecamatan</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Kode Pos *</label>
-                                <input type="text" class="form-control" name="shipping_postal_code" 
-                                       placeholder="Contoh: 12345" required>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Catatan (Opsional)</label>
-                            <textarea class="form-control" name="notes" rows="2" 
-                                      placeholder="Catatan tambahan untuk pengiriman"></textarea>
-                        </div>
-
-                        <!-- Hidden inputs for location IDs and names -->
-                        <input type="hidden" id="district_id" name="district_id">
-                        <input type="hidden" id="province_name" name="province_name">
-                        <input type="hidden" id="city_name" name="city_name">
-                        <input type="hidden" id="district_name" name="district_name">
-                        <input type="hidden" id="total_weight" name="total_weight" value="{{ $totalWeight }}">
-                        
-                        <!-- Hidden inputs for checkout -->
-                        <input type="hidden" name="total_amount" id="total_amount_input" value="{{ $total }}">
-                        <input type="hidden" id="shipping_cost_input" name="shipping_cost" value="0">
-                        <input type="hidden" id="courier_name_input" name="courier_name" value="">
-                        <input type="hidden" id="courier_service_input" name="courier_service" value="">
-                        <input type="hidden" name="payment_method" id="payment_method_input" value="midtrans">
-                        
-                        <!-- Hidden inputs for items -->
-                        @foreach($checkoutItems as $index => $item)
-                        <input type="hidden" name="items[{{ $index }}][product_id]" value="{{ $item['product']->id }}">
-                        <input type="hidden" name="items[{{ $index }}][quantity]" value="{{ $item['quantity'] }}">
-                        <input type="hidden" name="items[{{ $index }}][size]" value="{{ $item['size'] }}">
-                        @endforeach
-                    </form>
-                </div>
-
-                <!-- Pilih Kurir -->
-                <div class="checkout-card" id="courierSection" style="display: none;">
-                    <h5 class="section-title">🚚 Pilih Kurir Pengiriman</h5>
+    <form action="{{ route('checkout.process') }}" method="POST" id="checkout-form">
+    @csrf
+    
+    <div class="row">
+        <!-- Form Checkout -->
+        <div class="col-lg-8">
+            <div class="checkout-card">
+                <div class="form-section">
+                    <!-- Informasi Pengiriman -->
+                    <h5 class="section-title">📦 Informasi Pengiriman</h5>
                     
                     <div class="row">
-                        <div class="col-md-8 mb-3">
-                            <label class="form-label">Pilih Kurir</label>
-                            <select class="form-select" id="courierSelect">
-                                <option value="">Pilih Kurir</option>
-                                <option value="jne">JNE</option>
-                                <option value="pos">POS Indonesia</option>
-                                <option value="tiki">TIKI</option>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="shipping_name">Nama Lengkap *</label>
+                                <input type="text" class="form-control" id="shipping_name" 
+                                       name="shipping_name" value="{{ old('shipping_name', Auth::user()->name ?? '') }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="shipping_phone">Nomor Telepon *</label>
+                                <input type="text" 
+                                       name="shipping_phone" 
+                                       value="{{ old('shipping_phone', Auth::user()->phone ?? '') }}" 
+                                       required 
+                                       class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email *</label>
+                        <input type="email" class="form-control" name="shipping_email" 
+                               value="{{ Auth::user()->email ?? '' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Alamat Lengkap *</label>
+                        <textarea class="form-control" name="shipping_address" rows="3" required 
+                                  placeholder="Nama jalan, nomor rumah, RT/RW, dll">{{ old('shipping_address') }}</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Provinsi *</label>
+                            <select class="form-select" id="province" name="shipping_province" required>
+                                <option value="">Pilih Provinsi</option>
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">&nbsp;</label>
-                            <button type="button" class="btn btn-primary w-100" id="calculateShippingBtn" disabled>
-                                📦 Cek Ongkir
-                            </button>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Kota/Kabupaten *</label>
+                            <select class="form-select" id="city" name="shipping_city" required disabled>
+                                <option value="">Pilih Kota/Kabupaten</option>
+                            </select>
                         </div>
                     </div>
 
-                    <div id="shippingOptions" style="display: none;">
-                        <label class="form-label">Pilih Layanan</label>
-                        <div id="shippingOptionsList"></div>
-                    </div>
-
-                    <div id="courierLoading" class="text-center" style="display: none;">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Kecamatan *</label>
+                            <select class="form-select" id="district" name="shipping_district" required disabled>
+                                <option value="">Pilih Kecamatan</option>
+                            </select>
                         </div>
-                        <p class="mt-2">Mengambil data ongkir...</p>
-                    </div>
-
-                    <div id="courierError" class="alert alert-danger" style="display: none;"></div>
-                </div>
-
-                <!-- Metode Pembayaran -->
-                <div class="checkout-card">
-                    <h5 class="section-title">💳 Metode Pembayaran</h5>
-                    <div class="payment-methods">
-                        <div class="payment-option" onclick="selectPayment('midtrans')">
-                            <input type="radio" name="payment_method" value="midtrans" id="payment_midtrans" checked>
-                            <div class="payment-icon">💳</div>
-                            <div class="payment-label">Midtrans</div>
-                            <small class="text-muted">Credit/Debit, VA, E-Wallet</small>
-                        </div>
-                        <div class="payment-option" onclick="selectPayment('bank_transfer')">
-                            <input type="radio" name="payment_method" value="bank_transfer" id="payment_bank">
-                            <div class="payment-icon">🏦</div>
-                            <div class="payment-label">Transfer Bank</div>
-                            <small class="text-muted">Manual Transfer</small>
-                        </div>
-                        <div class="payment-option" onclick="selectPayment('cod')">
-                            <input type="radio" name="payment_method" value="cod" id="payment_cod">
-                            <div class="payment-icon">💵</div>
-                            <div class="payment-label">COD</div>
-                            <small class="text-muted">Cash on Delivery</small>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Kode Pos *</label>
+                            <input type="text" class="form-control" name="shipping_postal_code" 
+                                   placeholder="Contoh: 12345" required>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Summary Pesanan -->
-            <div class="col-lg-4">
-                <div class="summary-card">
-                    <h5 class="section-title">📦 Ringkasan Pesanan</h5>
-                    
-                    <!-- Products List -->
                     <div class="mb-3">
-                        @foreach($checkoutItems as $item)
-                        <div class="product-item">
-                            <img src="{{ $item['product']->images->first()->image_path ?? 'https://via.placeholder.com/80' }}" 
-                                 alt="{{ $item['product']->name }}" class="product-image">
-                            <div class="product-info">
-                                <div class="product-name">{{ $item['product']->name }}</div>
-                                <div class="product-specs">
-                                    Ukuran: {{ $item['size'] }} | Qty: {{ $item['quantity'] }}
-                                </div>
-                            </div>
-                            <div class="product-price">
-                                Rp {{ number_format($item['subtotal'], 0, ',', '.') }}
-                            </div>
-                        </div>
-                        @endforeach
+                        <label class="form-label">Catatan (Opsional)</label>
+                        <textarea class="form-control" name="notes" rows="2" 
+                                  placeholder="Catatan tambahan untuk pengiriman">{{ old('notes') }}</textarea>
                     </div>
 
-                    <!-- Summary -->
-                    <div class="summary-row">
-                        <span>Subtotal ({{ count($checkoutItems) }} item)</span>
-                        <span id="subtotal">Rp {{ number_format($total, 0, ',', '.') }}</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Berat Total</span>
-                        <span>{{ number_format($totalWeight, 0, ',', '.') }} gram</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Ongkos Kirim</span>
-                        <span id="shipping-cost">Rp 0</span>
-                    </div>
-                    <div class="summary-row total">
-                        <span>Total Pembayaran</span>
-                        <span id="grand-total">Rp {{ number_format($total, 0, ',', '.') }}</span>
-                    </div>
+                    <!-- Hidden inputs -->
+                    <input type="hidden" id="district_id" name="district_id">
+                    <input type="hidden" id="province_name" name="province_name">
+                    <input type="hidden" id="city_name" name="city_name">
+                    <input type="hidden" id="district_name" name="district_name">
+                    <input type="hidden" id="total_weight" name="total_weight" value="{{ $totalWeight }}">
+                    
+                    <input type="hidden" name="total_amount" id="total_amount_input" value="{{ $total }}">
+                    <input type="hidden" id="shipping_cost_input" name="shipping_cost" value="0">
+                    <input type="hidden" id="courier_name_input" name="courier_name" value="">
+                    <input type="hidden" id="courier_service_input" name="courier_service" value="">
+                    <input type="hidden" name="payment_method" id="payment_method_input" value="midtrans">
+                    
+                    @foreach($checkoutItems as $index => $item)
+                    <input type="hidden" name="items[{{ $index }}][product_id]" value="{{ $item['product']->id }}">
+                    <input type="hidden" name="items[{{ $index }}][quantity]" value="{{ $item['quantity'] }}">
+                    <input type="hidden" name="items[{{ $index }}][size]" value="{{ $item['size'] }}">
+                    @endforeach
+                </div>
+            </div>
 
-                    <button type="button" class="btn-checkout mt-3" id="checkoutBtn" disabled>
-                        Pilih Alamat & Kurir Terlebih Dahulu
-                    </button>
+            <!-- Pilih Kurir -->
+            <div class="checkout-card" id="courierSection" style="display: none;">
+                <h5 class="section-title">🚚 Pilih Kurir Pengiriman</h5>
+                
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label">Pilih Kurir</label>
+                        <select class="form-select" id="courierSelect">
+                            <option value="">Pilih Kurir</option>
+                            <option value="jne">JNE</option>
+                            <option value="pos">POS Indonesia</option>
+                            <option value="tiki">TIKI</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="button" class="btn btn-primary w-100" id="calculateShippingBtn" disabled>
+                            📦 Cek Ongkir
+                        </button>
+                    </div>
+                </div>
 
-                    <div class="alert alert-info mt-3">
-                        <small>
-                            <strong>ℹ️ Info:</strong><br>
-                            Pastikan alamat pengiriman sudah benar sebelum melakukan pembayaran.
-                        </small>
+                <div id="shippingOptions" style="display: none;">
+                    <label class="form-label">Pilih Layanan</label>
+                    <div id="shippingOptionsList"></div>
+                </div>
+
+                <div id="courierLoading" class="text-center" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Mengambil data ongkir...</p>
+                </div>
+
+                <div id="courierError" class="alert alert-danger" style="display: none;"></div>
+            </div>
+
+            <!-- Metode Pembayaran -->
+            <div class="checkout-card">
+                <h5 class="section-title">💳 Metode Pembayaran</h5>
+                <div class="payment-methods">
+                    <div class="payment-option" onclick="selectPayment('midtrans')">
+                        <input type="radio" name="payment_method" value="midtrans" id="payment_midtrans" checked>
+                        <div class="payment-icon">💳</div>
+                        <div class="payment-label">Midtrans</div>
+                        <small class="text-muted">Credit/Debit, VA, E-Wallet</small>
+                    </div>
+                    <div class="payment-option" onclick="selectPayment('bank_transfer')">
+                        <input type="radio" name="payment_method" value="bank_transfer" id="payment_bank">
+                        <div class="payment-icon">🏦</div>
+                        <div class="payment-label">Transfer Bank</div>
+                        <small class="text-muted">Manual Transfer</small>
+                    </div>
+                    <div class="payment-option" onclick="selectPayment('cod')">
+                        <input type="radio" name="payment_method" value="cod" id="payment_cod">
+                        <div class="payment-icon">💵</div>
+                        <div class="payment-label">COD</div>
+                        <small class="text-muted">Cash on Delivery</small>
                     </div>
                 </div>
             </div>
-</form>
+        </div>
+
+        <!-- Summary Pesanan -->
+        <div class="col-lg-4">
+            <div class="summary-card">
+                <h5 class="section-title">📦 Ringkasan Pesanan</h5>
+                
+                <!-- Products List -->
+                <div class="mb-3">
+                    @foreach($checkoutItems as $item)
+                    <div class="product-item">
+                        <img src="{{ $item['product']->images->first()->image_path ?? 'https://via.placeholder.com/80' }}" 
+                             alt="{{ $item['product']->name }}" class="product-image">
+                        <div class="product-info">
+                            <div class="product-name">{{ $item['product']->name }}</div>
+                            <div class="product-specs">
+                                Ukuran: {{ $item['size'] }} | Qty: {{ $item['quantity'] }}
+                            </div>
+                        </div>
+                        <div class="product-price">
+                            Rp {{ number_format($item['subtotal'], 0, ',', '.') }}
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+
+                <!-- Summary -->
+                <div class="summary-row">
+                    <span>Subtotal ({{ count($checkoutItems) }} item)</span>
+                    <span id="subtotal">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Berat Total</span>
+                    <span>{{ number_format($totalWeight, 0, ',', '.') }} gram</span>
+                </div>
+                <div class="summary-row">
+                    <span>Ongkos Kirim</span>
+                    <span id="shipping-cost">Rp 0</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total Pembayaran</span>
+                    <span id="grand-total">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                </div>
+
+                <button type="submit" class="btn-checkout mt-3" id="checkoutBtn" disabled>
+                    Pilih Alamat & Kurir Terlebih Dahulu
+                </button>
+
+                <div class="alert alert-info mt-3">
+                    <small>
+                        <strong>ℹ️ Info:</strong><br>
+                        Pastikan alamat pengiriman sudah benar sebelum melakukan pembayaran.
+                    </small>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+</form> <!-- FORM DITUTUP DI SINI -->
 
 <script>
 let provinces = [];
@@ -841,6 +835,9 @@ function displayShippingOptions(courierData, courierName) {
     dataArray.forEach((item, index) => {
         console.log(`\nProcessing item ${index}:`, item);
         
+        // This appears to be a flat structure with direct properties
+        // Structure: { name, code, service, description, cost, etd }
+        
         let costValue = null;
         let costService = null;
         let costDescription = null;
@@ -1039,101 +1036,63 @@ function updateCheckoutButton() {
     }
 }
 
-// Checkout Button Click - INI YANG DIPERBAIKI
+// Checkout Button Click
 document.getElementById('checkoutBtn').addEventListener('click', async function() {
     const btn = this;
     const originalText = btn.textContent;
     
-    // PERBAIKAN: Ubah dari 'checkoutForm' menjadi 'checkout-form'
+    // PERBAIKI: Gunakan ID yang benar - checkout-form (bukan checkoutForm)
     const form = document.getElementById('checkout-form');
     
+    console.log('Form element:', form); // Debug
+    
     if (!form) {
-        console.error('Form tidak ditemukan!');
-        alert('Terjadi kesalahan: Form tidak ditemukan. Silakan refresh halaman.');
+        console.error('Form not found! Check the form ID');
+        alert('Error: Form tidak ditemukan. Silakan refresh halaman.');
         return;
     }
     
     if (!form.checkValidity()) {
+        console.log('Form validation failed');
         form.reportValidity();
         return;
     }
     
-    // Validate shipping selection
+    // ... sisa kode JavaScript tetap sama ...
+    // Validasi shipping selection
     if (!selectedShippingCost || selectedShippingCost <= 0) {
         alert('Silakan pilih layanan pengiriman terlebih dahulu');
         return;
     }
     
-    // Validate payment method
+    // Validasi payment method
     const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
     if (!paymentMethod) {
         alert('Silakan pilih metode pembayaran');
         return;
     }
     
-    // Update hidden inputs to ensure they're set
+    // Update hidden inputs
     document.getElementById('total_amount_input').value = subtotal;
     document.getElementById('shipping_cost_input').value = selectedShippingCost;
     document.getElementById('courier_name_input').value = selectedCourierName;
     document.getElementById('courier_service_input').value = selectedCourierService;
     document.getElementById('payment_method_input').value = paymentMethod.value;
-    document.getElementById('province_name').value = document.getElementById('province').options[document.getElementById('province').selectedIndex].text;
-    document.getElementById('city_name').value = document.getElementById('city').options[document.getElementById('city').selectedIndex].text;
-    document.getElementById('district_name').value = document.getElementById('district').options[document.getElementById('district').selectedIndex].text;
     
-    // Disable button and show loading
+    // Disable button dan show loading
     btn.disabled = true;
     btn.innerHTML = '<span class="loading-spinner"></span>Memproses...';
     
     try {
-        // Create FormData from form
+        // Create FormData dari form
         const formData = new FormData(form);
         
-        // Double check critical fields are set
-        if (!formData.get('total_amount')) {
-            formData.set('total_amount', subtotal);
-        }
-        if (!formData.get('shipping_cost')) {
-            formData.set('shipping_cost', selectedShippingCost);
-        }
-        if (!formData.get('courier_name')) {
-            formData.set('courier_name', selectedCourierName);
-        }
-        if (!formData.get('courier_service')) {
-            formData.set('courier_service', selectedCourierService);
-        }
-        if (!formData.get('payment_method')) {
-            formData.set('payment_method', paymentMethod.value);
-        }
-        
-        // Ensure province, city, district names (not IDs)
-        if (!formData.get('shipping_province') || formData.get('shipping_province') === '') {
-            const provinceSelect = document.getElementById('province');
-            formData.set('shipping_province', provinceSelect.options[provinceSelect.selectedIndex].text);
-        }
-        if (!formData.get('shipping_city') || formData.get('shipping_city') === '') {
-            const citySelect = document.getElementById('city');
-            formData.set('shipping_city', citySelect.options[citySelect.selectedIndex].text);
-        }
-        if (!formData.get('shipping_district') || formData.get('shipping_district') === '') {
-            const districtSelect = document.getElementById('district');
-            formData.set('shipping_district', districtSelect.options[districtSelect.selectedIndex].text);
-        }
-        
         console.log('=== CHECKOUT DATA ===');
-        console.log('Subtotal:', subtotal);
-        console.log('Shipping Cost:', selectedShippingCost);
-        console.log('Grand Total:', subtotal + selectedShippingCost);
-        console.log('Payment Method:', paymentMethod.value);
-        console.log('Courier:', selectedCourierName, '-', selectedCourierService);
-        
-        // Log all form data
-        console.log('\nForm Data being sent:');
         for (let pair of formData.entries()) {
             console.log(pair[0] + ': ' + pair[1]);
         }
         
-        // Submit to server
+        // Submit ke server
         const response = await fetch('{{ route('checkout.process') }}', {
             method: 'POST',
             headers: {
@@ -1149,7 +1108,6 @@ document.getElementById('checkoutBtn').addEventListener('click', async function(
         
         if (data.success) {
             console.log('✓ Checkout successful, redirecting to:', data.redirect_url);
-            // Redirect to order page
             window.location.href = data.redirect_url;
         } else {
             throw new Error(data.message || 'Terjadi kesalahan');
@@ -1157,15 +1115,7 @@ document.getElementById('checkoutBtn').addEventListener('click', async function(
         
     } catch (error) {
         console.error('Checkout error:', error);
-        
-        let errorMessage = 'Terjadi kesalahan: ' + error.message;
-        
-        // Try to parse more detailed error
-        if (error.message.includes('required')) {
-            errorMessage = 'Data tidak lengkap. ' + error.message + '\n\nSilakan periksa semua field sudah terisi dengan benar.';
-        }
-        
-        alert(errorMessage);
+        alert('Terjadi kesalahan: ' + error.message);
         
         // Restore button
         btn.disabled = false;
