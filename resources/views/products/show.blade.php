@@ -18,8 +18,26 @@
         flex-wrap: wrap;
     }
 
-  .thumbnail-gallery { display: flex; flex-direction: column; gap: 15px; overflow-y: auto; height: 100%; max-height: 500px; top: 8rem; padding-right: 10px; } 
-  .thumbnail-gallery img { width: 80px; height: 80px; cursor: pointer; object-fit: cover; border: 1px solid transparent; transition: border-color 0.2s ease, transform 0.2s ease; margin-top: 2px; }
+    .thumbnail-gallery { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 15px; 
+        overflow-y: auto; 
+        height: 100%; 
+        max-height: 500px; 
+        top: 8rem; 
+        padding-right: 10px; 
+    } 
+    
+    .thumbnail-gallery img { 
+        width: 80px; 
+        height: 80px; 
+        cursor: pointer; 
+        object-fit: cover; 
+        border: 1px solid transparent; 
+        transition: border-color 0.2s ease, transform 0.2s ease; 
+        margin-top: 2px; 
+    }
 
     .thumbnail-gallery img.active,
     .thumbnail-gallery img:hover {
@@ -34,6 +52,7 @@
         justify-content: center;
         align-items: center;
         overflow: hidden;
+        position: relative;
     }
 
     .main-image {
@@ -54,8 +73,78 @@
         flex: 1;
     }
 
-.product-title-detail { font-size: 30px !important; font-weight: 500 !important; margin-bottom: 0.5rem; } 
-.product-price-detail { font-size: 20px !important; font-weight: 500 !important; color: #8B4513 !important; margin-bottom: 1.5rem; }
+    .product-title-detail { 
+        font-size: 30px !important; 
+        font-weight: 500 !important; 
+        margin-bottom: 0.5rem; 
+    } 
+    
+    .product-price-detail { 
+        font-size: 20px !important; 
+        font-weight: 500 !important; 
+        color: #8B4513 !important; 
+        margin-bottom: 1.5rem; 
+    }
+
+    /* Discount Badge on Image */
+    .discount-badge-overlay {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: linear-gradient(135deg, rgb(229, 98, 62) 0%, rgb(224, 13, 6) 100%);
+        color: white;
+        font-size: 14px;
+        font-weight: 700;
+        padding: 8px 16px;
+        border-radius: 25px;
+        z-index: 10;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+    }
+
+    /* Countdown Timer for Product Detail */
+    .product-countdown-timer {
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .countdown-unit {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 40px;
+    }
+
+    .countdown-value {
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1;
+        color: #fff;
+    }
+
+    .countdown-label {
+        font-size: 9px;
+        color: rgba(255, 255, 255, 0.7);
+        text-transform: uppercase;
+        margin-top: 3px;
+    }
+
+    .countdown-separator {
+        font-size: 18px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.5);
+    }
 
     .product-description-detail {
         font-size: 1rem;
@@ -64,7 +153,6 @@
         margin-bottom: 2rem;
     }
 
-    /* Tombol aksi */
     .action-buttons {
         display: flex;
         gap: 1rem;
@@ -108,7 +196,6 @@
         transform: translateY(-2px);
     }
 
-    /* Pilihan ukuran */
     .size-option {
         display: inline-block;
         padding: 8px 15px;
@@ -162,41 +249,6 @@
         margin: 0;
     }
 
-    .zoomed-image-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.85);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 1050;
-    }
-
-    .zoomed-image {
-        max-width: 90%;
-        max-height: 90%;
-        object-fit: contain;
-    }
-
-    .close-btn {
-        position: absolute;
-        top: 20px;
-        right: 30px;
-        color: white;
-        font-size: 2.5rem;
-        cursor: pointer;
-        opacity: 0.8;
-        transition: opacity 0.2s ease;
-    }
-
-    .close-btn:hover {
-        opacity: 1;
-    }
-
-    /* Loading states */
     .btn-loading {
         position: relative;
         pointer-events: none;
@@ -222,7 +274,7 @@
         100% { transform: rotate(360deg); }
     }
 
-    /* Custom Alert Styles */
+    /* Custom Alert & Toast Styles */
     .custom-alert-overlay {
         position: fixed;
         top: 0;
@@ -299,17 +351,9 @@
     }
 
     @keyframes checkmark {
-        0% {
-            transform: scale(0);
-            opacity: 0;
-        }
-        50% {
-            transform: scale(1.3);
-        }
-        100% {
-            transform: scale(1);
-            opacity: 1;
-        }
+        0% { transform: scale(0); opacity: 0; }
+        50% { transform: scale(1.3); }
+        100% { transform: scale(1); opacity: 1; }
     }
 
     @keyframes shake {
@@ -377,7 +421,6 @@
         color: #666;
     }
 
-    /* Toast Notification */
     .toast-container {
         position: fixed;
         top: 20px;
@@ -407,13 +450,8 @@
         opacity: 1;
     }
 
-    .custom-toast.error {
-        border-left-color: #f44336;
-    }
-
-    .custom-toast.warning {
-        border-left-color: #ff9800;
-    }
+    .custom-toast.error { border-left-color: #f44336; }
+    .custom-toast.warning { border-left-color: #ff9800; }
 
     .toast-icon {
         width: 24px;
@@ -427,17 +465,9 @@
         flex-shrink: 0;
     }
 
-    .toast-icon.success {
-        background: #4CAF50;
-    }
-
-    .toast-icon.error {
-        background: #f44336;
-    }
-
-    .toast-icon.warning {
-        background: #ff9800;
-    }
+    .toast-icon.success { background: #4CAF50; }
+    .toast-icon.error { background: #f44336; }
+    .toast-icon.warning { background: #ff9800; }
 
     .toast-content {
         flex-grow: 1;
@@ -477,7 +507,6 @@
         color: #666;
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
         .product-image-section {
             flex-direction: column;
@@ -525,7 +554,6 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="product-image-section">
-
                     @if($product->images->count() > 1)
                         <div class="thumbnail-gallery">
                             @foreach($product->images as $thumb)
@@ -535,37 +563,67 @@
                     @endif
 
                     <div class="main-image-display">
+                        {{-- Discount Badge on Image --}}
+                        @if($activeDiscount && $activeDiscount->is_valid)
+                            <div class="discount-badge-overlay">
+                                -{{ $activeDiscount->percentage }}%
+                            </div>
+                        @endif
+
                         <img id="main-product-image" 
                              src="{{ $product->images->first()->image_path ?? 'path/to/placeholder.jpg' }}" 
                              class="main-image" 
                              alt="{{ $product->name }}">
                     </div>
-
                 </div>
             </div>
 
             <div class="col-md-6">
                 <div class="product-info-wrapper">
                     <h1 class="product-title-detail">{{ $product->name }}</h1>
-                    @php
-                        $discount = $activeDiscounts->firstWhere('products.0.id', $product->id);
-                    @endphp
 
-                    @if($discount)
-                        @php
-                            $discountedPrice = $product->harga - ($product->harga * $discount->percentage / 100);
-                        @endphp
-                      <p class="product-price-detail d-flex align-items-center gap-2">
-    <span class="text-muted" style="text-decoration: line-through;">
-        Rp {{ number_format($product->harga, 0, ',', '.') }}
-    </span>
-    <span class="text-danger fw-bold">
-        Rp {{ number_format($discountedPrice, 0, ',', '.') }}
-    </span>
-</p>
+                    {{-- Price with Discount --}}
+                    @if($activeDiscount && $activeDiscount->is_valid)
+                        <p class="product-price-detail d-flex align-items-center gap-2">
+                            <span class="text-muted" style="text-decoration: line-through;">
+                                Rp {{ number_format($product->harga, 0, ',', '.') }}
+                            </span>
+                            <span class="text-danger fw-bold">
+                                Rp {{ number_format($discountedPrice, 0, ',', '.') }}
+                            </span>
+                        </p>
+                        <div class="mb-3">
+                            <span class="badge bg-success">
+                                Hemat Rp {{ number_format($savings, 0, ',', '.') }}
+                            </span>
+                        </div>
+
+                        {{-- Countdown Timer --}}
+                        <div class="product-countdown-timer" data-end-date="{{ $activeDiscount->end_date_iso }}">
+                            <span style="font-size: 12px; opacity: 0.9;">⏰ Berakhir dalam:</span>
+                            <div class="countdown-unit">
+                                <span class="countdown-value days">00</span>
+                                <span class="countdown-label">Hari</span>
+                            </div>
+                            <span class="countdown-separator">:</span>
+                            <div class="countdown-unit">
+                                <span class="countdown-value hours">00</span>
+                                <span class="countdown-label">Jam</span>
+                            </div>
+                            <span class="countdown-separator">:</span>
+                            <div class="countdown-unit">
+                                <span class="countdown-value minutes">00</span>
+                                <span class="countdown-label">Menit</span>
+                            </div>
+                            <span class="countdown-separator">:</span>
+                            <div class="countdown-unit">
+                                <span class="countdown-value seconds">00</span>
+                                <span class="countdown-label">Detik</span>
+                            </div>
+                        </div>
                     @else
                         <p class="product-price-detail">
-                            Rp {{ number_format($product->harga,0,',','.') }}
+                            Rp {{ number_format($product->harga, 0, ',', '.') }}
                         </p>
                     @endif
 
@@ -575,7 +633,7 @@
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                         <input type="hidden" name="product_name" value="{{ $product->name }}">
-                        <input type="hidden" name="product_price" value="{{ $product->harga }}">
+                        <input type="hidden" name="product_price" value="{{ $activeDiscount && $activeDiscount->is_valid ? $discountedPrice : $product->harga }}">
                         <input type="hidden" name="product_image" value="{{ $product->images->first()->image_path ?? '' }}">
 
                         <div class="mb-4">
@@ -612,15 +670,16 @@
             </div>
         </div>
 
+        {{-- Recommended Products --}}
         @if($recommendedProducts->count() > 0)
             <div class="mt-5">
                 <hr class="my-5">
                 <h3 class="text-center mb-5">Produk Rekomendasi Untukmu</h3>
                 <div class="row g-3">
-                    @foreach($recommendedProducts as $product)
+                    @foreach($recommendedProducts as $recommendedProduct)
                         <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                             @include('partials.product-card', [
-                                'product' => $product,
+                                'product' => $recommendedProduct,
                                 'activeDiscounts' => $recommendedDiscounts
                             ])
                         </div>
@@ -628,7 +687,6 @@
                 </div>
             </div>
         @endif
-
     </div>
 </div>
 
@@ -650,8 +708,45 @@
 
 @endsection
 
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Countdown Timer untuk Product Detail
+    const productCountdown = document.querySelector('.product-countdown-timer');
+    
+    if (productCountdown) {
+        const endDate = new Date(productCountdown.dataset.endDate).getTime();
+        
+        const daysEl = productCountdown.querySelector('.days');
+        const hoursEl = productCountdown.querySelector('.hours');
+        const minutesEl = productCountdown.querySelector('.minutes');
+        const secondsEl = productCountdown.querySelector('.seconds');
+        
+        function updateProductCountdown() {
+            const now = new Date().getTime();
+            const distance = endDate - now;
+            
+            if (distance < 0) {
+                location.reload();
+                return;
+            }
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            daysEl.textContent = String(days).padStart(2, '0');
+            hoursEl.textContent = String(hours).padStart(2, '0');
+            minutesEl.textContent = String(minutes).padStart(2, '0');
+            secondsEl.textContent = String(seconds).padStart(2, '0');
+        }
+        
+        updateProductCountdown();
+        setInterval(updateProductCountdown, 1000);
+    }
+
+    // Rest of your JavaScript code...
     const mainImage = document.getElementById('main-product-image');
     const thumbnails = document.querySelectorAll('.thumbnail-gallery img');
     const sizeOptions = document.querySelectorAll('.size-option');
@@ -663,7 +758,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const buyNowBtn = document.getElementById('buy-now');
     const selectedSizeInput = document.getElementById('selected-size');
 
-    /** ---------------- Custom Alert Functions ---------------- **/
+    // Custom Alert Functions
     function showCustomAlert(type, title, message, callback = null) {
         const overlay = document.getElementById('customAlertOverlay');
         const alert = document.getElementById('customAlert');
@@ -673,14 +768,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const button = document.getElementById('alertButton');
         const closeBtn = document.getElementById('alertClose');
 
-        // Reset classes
         alert.className = 'custom-alert ' + type;
-        
-        // Set content
         titleEl.textContent = title;
         messageEl.textContent = message;
         
-        // Set icon based on type
         if (type === 'success') {
             icon.innerHTML = '<i class="bi bi-check-lg"></i>';
         } else if (type === 'error') {
@@ -689,15 +780,9 @@ document.addEventListener('DOMContentLoaded', function() {
             icon.innerHTML = '<i class="bi bi-exclamation-lg"></i>';
         }
 
-        // Show overlay
         overlay.style.display = 'flex';
-        
-        // Add show class with slight delay for animation
-        setTimeout(() => {
-            alert.classList.add('show');
-        }, 10);
+        setTimeout(() => alert.classList.add('show'), 10);
 
-        // Handle close events
         const closeAlert = () => {
             alert.classList.remove('show');
             setTimeout(() => {
@@ -708,16 +793,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         button.onclick = closeAlert;
         closeBtn.onclick = closeAlert;
-        
-        // Close on overlay click
-        overlay.onclick = (e) => {
-            if (e.target === overlay) closeAlert();
-        };
+        overlay.onclick = (e) => { if (e.target === overlay) closeAlert(); };
     }
 
     function showToast(type, title, message, duration = 4000) {
         const container = document.getElementById('toastContainer');
-        
         const toast = document.createElement('div');
         toast.className = `custom-toast ${type}`;
         
@@ -736,30 +816,20 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         
         container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
         
-        // Show toast
-        setTimeout(() => {
-            toast.classList.add('show');
-        }, 10);
-        
-        // Close button
-        const closeBtn = toast.querySelector('.toast-close');
         const closeToast = () => {
             toast.classList.remove('show');
             setTimeout(() => {
-                if (container.contains(toast)) {
-                    container.removeChild(toast);
-                }
+                if (container.contains(toast)) container.removeChild(toast);
             }, 300);
         };
         
-        closeBtn.onclick = closeToast;
-        
-        // Auto close
+        toast.querySelector('.toast-close').onclick = closeToast;
         setTimeout(closeToast, duration);
     }
 
-    /** ---------------- Thumbnail Click ---------------- **/
+    // Thumbnail Click
     thumbnails.forEach(thumbnail => {
         thumbnail.addEventListener('click', function() {
             mainImage.src = this.src;
@@ -768,7 +838,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    /** ---------------- Size Selection ---------------- **/
+    // Size Selection
     sizeOptions.forEach(option => {
         option.addEventListener('click', function() {
             sizeOptions.forEach(o => o.classList.remove('active'));
@@ -776,41 +846,24 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedSizeInput.value = this.dataset.size;
         });
     });
-    // Default pilih size pertama
+    
     if (sizeOptions.length > 0) {
         sizeOptions[0].classList.add('active');
         selectedSizeInput.value = sizeOptions[0].dataset.size;
     }
 
-    /** ---------------- Quantity Control ---------------- **/
+    // Quantity Control
     decreaseBtn.addEventListener('click', function() {
         let currentQty = parseInt(quantityInput.value);
         if (currentQty > 1) quantityInput.value = currentQty - 1;
     });
+    
     increaseBtn.addEventListener('click', function() {
         let currentQty = parseInt(quantityInput.value);
         if (currentQty < stockValue) quantityInput.value = currentQty + 1;
     });
 
-    /** ---------------- Zoom Image (jika ada container zoom) ---------------- **/
-    const zoomedImageContainer = document.getElementById('zoomed-image-container');
-    const zoomedImage = document.getElementById('zoomed-image');
-    const closeBtn = document.querySelector('.close-btn');
-    
-    if (zoomedImageContainer && zoomedImage && closeBtn) {
-        mainImage.addEventListener('click', function() {
-            zoomedImage.src = this.src;
-            zoomedImageContainer.style.display = 'flex';
-        });
-        closeBtn.addEventListener('click', function() {
-            zoomedImageContainer.style.display = 'none';
-        });
-        zoomedImageContainer.addEventListener('click', function(e) {
-            if (e.target === this) this.style.display = 'none';
-        });
-    }
-
-    /** ---------------- Validation ---------------- **/
+    // Validation
     function validateForm() {
         if (!selectedSizeInput.value) {
             showCustomAlert('warning', 'Pilih Ukuran', 'Silakan pilih ukuran produk terlebih dahulu!');
@@ -827,17 +880,15 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
-    /** ---------------- Add to Cart ---------------- **/
+    // Add to Cart
     addToCartBtn.addEventListener('click', function() {
         if (!validateForm()) return;
 
-        // Disable button dan show loading
         this.classList.add('btn-loading');
         this.disabled = true;
         const originalText = this.innerHTML;
         this.innerHTML = '<span>Menambahkan...</span>';
 
-        // Siapkan data
         const formData = {
             product_id: document.querySelector('input[name="product_id"]').value,
             quantity: quantityInput.value,
@@ -857,14 +908,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Tampilkan toast notification
                 showToast('success', 'Berhasil!', 'Produk berhasil ditambahkan ke keranjang');
-                
-                // Update cart count
                 updateCartCount(data.cart_count);
-                
-                // Atau gunakan custom alert (pilih salah satu)
-                // showCustomAlert('success', 'Berhasil!', 'Produk berhasil ditambahkan ke keranjang');
             } else {
                 showCustomAlert('error', 'Gagal!', data.message || 'Gagal menambahkan produk ke keranjang!');
             }
@@ -880,7 +925,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    /** ---------------- Buy Now ---------------- **/
+    // Buy Now
     buyNowBtn.addEventListener('click', function(e) {
         e.preventDefault();
         if (!validateForm()) return;
@@ -889,17 +934,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const quantity = quantityInput.value;
         const size = selectedSizeInput.value;
 
-        // Redirect langsung ke checkout dengan parameters
         window.location.href = `/checkout?product_id=${productId}&quantity=${quantity}&size=${size}`;
     });
 
-    /** ---------------- Update Cart Count ---------------- **/
+    // Update Cart Count
     function updateCartCount(count) {
         const cartCountElements = document.querySelectorAll('.cart-count, .cart-badge');
         cartCountElements.forEach(element => {
             if (element) {
                 element.textContent = count || 0;
-                // Show badge if count > 0
                 if (count > 0) {
                     element.style.display = 'inline';
                 } else {
@@ -909,7 +952,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    /** ---------------- Keyboard Support ---------------- **/
+    // Keyboard Support
     document.addEventListener('keydown', function(e) {
         const overlay = document.getElementById('customAlertOverlay');
         if (overlay.style.display === 'flex' && e.key === 'Escape') {
@@ -922,3 +965,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+@endpush

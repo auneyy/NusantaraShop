@@ -6,36 +6,83 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Discount;
-use App\Http\Controllers\Admin\DiscountController;
 
 class ProductController extends Controller
 {
+    /**
+     * Display a listing of products
+     */
     public function index()
     {
         $query = Product::query()->with(['category', 'images']);
 
+        // Filter by category
         if (request()->has('category')) {
             $query->whereHas('category', function($q) {
                 $q->where('slug', request('category'));
             });
         }
 
-        $products = $query->paginate(12);
+        // Filter by search
+        if (request()->has('search') && request('search') != '') {
+            $searchTerm = request('search');
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('deskripsi', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        // Sort options
+        if (request()->has('sort')) {
+            switch (request('sort')) {
+                case 'price_asc':
+                    $query->orderBy('harga', 'asc');
+                    break;
+                case 'price_desc':
+                    $query->orderBy('harga', 'desc');
+                    break;
+                case 'name_asc':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'name_desc':
+                    $query->orderBy('name', 'desc');
+                    break;
+                default:
+                    $query->latest();
+            }
+        } else {
+            $query->latest();
+        }
+
+        $products = $query->paginate(12)->withQueryString();
         $categories = Category::withCount('products')->get();
         
-        // Dapatkan diskon aktif untuk produk
-        $activeDiscounts = $this->getActiveDiscountsForProducts($products);
+        // Gunakan method dari Model Discount (REAL-TIME CHECK dengan WIB)
+        $activeDiscounts = Discount::getActiveDiscountsForProducts($products->pluck('id'));
 
         return view('products', compact('products', 'categories', 'activeDiscounts'));
     }
 
+    /**
+     * Display the specified product
+     */
     public function show(Product $product)
     {
         $product->load(['images', 'category']);
         
-        // Dapatkan diskon aktif untuk produk ini
-        $activeDiscounts = $this->getActiveDiscountsForProducts(collect([$product]));
+        // Cek discount aktif untuk produk ini (REAL-TIME)
+        $activeDiscount = Discount::getActiveDiscountForProduct($product->id);
         
+        // Hitung harga setelah discount
+        $discountedPrice = null;
+        $savings = null;
+        
+        if ($activeDiscount) {
+            $discountedPrice = $activeDiscount->calculateDiscountedPrice($product->harga);
+            $savings = $activeDiscount->calculateSavings($product->harga);
+        }
+        
+        // Produk rekomendasi
         $recommendedProducts = Product::where('is_featured', 1)
             ->where('id', '!=', $product->id)
             ->with('images')
@@ -43,47 +90,41 @@ class ProductController extends Controller
             ->limit(4)
             ->get();
             
-        // Dapatkan diskon aktif untuk produk rekomendasi
-        $recommendedDiscounts = $this->getActiveDiscountsForProducts($recommendedProducts);
+        // Discount untuk produk rekomendasi
+        $recommendedDiscounts = Discount::getActiveDiscountsForProducts($recommendedProducts->pluck('id'));
 
-        return view('products.show', compact('product', 'recommendedProducts', 'activeDiscounts', 'recommendedDiscounts'));
+        return view('products.show', compact(
+            'product', 
+            'activeDiscount',
+            'discountedPrice',
+            'savings',
+            'recommendedProducts', 
+            'recommendedDiscounts'
+        ));
     }
 
+    /**
+     * Search products
+     */
     public function search()
     {
-        $query = Product::query()->with(['images']);
+        $query = Product::query()->with(['images', 'category']);
 
-        if (request()->has('q')) {
-            $query->where('name', 'like', '%' . request('q') . '%')
-                  ->orWhere('deskripsi', 'like', '%' . request('q') . '%');
+        if (request()->has('q') && request('q') != '') {
+            $searchTerm = request('q');
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('deskripsi', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('sku', 'like', '%' . $searchTerm . '%');
+            });
         }
 
-        $products = $query->paginate(12);
+        $products = $query->paginate(12)->withQueryString();
         $categories = Category::withCount('products')->get();
         
-        // Dapatkan diskon aktif untuk produk
-        $activeDiscounts = $this->getActiveDiscountsForProducts($products);
+        // Gunakan method dari Model (REAL-TIME CHECK)
+        $activeDiscounts = Discount::getActiveDiscountsForProducts($products->pluck('id'));
 
         return view('search', compact('products', 'categories', 'activeDiscounts'));
     }
-    
-    /**
-     * Method untuk mendapatkan diskon aktif untuk kumpulan produk
-     */
-    private function getActiveDiscountsForProducts($products)
-    {
-        $currentDate = now()->format('Y-m-d');
-        $productIds = $products->pluck('id');
-        
-        return Discount::where('start_date', '<=', $currentDate)
-            ->where('end_date', '>=', $currentDate)
-            ->whereHas('products', function($query) use ($productIds) {
-                $query->whereIn('products.id', $productIds);
-            })
-            ->with(['products' => function($query) use ($productIds) {
-                $query->whereIn('products.id', $productIds);
-            }])
-            ->get();
-    }
-
 }

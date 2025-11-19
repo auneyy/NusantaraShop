@@ -28,7 +28,6 @@
     transform: scale(1.02);
   }
 
-  /* Dark overlay for better text readability */
   .hero-carousel .carousel-item::before {
     content: '';
     position: absolute;
@@ -41,7 +40,6 @@
     transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Carousel caption styling - Compact */
   .hero-carousel .carousel-caption {
     position: absolute;
     top: 55%;
@@ -72,7 +70,6 @@
     line-height: 1.5;
   }
 
-  /* Custom button styles - Compact with smoother animations */
   .btn-primary-custom {
     background-color: #422D1C;
     border-color: #422D1C;
@@ -117,28 +114,7 @@
     box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
   }
 
-  .btn-secondary-custom {
-    background-color: rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    color: white;
-    padding: 8px 24px;
-    font-weight: 600;
-    border-radius: 6px;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    text-decoration: none;
-    display: inline-block;
-    font-size: 0.9rem;
-    backdrop-filter: blur(10px);
-  }
-
-  .btn-secondary-custom:hover {
-    background-color: rgba(255, 255, 255, 0.9);
-    color: #422D1C;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
-  }
-
-  /* Custom carousel controls - Compact with smoother animations */
+  /* Custom carousel controls */
   .hero-carousel .carousel-control-prev,
   .hero-carousel .carousel-control-next {
     width: 40px;
@@ -167,14 +143,6 @@
     box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
   }
 
-  .hero-carousel .carousel-control-prev-icon,
-  .hero-carousel .carousel-control-next-icon {
-    width: 16px;
-    height: 16px;
-    background-size: contain;
-  }
-
-  /* Custom carousel indicators - Compact with smoother animations */
   .hero-carousel .carousel-indicators {
     bottom: 20px;
     margin-bottom: 0;
@@ -194,55 +162,6 @@
     background-color: white;
     transform: scale(1.4);
     box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
-  }
-
-  .hero-carousel .carousel-indicators button:hover {
-    background-color: rgba(255, 255, 255, 0.8);
-    transform: scale(1.2);
-  }
-
-  /* Animate.css integration - Smoother animations */
-  .carousel-caption .animate__animated {
-    animation-duration: 1.2s;
-    animation-delay: 0.2s;
-    animation-fill-mode: both;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .carousel-caption h1.animate__animated {
-    animation-delay: 0.2s;
-    animation-duration: 1s;
-  }
-
-  .carousel-caption p.animate__animated {
-    animation-delay: 0.2s;
-    animation-duration: 1s;
-  }
-
-  .carousel-caption .btn.animate__animated {
-    animation-delay: 0.2s;
-    animation-duration: 1s;
-  }
-
-  /* Additional smooth transitions with enhanced animations */
-  .carousel-fade .carousel-item {
-    opacity: 0;
-    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: none;
-  }
-
-  .carousel-fade .carousel-item.active,
-  .carousel-fade .carousel-item-next.carousel-item-start,
-  .carousel-fade .carousel-item-prev.carousel-item-end {
-    z-index: 1;
-    opacity: 1;
-  }
-
-  .carousel-fade .active.carousel-item-start,
-  .carousel-fade .active.carousel-item-end {
-    z-index: 0;
-    opacity: 0;
-    transition: opacity 0s 0.8s;
   }
 
   /* Features Section */
@@ -333,7 +252,7 @@
 
   /* Product Section Styles */
   .products-section {
-    padding: 20px 0;
+    padding: 60px 0;
     background-color: #ffffff;
   }
 
@@ -350,79 +269,62 @@
     margin: 0 auto;
   }
 
-  .product-card {
-    border: 1px solid #e9ecef;
+  /* Banner Discount with Countdown */
+  .banner-discount-section {
+    margin: 60px 0;
+    padding: 0 15px;
+  }
+
+  .banner-discount-wrapper {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    border-radius: 20px;
     overflow: hidden;
-    transition: all 0.3s ease;
-    background: white;
-    height: 100%;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  }
-
-  .product-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-    border-color: #422D1C;
-  }
-
-  .product-image {
-    width: 100%;
-    height: 280px;
-    object-fit: cover;
-    border-bottom: 1px solid #f0f0f0;
-    transition: transform 0.3s ease;
-  }
-
-  .product-card:hover .product-image {
-    transform: scale(1.05);
-  }
-
-  .product-info {
-    padding: 20px;
-  }
-
-  .product-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #422D1C;
-    margin-bottom: 8px;
-    line-height: 1.4;
-  }
-
-  .product-price {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #8B4513;
-    margin-bottom: 15px;
-  }
-
-  .btn-add-cart {
-    background-color: #f8f9fa;
-    color: #422D1C;
-    border: 2px solid #422D1C;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    width: 100%;
-    font-size: 0.9rem;
-  }
-
-  .btn-add-cart:hover {
-    background-color: #422D1C;
-    color: white;
-    transform: translateY(-2px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
   }
 
   .banner-discount {
     width: 100%;
     height: auto;
-    margin: 50px auto;
     display: block;
-    max-width: 1200px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .banner-countdown-overlay {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    padding: 20px 40px;
     border-radius: 15px;
-}
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .banner-countdown-item {
+    text-align: center;
+    min-width: 70px;
+  }
+
+  .banner-countdown-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .banner-countdown-label {
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    margin-top: 5px;
+    letter-spacing: 1px;
+  }
 
   .load-more-section {
     text-align: center;
@@ -449,98 +351,28 @@
       margin-bottom: 1rem;
     }
 
-    .btn-primary-custom,
-    .btn-outline-custom,
-    .btn-secondary-custom {
-      display: block;
-      width: 70%;
-      margin: 8px auto;
-      text-align: center;
-      font-size: 0.85rem;
-      padding: 8px 20px;
+    .banner-countdown-overlay {
+      padding: 15px 25px;
+      gap: 15px;
+      bottom: 20px;
     }
 
-    .hero-carousel .carousel-control-prev,
-    .hero-carousel .carousel-control-next {
-      width: 35px;
-      height: 35px;
+    .banner-countdown-item {
+      min-width: 50px;
     }
 
-    .hero-carousel .carousel-control-prev {
-      left: 15px;
-    }
-
-    .hero-carousel .carousel-control-next {
-      right: 15px;
-    }
-
-    .hero-carousel .carousel-control-prev-icon,
-    .hero-carousel .carousel-control-next-icon {
-      width: 14px;
-      height: 14px;
-    }
-
-    .hero-carousel .carousel-indicators button {
-      width: 6px;
-      height: 6px;
-      margin: 0 3px;
-    }
-
-    .features-section {
-      padding: 60px 0;
-    }
-
-    .products-container {
-      padding: 0 10px;
-    }
-
-    .product-image {
-      height: 220px;
-    }
-
-    .product-info {
-      padding: 15px;
-    }
-  }
-
-  @media (max-width: 576px) {
-    .hero-carousel {
-      height: 55vh;
-    }
-
-    .hero-carousel .carousel-item {
-      height: 55vh;
-    }
-
-    .hero-carousel .carousel-caption h1 {
+    .banner-countdown-value {
       font-size: 1.5rem;
-    }
-
-    .hero-carousel .carousel-caption p {
-      font-size: 0.85rem;
-    }
-
-    .hero-carousel .carousel-caption {
-      width: 90%;
-    }
-
-    .btn-primary-custom,
-    .btn-outline-custom,
-    .btn-secondary-custom {
-      width: 80%;
-      font-size: 0.8rem;
-      padding: 8px 16px;
     }
   }
 </style>
 
-<!-- Include Animate.css CDN for animations -->
+<!-- Include Animate.css CDN -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
 <!-- Hero Slider -->
 <div id="heroCarousel" class="carousel slide carousel-fade hero-carousel" data-bs-ride="carousel" data-bs-interval="5000">
   <div class="carousel-inner">
-
     <!-- Slide 1 -->
     <div class="carousel-item active">
       <img src="{{ asset('storage/product_images/macambatik.jpg') }}" class="d-block w-100" alt="Elegant Batik Collection">
@@ -569,16 +401,6 @@
     </div>
 
     <!-- Slide 3 -->
-    <!-- <div class="carousel-item">
-      <img src="{{ asset('storage/product_images/batik2.jpg') }}" class="d-block w-100" alt="Batik for Every Moment">
-      <div class="carousel-caption">
-        <h1 class="animate__animated animate__fadeInDown">Warna, Motif, dan Cerita</h1>
-        <p class="animate__animated animate__fadeInUp">Setiap goresan batik mempunyai makna, Setiap motif punya cerita, setiap helai membawa budaya.</p>
-      </div>
-    </div> -->
-
-    
-    <!-- Slide 4 -->
     <div class="carousel-item">
       <img src="{{ asset('storage/product_images/macambatik1.jpg') }}" class="d-block w-100" alt="Traditional Heritage">
       <div class="carousel-caption">
@@ -586,8 +408,6 @@
         <p class="animate__animated animate__fadeInUp">Setiap orang punya gaya unik. Yuk, cari yang paling cocok buat kamu di sini.</p>
       </div>
     </div>
-
-
   </div>
 
   <!-- Controls -->
@@ -602,49 +422,83 @@
 
   <!-- Indicators -->
   <div class="carousel-indicators">
-    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-    <!-- <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button> -->
-    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 4"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
   </div>
 </div>
-    
-<!-- Products Section -->
+
+<!-- Products Section - Featured -->
 <div class="products-section">
   <div class="products-container">
     <h2 class="section-title">Koleksi Terbaru Kami</h2>
     
     <div class="row g-3">
-      @foreach($products->take(4) as $product)
+      @forelse($products->take(4) as $product)
         <div class="col-6 col-md-3 mb-2">
-          @include('partials.product-card', ['product' => $product])
+          {{-- Pass activeDiscounts ke product card --}}
+          @include('partials.product-card', [
+              'product' => $product,
+              'activeDiscounts' => $activeDiscounts
+          ])
         </div>
-      @endforeach
+      @empty
+        <div class="col-12">
+          <div class="alert alert-info text-center">
+            <p class="mb-0">Belum ada produk tersedia</p>
+          </div>
+        </div>
+      @endforelse
     </div>
   </div>
 </div>
 
-<!-- Banner Discount -->
-@if(isset($discountBanner) && $discountBanner->banner_image)
-    <div class="banner-container text-center">
-        <a href="{{ route('promo') }}">
-            <img src="{{ $discountBanner->banner_image }}" 
-                 alt="Discount Banner - {{ $discountBanner->title }}" 
-                 class="banner-discount img-fluid"
-                 style="width: 100%; object-fit: cover;">
-        </a>
+<!-- Banner Discount with Countdown Timer -->
+@if(isset($discountBanner) && $discountBanner && $discountBanner->banner_image && $discountBanner->is_valid)
+<div class="banner-discount-section">
+  <div class="banner-discount-wrapper">
+    <a href="{{ route('products.index') }}">
+      <img src="{{ $discountBanner->banner_image }}" 
+           alt="{{ $discountBanner->title }}" 
+           class="banner-discount">
+    </a>
+    
+    {{-- Countdown Timer Overlay --}}
+    <div class="banner-countdown-overlay" data-end-date="{{ $discountBanner->end_date_iso }}">
+      <div class="banner-countdown-item">
+        <span class="banner-countdown-value days">00</span>
+        <span class="banner-countdown-label">Hari</span>
+      </div>
+      <div class="banner-countdown-item">
+        <span class="banner-countdown-value hours">00</span>
+        <span class="banner-countdown-label">Jam</span>
+      </div>
+      <div class="banner-countdown-item">
+        <span class="banner-countdown-value minutes">00</span>
+        <span class="banner-countdown-label">Menit</span>
+      </div>
+      <div class="banner-countdown-item">
+        <span class="banner-countdown-value seconds">00</span>
+        <span class="banner-countdown-label">Detik</span>
+      </div>
     </div>
+  </div>
+</div>
 @endif
 
-<!-- Products Section -->
-<div class="products-section">
+<!-- Products Section - All Products -->
+<div class="products-section" style="padding-top: 20px;">
   <div class="products-container">
     <h2 class="section-title">Semua Produk</h2>
     
     <div class="row g-3">
       @foreach($products->take(8) as $product)
         <div class="col-6 col-md-3 mb-2">
-          @include('partials.product-card', ['product' => $product])
+          {{-- Pass activeDiscounts ke product card --}}
+          @include('partials.product-card', [
+              'product' => $product,
+              'activeDiscounts' => $activeDiscounts
+          ])
         </div>
       @endforeach
     </div>
@@ -710,3 +564,44 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Banner Countdown Timer
+    const bannerCountdown = document.querySelector('.banner-countdown-overlay');
+    
+    if (bannerCountdown) {
+        const endDate = new Date(bannerCountdown.dataset.endDate).getTime();
+        
+        const daysEl = bannerCountdown.querySelector('.days');
+        const hoursEl = bannerCountdown.querySelector('.hours');
+        const minutesEl = bannerCountdown.querySelector('.minutes');
+        const secondsEl = bannerCountdown.querySelector('.seconds');
+        
+        function updateBannerCountdown() {
+            const now = new Date().getTime();
+            const distance = endDate - now;
+            
+            if (distance < 0) {
+                location.reload();
+                return;
+            }
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            daysEl.textContent = String(days).padStart(2, '0');
+            hoursEl.textContent = String(hours).padStart(2, '0');
+            minutesEl.textContent = String(minutes).padStart(2, '0');
+            secondsEl.textContent = String(seconds).padStart(2, '0');
+        }
+        
+        updateBannerCountdown();
+        setInterval(updateBannerCountdown, 1000);
+    }
+});
+</script>
+@endpush

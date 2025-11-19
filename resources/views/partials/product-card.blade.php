@@ -12,7 +12,7 @@ if (isset($activeDiscounts)) {
             $hasActiveDiscount = true;
             $discountPercentage = $discount->percentage;
             $discountedPrice = $product->harga - ($product->harga * $discount->percentage / 100);
-            $discountEndDate = $discount->end_date->toIso8601String();
+            $discountEndDate = $discount->end_date_iso;
             $discountId = $discount->id;
             break;
         }

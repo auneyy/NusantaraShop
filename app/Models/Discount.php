@@ -38,12 +38,13 @@ class Discount extends Model
     // ========================================
     
     /**
-     * Scope untuk mendapatkan discount yang aktif (real-time check)
+     * Scope untuk mendapatkan discount yang aktif (real-time check dengan WIB)
      */
     public function scopeActive($query)
     {
-        return $query->where('start_date', '<=', Carbon::now())
-                     ->where('end_date', '>=', Carbon::now());
+        $now = Carbon::now('Asia/Jakarta');
+        return $query->where('start_date', '<=', $now)
+                     ->where('end_date', '>=', $now);
     }
 
     /**
@@ -51,7 +52,8 @@ class Discount extends Model
      */
     public function scopeUpcoming($query)
     {
-        return $query->where('start_date', '>', Carbon::now());
+        $now = Carbon::now('Asia/Jakarta');
+        return $query->where('start_date', '>', $now);
     }
 
     /**
@@ -59,7 +61,8 @@ class Discount extends Model
      */
     public function scopeExpired($query)
     {
-        return $query->where('end_date', '<', Carbon::now());
+        $now = Carbon::now('Asia/Jakarta');
+        return $query->where('end_date', '<', $now);
     }
 
     // ========================================
@@ -67,13 +70,16 @@ class Discount extends Model
     // ========================================
     
     /**
-     * Cek apakah discount masih valid (real-time)
+     * Cek apakah discount masih valid (real-time dengan WIB)
      * Usage: $discount->is_valid
      */
     public function getIsValidAttribute()
     {
-        $now = Carbon::now();
-        return $now->between($this->start_date, $this->end_date);
+        $now = Carbon::now('Asia/Jakarta');
+        $startDate = Carbon::parse($this->start_date)->timezone('Asia/Jakarta');
+        $endDate = Carbon::parse($this->end_date)->timezone('Asia/Jakarta');
+        
+        return $now->between($startDate, $endDate);
     }
 
     /**
@@ -82,11 +88,13 @@ class Discount extends Model
      */
     public function getStatusAttribute()
     {
-        $now = Carbon::now();
+        $now = Carbon::now('Asia/Jakarta');
+        $startDate = Carbon::parse($this->start_date)->timezone('Asia/Jakarta');
+        $endDate = Carbon::parse($this->end_date)->timezone('Asia/Jakarta');
         
-        if ($now->lt($this->start_date)) {
+        if ($now->lt($startDate)) {
             return 'upcoming';
-        } elseif ($now->between($this->start_date, $this->end_date)) {
+        } elseif ($now->between($startDate, $endDate)) {
             return 'active';
         } else {
             return 'expired';
@@ -103,7 +111,10 @@ class Discount extends Model
             return 0;
         }
         
-        return Carbon::now()->diffInSeconds($this->end_date, false);
+        $now = Carbon::now('Asia/Jakarta');
+        $endDate = Carbon::parse($this->end_date)->timezone('Asia/Jakarta');
+        
+        return $now->diffInSeconds($endDate, false);
     }
 
     /**
@@ -112,21 +123,22 @@ class Discount extends Model
      */
     public function getCountdownDataAttribute()
     {
-        $now = Carbon::now();
+        $now = Carbon::now('Asia/Jakarta');
+        $endDate = Carbon::parse($this->end_date)->timezone('Asia/Jakarta');
         
         if (!$this->is_valid) {
             return null;
         }
 
-        $diff = $now->diff($this->end_date);
+        $diff = $now->diff($endDate);
         
         return [
             'days' => $diff->d,
             'hours' => $diff->h,
             'minutes' => $diff->i,
             'seconds' => $diff->s,
-            'total_seconds' => $now->diffInSeconds($this->end_date),
-            'end_date_iso' => $this->end_date->toIso8601String(),
+            'total_seconds' => $now->diffInSeconds($endDate),
+            'end_date_iso' => $endDate->toIso8601String(),
         ];
     }
 
@@ -140,21 +152,25 @@ class Discount extends Model
     }
 
     /**
-     * Mendapatkan formatted start date
+     * Mendapatkan formatted start date (WIB)
      * Usage: $discount->formatted_start_date
      */
     public function getFormattedStartDateAttribute()
     {
-        return $this->start_date->format('d M Y H:i');
+        return Carbon::parse($this->start_date)
+            ->timezone('Asia/Jakarta')
+            ->format('d M Y H:i') . ' WIB';
     }
 
     /**
-     * Mendapatkan formatted end date
+     * Mendapatkan formatted end date (WIB)
      * Usage: $discount->formatted_end_date
      */
     public function getFormattedEndDateAttribute()
     {
-        return $this->end_date->format('d M Y H:i');
+        return Carbon::parse($this->end_date)
+            ->timezone('Asia/Jakarta')
+            ->format('d M Y H:i') . ' WIB';
     }
 
     /**
@@ -163,7 +179,10 @@ class Discount extends Model
      */
     public function getDurationDaysAttribute()
     {
-        return $this->start_date->diffInDays($this->end_date);
+        $startDate = Carbon::parse($this->start_date)->timezone('Asia/Jakarta');
+        $endDate = Carbon::parse($this->end_date)->timezone('Asia/Jakarta');
+        
+        return $startDate->diffInDays($endDate);
     }
 
     /**
@@ -176,7 +195,33 @@ class Discount extends Model
             return false;
         }
         
-        return Carbon::now()->diffInHours($this->end_date) <= 24;
+        $now = Carbon::now('Asia/Jakarta');
+        $endDate = Carbon::parse($this->end_date)->timezone('Asia/Jakarta');
+        
+        return $now->diffInHours($endDate) <= 24;
+    }
+
+    /**
+     * Mendapatkan waktu mulai dalam format ISO untuk JavaScript
+     * Usage: $discount->start_date_iso
+     */
+    public function getStartDateIsoAttribute()
+    {
+        return Carbon::parse($this->start_date)
+            ->timezone('Asia/Jakarta')
+            ->toIso8601String();
+    }
+
+    /**
+     * Mendapatkan waktu berakhir dalam format ISO untuk JavaScript
+     * Usage: $discount->end_date_iso
+     * PENTING: Ini yang dipakai di countdown timer!
+     */
+    public function getEndDateIsoAttribute()
+    {
+        return Carbon::parse($this->end_date)
+            ->timezone('Asia/Jakarta')
+            ->toIso8601String();
     }
 
     // ========================================
@@ -285,7 +330,10 @@ class Discount extends Model
      */
     public function hasStarted()
     {
-        return Carbon::now()->gte($this->start_date);
+        $now = Carbon::now('Asia/Jakarta');
+        $startDate = Carbon::parse($this->start_date)->timezone('Asia/Jakarta');
+        
+        return $now->gte($startDate);
     }
 
     /**
@@ -293,7 +341,10 @@ class Discount extends Model
      */
     public function hasEnded()
     {
-        return Carbon::now()->gt($this->end_date);
+        $now = Carbon::now('Asia/Jakarta');
+        $endDate = Carbon::parse($this->end_date)->timezone('Asia/Jakarta');
+        
+        return $now->gt($endDate);
     }
 
     /**
@@ -305,6 +356,9 @@ class Discount extends Model
             return 0;
         }
         
-        return Carbon::now()->diffInSeconds($this->start_date);
+        $now = Carbon::now('Asia/Jakarta');
+        $startDate = Carbon::parse($this->start_date)->timezone('Asia/Jakarta');
+        
+        return $now->diffInSeconds($startDate);
     }
 }
