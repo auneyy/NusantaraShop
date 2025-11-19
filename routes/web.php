@@ -20,6 +20,8 @@ use App\Http\Controllers\Admin\MessageController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\HelpController;
+
 
 // Middleware untuk mencegah back history di seluruh aplikasi
 Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(function () {
@@ -36,7 +38,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
     // Halaman umum (dapat diakses semua orang)
     Route::get('/promo', [PromoController::class, 'index'])->name('promo');
     Route::view('/contact', 'contact')->name('contact');
-    Route::view('/help', 'help')->name('help');
+    Route::get('/help', [HelpController::class, 'index'])->name('help');
 
     Route::get('/search', [SearchController::class, 'search'])->name('search');
     Route::get('/search-suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
@@ -222,7 +224,7 @@ Route::get('/test-rajaongkir', function() {
             // Kategori
             Route::resource('categories', CategoryController::class)->except(['show']);
 
-            // Artikel
+            // Artikel - PERBAIKI INI
             Route::resource('artikel', ArtikelController::class);
            
             // Pesanan
@@ -233,8 +235,8 @@ Route::get('/test-rajaongkir', function() {
             // Laporan Pendapatan
             Route::get('/pendapatan', fn () => view('admin.pendapatan'))->name('pendapatan');
 
-            // Pesan Masuk
-            Route::resource('admin/messages', MessageController::class)->only(['index','show']);
+            // Pesan Masuk - PERBAIKI INI (hapus /admin/ di awal)
+            Route::resource('messages', MessageController::class)->only(['index','show']);
                 
             // Admin Logout
             Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');

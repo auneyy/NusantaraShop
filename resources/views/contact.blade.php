@@ -13,7 +13,7 @@
   background-position: center;
   background-attachment: fixed;
   padding: 180px 0 120px 0;
-  min-height: 450px;
+  min-height: 85vh;
   text-align: center;
   position: relative;
   display: flex;

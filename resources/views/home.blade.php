@@ -377,7 +377,7 @@
     <div class="carousel-item active">
       <img src="{{ asset('storage/product_images/macambatik.jpg') }}" class="d-block w-100" alt="Elegant Batik Collection">
       <div class="carousel-caption">
-        <h1 class="animate__animated animate__fadeInDown">Temukan baju adat yang cocok dengan dirimu di NusantaraShop</h1>
+        <h1 class="animate__animated animate__fadeInDown">Temukan pakaian batik yang cocok dengan dirimu di NusantaraShop</h1>
         <p class="animate__animated animate__fadeInUp">Membuatmu terhubung dengan budaya lewat kenyamanan</p>
         <div class="animate__animated animate__fadeInUp">
           @guest

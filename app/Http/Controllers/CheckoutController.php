@@ -732,6 +732,18 @@ class CheckoutController extends Controller
                     \Midtrans\Config::$serverKey = config('midtrans.server_key');
                     \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
                     
+                    if (!$order->midtrans_transaction_id) {
+                        Log::warning("Tidak bisa cek status. Transaksi Midtrans belum dibuat.", [
+                            'order_number' => $order->order_number
+                        ]);
+                    
+                        return response()->json([
+                            'status' => $order->payment_status,
+                            'message' => 'Transaksi belum dibuat di Midtrans'
+                        ], 200);
+                    }
+                    
+                    
                     $status = \Midtrans\Transaction::status($order->order_number);
                     
                     $this->processPaymentNotification(

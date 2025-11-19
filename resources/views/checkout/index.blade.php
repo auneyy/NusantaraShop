@@ -1,6 +1,7 @@
 @extends('layout.app')
 
 @section('content')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
     .checkout-container {
         padding: 2rem 0;
@@ -348,17 +349,12 @@
                                     <div class="form-group">
                                         <label for="shipping_phone">Nomor Telepon *</label>
                                       <input type="text" 
-       name="shipping_phone" 
-       value="{{ old('shipping_phone', Auth::user()->phone ?? '') }}" 
-       required 
-       class="form-control">
+                                        name="shipping_phone" 
+                                        value="{{ old('shipping_phone', Auth::user()->phone ?? '') }}" 
+                                        required 
+                                        class="form-control">
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Nomor Telepon *</label>
-                                <input type="tel" class="form-control" name="shipping_phone" 
-                                       value="{{ $user->phone ?? '' }}" required>
                             </div>
                         </div>
 
@@ -549,6 +545,7 @@
                     </div>
                 </div>
             </div>
+</form>
         </div>
     </div>
 </div>
@@ -844,9 +841,6 @@ function displayShippingOptions(courierData, courierName) {
     dataArray.forEach((item, index) => {
         console.log(`\nProcessing item ${index}:`, item);
         
-        // This appears to be a flat structure with direct properties
-        // Structure: { name, code, service, description, cost, etd }
-        
         let costValue = null;
         let costService = null;
         let costDescription = null;
@@ -1045,13 +1039,20 @@ function updateCheckoutButton() {
     }
 }
 
-// Checkout Button Click
+// Checkout Button Click - INI YANG DIPERBAIKI
 document.getElementById('checkoutBtn').addEventListener('click', async function() {
     const btn = this;
     const originalText = btn.textContent;
     
-    // Validate form
-    const form = document.getElementById('checkoutForm');
+    // PERBAIKAN: Ubah dari 'checkoutForm' menjadi 'checkout-form'
+    const form = document.getElementById('checkout-form');
+    
+    if (!form) {
+        console.error('Form tidak ditemukan!');
+        alert('Terjadi kesalahan: Form tidak ditemukan. Silakan refresh halaman.');
+        return;
+    }
+    
     if (!form.checkValidity()) {
         form.reportValidity();
         return;
