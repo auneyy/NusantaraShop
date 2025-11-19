@@ -495,7 +495,7 @@
               <i class="bi bi-person-circle"></i>
             </a>
             <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{{ route('profile.index') }}">{{ Auth::user()->name }}</a></li>
+              <li><a class="dropdown-item" href="{{ route('profile.index') }}">{{ Auth::user()->name }}</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="{{ route('orders.index') }}">Pesanan Saya</a></li>
               <li>

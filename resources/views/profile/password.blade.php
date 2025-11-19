@@ -8,7 +8,6 @@
     /* Reset dan Base Styles */
     .change-password-container {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-        background-color: #f5f5f5 !important;
         min-height: 100vh;
         padding: 0 !important;
         margin: 0 !important;
@@ -364,7 +363,7 @@
 
         <!-- Main Form Container -->
         <div class="change-password-form-container">
-            <form method="POST" action="{{ route('password.update') }}" id="change-password-form">
+            <form method="POST" action="{{ route('profile.password') }}" id="change-password-form">
                 @csrf
                 @method('PUT')
 

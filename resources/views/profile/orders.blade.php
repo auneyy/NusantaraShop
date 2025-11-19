@@ -870,7 +870,7 @@
     </div>
 </div>
 
-<!-- Membatalkan Order Modal -->
+<!-- Cancel Order Modal -->
 <div id="cancelModal" class="orders-modal hidden">
     <div class="orders-modal-content">
         <div class="orders-modal-header">
@@ -915,7 +915,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Menutup Modal menggunakan kunci ESC
+    // Close modal with ESC key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
             closeCancelModal();

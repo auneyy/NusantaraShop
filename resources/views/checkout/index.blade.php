@@ -297,18 +297,63 @@
 
 <div class="checkout-container">
     <div class="container">
-        <div class="row">
-            <div class="col-lg-8">
-                <!-- Alamat Pengiriman -->
-                <div class="checkout-card">
-                    <h5 class="section-title">📍 Alamat Pengiriman</h5>
-                    <form id="checkoutForm">
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Nama Lengkap *</label>
-                                <input type="text" class="form-control" name="shipping_name" 
-                                       value="{{ $user->name ?? '' }}" required>
+        <!-- Header -->
+        <div class="checkout-card">
+            <div class="checkout-header">
+                <div class="checkout-step">
+                    <div class="step-number">1</div>
+                    <h4 class="mb-0">Checkout Pesanan Anda</h4>
+                </div>
+                <p class="mb-0">Lengkapi informasi pengiriman untuk melanjutkan ke pembayaran</p>
+            </div>
+        </div>
+
+        <!-- Error Messages -->
+        @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
+        @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+        @endif
+
+        <form action="{{ route('checkout.process') }}" method="POST" id="checkout-form">
+            @csrf
+            
+            <div class="row">
+                <!-- Form Checkout -->
+                <div class="col-lg-8">
+                    <div class="checkout-card">
+                        <div class="form-section">
+                            <!-- Informasi Pengiriman -->
+                            <h5 class="section-title">📦 Informasi Pengiriman</h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="shipping_name">Nama Lengkap *</label>
+                                        <input type="text" class="form-control" id="shipping_name" 
+                                               name="shipping_name" value="{{ old('shipping_name', Auth::user()->name ?? '') }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="shipping_phone">Nomor Telepon *</label>
+                                      <input type="text" 
+       name="shipping_phone" 
+       value="{{ old('shipping_phone', Auth::user()->phone ?? '') }}" 
+       required 
+       class="form-control">
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nomor Telepon *</label>

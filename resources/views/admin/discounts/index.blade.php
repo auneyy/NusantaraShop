@@ -41,13 +41,13 @@
                                 data-end-date="{{ $discount->end_date->toIso8601String() }}"
                                 data-start-date="{{ $discount->start_date->toIso8601String() }}">
                                 <td>{{ $loop->iteration }}</td>
-                                <td>
-                                    @if($discount->banner_image)
-                                        <img src="{{ $discount->banner_image }}" alt="Banner" style="max-width: 100px; max-height: 60px;" class="img-thumbnail">
-                                    @else
-                                        <span class="text-muted">Tidak ada gambar</span>
-                                    @endif
-                                </td>
+                            <td>
+    @if($discount->banner_image)
+        <img src="{{ $discount->banner_image }}" alt="Banner" style="max-width: 100px; max-height: 60px;" class="img-thumbnail">
+    @else
+        <span class="text-muted">Tidak ada gambar</span>
+    @endif
+</td>
                                 <td>{{ $discount->title }}</td>
                                 <td>{{ $discount->subtitle ?? '-' }}</td>
                                 <td>{{ $discount->percentage }}%</td>
