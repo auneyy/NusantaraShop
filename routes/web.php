@@ -187,6 +187,12 @@ Route::get('/test-rajaongkir', function() {
             Route::post('/profile/settings/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.settings.preferences');
             Route::delete('/profile/delete', [ProfileController::class, 'deleteAccount'])->name('profile.delete');
             Route::patch('/orders/{order}/cancel', [ProfileController::class, 'cancelOrder'])->name('orders.cancel');
+
+            Route::prefix('api/ai-chat')->name('ai-chat.')->group(function () {
+                Route::post('/send', [App\Http\Controllers\AIChatController::class, 'chat'])->name('send');
+                Route::get('/suggestions', [App\Http\Controllers\AIChatController::class, 'getProductSuggestions'])->name('suggestions');
+                Route::get('/test', [App\Http\Controllers\AIChatController::class, 'testConnection'])->name('test');
+            });
         });
 
         Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');

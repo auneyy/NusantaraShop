@@ -664,6 +664,7 @@
 
   <main>
     @yield('content')
+    @include('partials.ai-chat')
   </main>
 
   <footer class="footer">
