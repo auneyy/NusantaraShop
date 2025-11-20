@@ -433,9 +433,9 @@
   <div class="products-container">
     <h2 class="section-title">Koleksi Terbaru Kami</h2>
     
-    <div class="row g-3">
+    <div class="row g-2 g-md-3">
       @forelse($products->take(4) as $product)
-        <div class="col-6 col-md-3 mb-2">
+        <div class="col-6 col-md-3 mb-3">
           {{-- Pass activeDiscounts ke product card --}}
           @include('partials.product-card', [
               'product' => $product,
@@ -491,9 +491,9 @@
   <div class="products-container">
     <h2 class="section-title">Semua Produk</h2>
     
-    <div class="row g-3">
+    <div class="row g-2 g-md-3">
       @foreach($products->take(8) as $product)
-        <div class="col-6 col-md-3 mb-2">
+        <div class="col-6 col-md-3 mb-3">
           {{-- Pass activeDiscounts ke product card --}}
           @include('partials.product-card', [
               'product' => $product,

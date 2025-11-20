@@ -15,32 +15,59 @@
   @stack('styles')
   
   <style>
-     body {
+    body {
       font-family: 'Manrope', sans-serif;
       background-color: #fff;
+      padding-top: 80px; /* Sesuaikan dengan tinggi navbar */
     }
 
-.navbar {
-  background-color: #fff !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  padding: 1rem 0;
-  z-index: 1000;
-  position: sticky;
-  top: 0;
-}
+    /* Navbar Base Styles */
+    .navbar {
+      background-color: #fff !important;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      padding: 1rem 0;
+      z-index: 1000;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
 
+    /* Navbar Scrolled State */
+    .navbar.scrolled {
+      padding: 0.5rem 0;
+      background-color: rgba(255, 255, 255, 0.95) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      backdrop-filter: blur(20px);
+    }
+
+    /* Navbar Hidden State (saat scroll down) */
+    .navbar.navbar-hidden {
+      transform: translateY(-100%);
+    }
+
+    /* Logo Animation */
     .logonusantara {
       height: 50px;
       width: auto;
       margin-right: 20px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    .navbar.scrolled .logonusantara {
+      height: 40px;
+    }
+
+    /* Nav Links */
     .navbar-nav .nav-link {
       color: #422D1C !important;
       font-weight: 500;
       margin: 0 10px;
       transition: all 0.3s ease;
       position: relative;
+      padding: 0.5rem 0 !important;
     }
 
     .navbar-nav .nav-link::after {
@@ -50,11 +77,13 @@
       bottom: 0;
       width: 0;
       height: 2px;
-      background-color: #8B4513;
+      background: linear-gradient(90deg, #8B4513, #422D1C);
       transition: width 0.3s ease-in-out;
+      border-radius: 2px;
     }
 
-    .navbar-nav .nav-link:hover::after {
+    .navbar-nav .nav-link:hover::after,
+    .navbar-nav .nav-link.active::after {
       width: 100%;
     }
 
@@ -64,80 +93,72 @@
       font-weight: 600;
     }
 
+    /* Navbar Icons */
     .navbar-icons {
       display: flex;
       align-items: center;
       gap: 15px;
     }
 
-    .navbar-icons a {
+    .navbar-icons a,
+    .navbar-icons .dropdown-toggle {
       color: #422D1C;
       font-size: 1.2rem;
       text-decoration: none;
-      transition: color 0.3s ease;
+      transition: all 0.3s ease;
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
     }
 
-    .navbar-icons a:hover {
+    .navbar-icons a::before,
+    .navbar-icons .dropdown-toggle::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: 40px;
+      height: 40px;
+      background-color: rgba(139, 69, 19, 0.1);
+      border-radius: 50%;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: -1;
+    }
+
+    .navbar-icons a:hover::before,
+    .navbar-icons .dropdown-toggle:hover::before {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .navbar-icons a:hover,
+    .navbar-icons .dropdown-toggle:hover {
       color: #8B4513;
+      transform: translateY(-2px);
     }
 
-    .btn-auth {
-      background-color: #422D1C;
-      border-color: #422D1C;
-      color: white;
-      padding: 0.375rem 1rem;
-      border-radius: 5px;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-
-    .btn-auth:hover {
-      background-color: #8B4513;
-      border-color: #8B4513;
-      color: white;
-    }
-
-    .btn-auth-outline {
-      background-color: transparent;
-      border: 2px solid #422D1C;
-      color: #422D1C;
-      padding: 0.375rem 1rem;
-      border-radius: 5px;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      margin-left: 10px;
-    }
-
-    .btn-auth-outline:hover {
-      background-color: #422D1C;
-      color: white;
-    }
-
-    .product-card img {
-      height: 300px;
-      object-fit: cover;
-    }
-
+    /* Mega Menu */
     .mega-menu {
       position: absolute;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateY(10px);
       top: 100%;
       z-index: 1000;
       width: 250px;
       background-color: #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
       padding: 1rem 0;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.3s ease-in-out;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
     }
 
     .mega-menu-wrapper:hover .mega-menu {
       opacity: 1;
       visibility: visible;
+      transform: translateX(-50%) translateY(0);
     }
 
     .category-list-5 {
@@ -151,13 +172,14 @@
       padding: 0.75rem 1.5rem;
       color: #422D1C;
       text-decoration: none;
-      transition: background-color 0.2s ease-in-out;
+      transition: all 0.2s ease-in-out;
       position: relative;
       overflow: hidden;
     }
 
     .category-list-5 .category-item:hover {
-      background-color: #f5f5f5;
+      background-color: #f8f9fa;
+      padding-left: 2rem;
     }
 
     .category-list-5 .category-item::before {
@@ -167,7 +189,7 @@
       left: 0;
       width: 4px;
       height: 100%;
-      background-color: #8c7b6c;
+      background: linear-gradient(180deg, #8B4513, #422D1C);
       transform: translateX(-100%);
       transition: transform 0.3s ease-in-out;
     }
@@ -187,8 +209,49 @@
       align-items: center;
       justify-content: space-between;
       text-decoration: none;
-      color: #8c7b6c;
+      color: #8B4513;
       font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .view-more-link:hover {
+      color: #422D1C;
+      transform: translateX(5px);
+    }
+
+    /* Scroll to Top Button */
+    .scroll-to-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #8B4513, #422D1C);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 20px rgba(66, 45, 28, 0.3);
+      z-index: 999;
+    }
+
+    .scroll-to-top.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .scroll-to-top:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 25px rgba(66, 45, 28, 0.4);
     }
 
     /* Modern Footer Styles */
@@ -198,6 +261,7 @@
       padding: 3rem 0 1.5rem;
       box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
       border-top: 1px solid #f0f0f0;
+      margin-top: 4rem;
     }
 
     .footer h5 {
@@ -243,6 +307,7 @@
       transition: all 0.3s ease;
       text-decoration: none;
       position: relative;
+      display: inline-block;
     }
 
     .footer .text-muted a:hover {
@@ -306,7 +371,6 @@
       opacity: 1;
     }
 
-    /* Contact Info Styling */
     .contact-info {
       display: flex;
       align-items: flex-start;
@@ -327,15 +391,50 @@
     }
 
     .dropdown-item {
-      font-size: 18px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1rem;
     }
 
-    .dropdown-item a{
-      font-size: 15px;
+    .dropdown-item:hover {
+      background-color: #f8f9fa;
+      padding-left: 1.5rem;
+    }
+
+    .dropdown-menu {
+      border: none;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+
+    .btn-primary {
+      background-color: #422D1C;
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #8B4513;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(66, 45, 28, 0.3);
     }
 
     /* Responsive */
     @media (max-width: 991px) {
+      body {
+        padding-top: 70px;
+      }
+
+      .navbar {
+        padding: 0.75rem 0;
+      }
+
+      .navbar.scrolled {
+        padding: 0.5rem 0;
+      }
+
       .navbar-icons {
         margin-top: 1rem;
         justify-content: center;
@@ -354,6 +453,14 @@
         left: 50%;
         transform: translateX(-50%);
       }
+
+      .scroll-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+      }
     }
 
     @media (max-width: 576px) {
@@ -366,15 +473,22 @@
       }
     }
 
-    .btn-primary{
-      background-color: #422D1C;
-      border: none;
+    /* Loading Animation */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .btn-primary:hover{
-      background-color: #8B4513;
+    .fade-in-up {
+      animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
-</style>
+  </style>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -430,9 +544,12 @@
 </head>
 
 <body>
+  <!-- Navbar dengan animasi scroll -->
   <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container">
-      <a href="{{ auth()->check() ? url('/home') : url('/') }}"><img src="{{ asset('storage/product_images/logobrand.png') }}" alt="logo" class="logonusantara"></a>
+      <a href="{{ auth()->check() ? url('/home') : url('/') }}">
+        <img src="{{ asset('storage/product_images/logobrand.png') }}" alt="logo" class="logonusantara">
+      </a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -470,7 +587,7 @@
                         <a href="{{ url('/products') }}" class="view-more-link">
                             Lihat Semua Kategori
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 18L15 12L9 6" stroke="#422D1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </a>
                     </div>
@@ -494,7 +611,7 @@
             <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="bi bi-person-circle"></i>
             </a>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu dropdown-menu-end">
               <li><a class="dropdown-item" href="{{ route('profile.index') }}">{{ Auth::user()->name }}</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="{{ route('orders.index') }}">Pesanan Saya</a></li>
@@ -514,13 +631,18 @@
           <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal">
             <i class="bi bi-search"></i>
           </a>
-          @else
           @endauth
         </div>
       </div>
     </div>
   </nav>
 
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">
+    <i class="bi bi-arrow-up"></i>
+  </button>
+
+  <!-- Search Modal -->
   <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -529,9 +651,9 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form>
+          <form action="{{ url('/products') }}" method="GET">
             <div class="mb-3">
-              <input type="text" class="form-control" placeholder="Cari produk batik...">
+              <input type="text" name="search" class="form-control" placeholder="Cari produk batik..." required>
             </div>
             <button type="submit" class="btn btn-primary">Cari</button>
           </form>
@@ -605,9 +727,69 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- SweetAlert2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+  <!-- Navbar Scroll Animation Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const navbar = document.querySelector('.navbar');
+      const scrollToTopBtn = document.getElementById('scrollToTop');
+      let lastScrollTop = 0;
+      let scrollTimeout;
+
+      // Navbar scroll effect
+      window.addEventListener('scroll', function() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+        // Add/remove scrolled class
+        if (scrollTop > 50) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+
+        // Hide navbar on scroll down, show on scroll up (Optional - uncomment jika ingin efek hide)
+        // if (scrollTop > lastScrollTop && scrollTop > 100) {
+        //   navbar.classList.add('navbar-hidden');
+        // } else {
+        //   navbar.classList.remove('navbar-hidden');
+        // }
+
+        lastScrollTop = scrollTop;
+
+        // Show/hide scroll to top button
+        if (scrollTop > 300) {
+          scrollToTopBtn.classList.add('show');
+        } else {
+          scrollToTopBtn.classList.remove('show');
+        }
+      });
+
+      // Scroll to top functionality
+      scrollToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        });
+      });
+    });
+  </script>
+
+  @stack('scripts')
 </body>
 
 </html>
