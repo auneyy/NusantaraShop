@@ -28,6 +28,8 @@ $displayImage = $primaryImage ?? $product->images->first();
 .product-card-wrapper {
     max-width: 280px;
     margin: 0 auto;
+    width: 100%;
+    padding: 0 5px;
 }
 
 .product-card-link {
@@ -51,6 +53,7 @@ $displayImage = $primaryImage ?? $product->images->first();
         0 4px 20px rgba(0, 0, 0, 0.05),
         0 1px 3px rgba(0, 0, 0, 0.1);
     border-radius: 15px;
+    height: 100%;
 }
 
 .minimalist-product-card:hover {
@@ -95,21 +98,27 @@ $displayImage = $primaryImage ?? $product->images->first();
 }
 
 .card-body-clean {
-    padding: 24px 20px;
+    padding: 20px 16px;
     text-align: center;
 }
 
 .product-title {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     color: #1a1a1a;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     line-height: 1.3;
     letter-spacing: -0.02em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 40px;
 }
 
 .product-price {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     color: #2d3748;
     margin-bottom: 0;
@@ -117,15 +126,16 @@ $displayImage = $primaryImage ?? $product->images->first();
 }
 
 .original-price {
-    font-size: 14px;
+    font-size: 13px;
     color: #a0aec0;
     text-decoration: line-through;
     font-weight: 400;
-    margin-right: 8px;
+    margin-right: 6px;
+    display: block;
 }
 
 .discount-price {
-    font-size: 16px;
+    font-size: 15px;
     color: #e53e3e;
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -133,14 +143,14 @@ $displayImage = $primaryImage ?? $product->images->first();
 
 .discount-badge {
     position: absolute;
-    top: 16px;
-    left: 16px;
+    top: 12px;
+    left: 12px;
     background: linear-gradient(135deg, rgb(229, 98, 62) 0%, rgb(224, 13, 6) 100%);
     color: white;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    padding: 6px 12px;
-    border-radius: 20px;
+    padding: 5px 10px;
+    border-radius: 15px;
     z-index: 10;
     letter-spacing: 0.02em;
     text-transform: uppercase;
@@ -149,56 +159,59 @@ $displayImage = $primaryImage ?? $product->images->first();
 
 .countdown-timer {
     position: absolute;
-    bottom: 16px;
+    bottom: 12px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(10px);
     color: white;
-    padding: 8px 16px;
-    border-radius: 12px;
-    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 10px;
     font-weight: 600;
     z-index: 10;
     display: flex;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    width: calc(100% - 24px);
+    max-width: 200px;
+    justify-content: center;
 }
 
 .countdown-timer .time-unit {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 30px;
+    min-width: 28px;
 }
 
 .countdown-timer .time-value {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     line-height: 1;
     color: #fff;
 }
 
 .countdown-timer .time-label {
-    font-size: 9px;
+    font-size: 8px;
     color: rgba(255, 255, 255, 0.7);
     text-transform: uppercase;
     margin-top: 2px;
 }
 
 .countdown-timer .separator {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     color: rgba(255, 255, 255, 0.5);
-    padding: 0 2px;
+    padding: 0 1px;
 }
 
 .price-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     margin-top: 4px;
 }
 
@@ -242,34 +255,107 @@ $displayImage = $primaryImage ?? $product->images->first();
 
 .d-flex.align-items-center.justify-content-center.bg-light .fa-image {
     color: #cbd5e0 !important;
-    font-size: 48px !important;
+    font-size: 40px !important;
 }
 
+/* Mobile Responsive Styles */
 @media (max-width: 768px) {
     .product-card-wrapper {
-        max-width: 250px;
+        max-width: 100%;
+        padding: 0 4px;
+    }
+    
+    .minimalist-product-card {
+        border-radius: 12px;
     }
     
     .card-body-clean {
-        padding: 20px 16px;
+        padding: 14px 10px;
     }
     
     .product-title {
-        font-size: 16px;
+        font-size: 13px;
+        margin-bottom: 8px;
+        min-height: 34px;
+        line-height: 1.2;
     }
     
     .product-price,
     .discount-price {
-        font-size: 15px;
+        font-size: 13px;
+    }
+    
+    .original-price {
+        font-size: 11px;
+    }
+    
+    .discount-badge {
+        top: 8px;
+        left: 8px;
+        font-size: 9px;
+        padding: 4px 8px;
+        border-radius: 12px;
     }
     
     .countdown-timer {
-        padding: 6px 12px;
-        font-size: 10px;
+        padding: 5px 8px;
+        font-size: 9px;
+        bottom: 8px;
+        gap: 4px;
+        width: calc(100% - 16px);
+        border-radius: 8px;
+    }
+    
+    .countdown-timer .time-unit {
+        min-width: 24px;
     }
     
     .countdown-timer .time-value {
+        font-size: 11px;
+    }
+    
+    .countdown-timer .time-label {
+        font-size: 7px;
+    }
+    
+    .countdown-timer .separator {
+        font-size: 10px;
+    }
+    
+    .d-flex.align-items-center.justify-content-center.bg-light .fa-image {
+        font-size: 32px !important;
+    }
+    
+    /* Disable hover effect on mobile */
+    .minimalist-product-card:hover {
+        transform: none;
+        box-shadow: 
+            0 4px 20px rgba(0, 0, 0, 0.05),
+            0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .minimalist-product-card:active {
+        transform: scale(0.98);
+    }
+}
+
+@media (max-width: 480px) {
+    .product-title {
         font-size: 12px;
+        min-height: 32px;
+    }
+    
+    .product-price,
+    .discount-price {
+        font-size: 12px;
+    }
+    
+    .original-price {
+        font-size: 10px;
+    }
+    
+    .card-body-clean {
+        padding: 12px 8px;
     }
 }
 </style>
@@ -358,7 +444,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const distance = endDate - now;
             
             if (distance < 0) {
-                // Discount sudah expired, reload halaman
                 location.reload();
                 return;
             }
@@ -374,10 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
             secondsEl.textContent = String(seconds).padStart(2, '0');
         }
         
-        // Update immediately
         updateCountdown();
-        
-        // Update every second
         setInterval(updateCountdown, 1000);
     });
 });
