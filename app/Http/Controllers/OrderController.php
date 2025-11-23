@@ -162,70 +162,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Check payment status for an order
-     */
-    public function checkPaymentStatus($orderNumber)
-    {
-        try {
-            $order = Order::where('order_number', $orderNumber)
-                         ->where('user_id', Auth::id())
-                         ->first();
-            
-            if (!$order) {
-                return response()->json(['error' => 'Order not found'], 404);
-            }
-
-            // If using Midtrans, check status from Midtrans API
-            if ($order->payment_method === 'midtrans' && $order->midtrans_transaction_id) {
-                try {
-                    \Midtrans\Config::$serverKey = config('midtrans.server_key');
-                    \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
-                    
-                    $status = \Midtrans\Transaction::status($order->order_number);
-                    
-                    // Update order if status changed
-                    if ($status->transaction_status !== $order->payment_status) {
-                        $this->processPaymentNotification(
-                            $order, 
-                            $status->transaction_status, 
-                            $status->payment_type ?? $order->midtrans_payment_type,
-                            $status->fraud_status ?? 'accept',
-                            $status->transaction_id ?? $order->midtrans_transaction_id
-                        );
-                        
-                        $order->refresh();
-                    }
-                    
-                } catch (\Exception $e) {
-                    Log::error('Error checking Midtrans status', [
-                        'order_number' => $order->order_number,
-                        'error' => $e->getMessage()
-                    ]);
-                }
-            }
-
-            return response()->json([
-                'success' => true,
-                'status' => $order->payment_status,
-                'order_status' => $order->status,
-                'payment_method' => $order->payment_method,
-                'transaction_id' => $order->midtrans_transaction_id,
-                'updated_at' => $order->updated_at->toISOString()
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Check payment status error', [
-                'order_number' => $orderNumber,
-                'user_id' => Auth::id(),
-                'error' => $e->getMessage()
-            ]);
-            
-            return response()->json(['error' => 'Internal server error'], 500);
-        }
-    }
-
-    /**
-     * Helper methods (copy from CheckoutController)
+     * Helper method to check if payment is pending
      */
     private function isPaymentPending($order)
     {
@@ -234,127 +171,9 @@ class OrderController extends Controller
                $order->payment_status === null;
     }
 
-    private function createMidtransTransaction($order)
-    {
-        try {
-            // Validate Midtrans configuration
-            $serverKey = config('midtrans.server_key');
-            $clientKey = config('midtrans.client_key');
-            
-            if (!$serverKey || !$clientKey) {
-                throw new \Exception('Midtrans configuration is incomplete.');
-            }
-
-            // Set Midtrans configuration
-            \Midtrans\Config::$serverKey = $serverKey;
-            \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
-            \Midtrans\Config::$isSanitized = true;
-            \Midtrans\Config::$is3ds = true;
-
-            // Prepare transaction parameters
-            $params = [
-                'transaction_details' => [
-                    'order_id' => $order->order_number,
-                    'gross_amount' => (int) $order->grand_total,
-                ],
-                'customer_details' => [
-                    'first_name' => $order->shipping_name,
-                    'email' => $order->shipping_email,
-                    'phone' => $order->shipping_phone,
-                ],
-                'item_details' => [],
-                'enabled_payments' => [
-                    'credit_card', 'mandiri_clickpay', 'cimb_clicks',
-                    'bca_klikbca', 'bca_klikpay', 'bri_epay', 'echannel',
-                    'permata_va', 'bca_va', 'bni_va', 'bri_va', 'other_va',
-                    'gopay', 'shopeepay', 'indomaret', 'alfamart'
-                ],
-                'expiry' => [
-                    'start_time' => date("Y-m-d H:i:s O"),
-                    'unit' => 'hours',
-                    'duration' => 24
-                ]
-            ];
-
-            // Add item details
-            foreach ($order->orderItems as $item) {
-                $params['item_details'][] = [
-                    'id' => 'item_' . $item->product_id . '_' . $item->size,
-                    'price' => (int) $item->product_price,
-                    'quantity' => (int) $item->quantity,
-                    'name' => substr($item->product_name . ' (' . $item->size . ')', 0, 50),
-                ];
-            }
-
-            // Add shipping cost as separate item
-            if ($order->shipping_cost > 0) {
-                $params['item_details'][] = [
-                    'id' => 'shipping',
-                    'price' => (int) $order->shipping_cost,
-                    'quantity' => 1,
-                    'name' => 'Ongkos Kirim',
-                ];
-            }
-
-            return \Midtrans\Snap::getSnapToken($params);
-
-        } catch (\Exception $e) {
-            Log::error('Midtrans transaction creation failed', [
-                'order_number' => $order->order_number ?? 'unknown',
-                'error_message' => $e->getMessage()
-            ]);
-            
-            throw new \Exception('Gagal membuat transaksi pembayaran: ' . $e->getMessage());
-        }
-    }
-
-    private function processPaymentNotification($order, $transactionStatus, $paymentType, $fraudStatus, $transactionId)
-    {
-        $updateData = [
-            'midtrans_transaction_id' => $transactionId,
-            'midtrans_payment_type' => $paymentType,
-            'updated_at' => now()
-        ];
-
-        switch ($transactionStatus) {
-            case 'capture':
-                if ($paymentType == 'credit_card') {
-                    $updateData['payment_status'] = ($fraudStatus == 'challenge') ? 'pending' : 'settlement';
-                    $updateData['status'] = ($fraudStatus == 'challenge') ? 'pending' : 'processing';
-                    if ($fraudStatus != 'challenge') {
-                        $updateData['payment_completed_at'] = now();
-                    }
-                } else {
-                    $updateData['payment_status'] = 'settlement';
-                    $updateData['status'] = 'processing';
-                    $updateData['payment_completed_at'] = now();
-                }
-                break;
-                
-            case 'settlement':
-                $updateData['payment_status'] = 'settlement';
-                $updateData['status'] = 'processing';
-                $updateData['payment_completed_at'] = now();
-                break;
-                
-            case 'pending':
-                $updateData['payment_status'] = 'pending';
-                $updateData['status'] = 'pending';
-                break;
-                
-            case 'deny':
-            case 'expire':
-            case 'cancel':
-            case 'failure':
-                $updateData['payment_status'] = $transactionStatus;
-                $updateData['status'] = 'cancelled';
-                $this->restoreStock($order);
-                break;
-        }
-
-        $order->update($updateData);
-    }
-
+    /**
+     * Restore product stock when order is cancelled
+     */
     private function restoreStock($order)
     {
         try {
@@ -363,9 +182,9 @@ class OrderController extends Controller
                 if ($product) {
                     $product->increment('stock_kuantitas', $item->quantity);
                     
-                    Log::info('Stock restored for product', [
+                    Log::info('Stock restored', [
                         'product_id' => $product->id,
-                        'product_name' => $product->nama_produk,
+                        'product_name' => $product->name,
                         'quantity_restored' => $item->quantity,
                         'new_stock' => $product->fresh()->stock_kuantitas
                     ]);
@@ -378,4 +197,265 @@ class OrderController extends Controller
             ]);
         }
     }
+
+    /**
+ * Create Midtrans transaction
+ */
+private function createMidtransTransaction($order)
+{
+    try {
+        // Validate Midtrans configuration
+        $serverKey = config('midtrans.server_key');
+        $clientKey = config('midtrans.client_key');
+        
+        if (!$serverKey || !$clientKey) {
+            throw new \Exception('Midtrans configuration is incomplete.');
+        }
+
+        // Format phone number
+        $phone = $order->shipping_phone;
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+        if (substr($phone, 0, 1) === '1') {
+            $phone = '628' . substr($phone, 1);
+        } elseif (substr($phone, 0, 1) === '0') {
+            $phone = '62' . substr($phone, 1);
+        } elseif (strlen($phone) < 10) {
+            $phone = '628123456789';
+        }
+
+        // Set Midtrans configuration
+        \Midtrans\Config::$serverKey = $serverKey;
+        \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+        \Midtrans\Config::$isSanitized = true;
+        \Midtrans\Config::$is3ds = true;
+
+        // Calculate item total
+        $itemTotal = 0;
+        $itemDetails = [];
+
+        // Add product items
+        foreach ($order->orderItems as $item) {
+            $itemPrice = (int) $item->product_price;
+            $itemQuantity = (int) $item->quantity;
+            
+            $itemName = substr($item->product_name . ' (' . $item->size . ')', 0, 50);
+            
+            $itemDetails[] = [
+                'id' => 'item_' . $item->product_id . '_' . $item->size,
+                'price' => $itemPrice,
+                'quantity' => $itemQuantity,
+                'name' => $itemName,
+            ];
+            
+            $itemTotal += $itemPrice * $itemQuantity;
+        }
+
+        // Add shipping cost
+        $shippingCost = (int) $order->shipping_cost;
+        if ($shippingCost > 0) {
+            $itemDetails[] = [
+                'id' => 'shipping',
+                'price' => $shippingCost,
+                'quantity' => 1,
+                'name' => 'Ongkos Kirim',
+            ];
+            $itemTotal += $shippingCost;
+        }
+
+        // Validate total amount
+        if ($itemTotal !== (int) $order->grand_total) {
+            \Log::warning('Grand total mismatch, using calculated total', [
+                'order_total' => $order->grand_total,
+                'calculated_total' => $itemTotal
+            ]);
+        }
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => $order->order_number,
+                'gross_amount' => $itemTotal,
+            ],
+            'customer_details' => [
+                'first_name' => $order->shipping_name,
+                'email' => $order->shipping_email,
+                'phone' => $phone,
+            ],
+            'item_details' => $itemDetails,
+            'enabled_payments' => [
+                'gopay', 'shopeepay', 'credit_card', 
+                'bca_va', 'bni_va', 'bri_va', 'permata_va',
+                'indomaret', 'alfamart',
+            ],
+            'expiry' => [
+                'start_time' => date("Y-m-d H:i:s O"),
+                'unit' => 'hours',
+                'duration' => 24
+            ]
+        ];
+
+        \Log::info('Midtrans Request Params', [
+            'order_id' => $order->order_number,
+            'gross_amount' => $itemTotal,
+            'item_count' => count($itemDetails)
+        ]);
+
+        return \Midtrans\Snap::getSnapToken($params);
+
+    } catch (\Exception $e) {
+        Log::error('Midtrans transaction creation failed', [
+            'order_number' => $order->order_number ?? 'unknown',
+            'error_message' => $e->getMessage()
+        ]);
+        
+        throw new \Exception('Gagal membuat transaksi pembayaran: ' . $e->getMessage());
+    }
+}
+
+/**
+ * Check payment status for an order - FIXED VERSION
+ */
+public function checkPaymentStatus($orderNumber)
+{
+    try {
+        $order = Order::where('order_number', $orderNumber)
+                     ->where('user_id', Auth::id())
+                     ->first();
+        
+        if (!$order) {
+            return response()->json(['error' => 'Order not found'], 404);
+        }
+
+        // ✅ JANGAN CHECK MIDTRANS JIKA SUDAH SUCCESS
+        if (in_array($order->payment_status, ['settlement', 'paid', 'success'])) {
+            return response()->json([
+                'success' => true,
+                'status' => $order->payment_status,
+                'order_status' => $order->status,
+                'payment_method' => $order->payment_method,
+                'message' => 'Payment already completed'
+            ]);
+        }
+
+        // Only check Midtrans for pending/failed payments
+        if ($order->payment_method === 'midtrans' && $order->midtrans_transaction_id) {
+            try {
+                \Midtrans\Config::$serverKey = config('midtrans.server_key');
+                \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+                
+                $status = \Midtrans\Transaction::status($order->order_number);
+                
+                Log::info('Midtrans status check', [
+                    'order_number' => $order->order_number,
+                    'current_db_status' => $order->payment_status,
+                    'midtrans_status' => $status->transaction_status
+                ]);
+                
+                // ✅ ONLY update if Midtrans status is more advanced than current status
+                if ($this->shouldUpdateStatus($order->payment_status, $status->transaction_status)) {
+                    // Panggil method dari CheckoutController atau proses manual
+                    $this->updateOrderStatusFromMidtrans($order, $status);
+                    $order->refresh();
+                }
+                
+            } catch (\Exception $e) {
+                Log::error('Error checking Midtrans status', [
+                    'order_number' => $order->order_number,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'status' => $order->payment_status,
+            'order_status' => $order->status,
+            'payment_method' => $order->payment_method,
+            'transaction_id' => $order->midtrans_transaction_id,
+            'updated_at' => $order->updated_at->toISOString()
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Check payment status error', [
+            'order_number' => $orderNumber,
+            'user_id' => Auth::id(),
+            'error' => $e->getMessage()
+        ]);
+        
+        return response()->json(['error' => 'Internal server error'], 500);
+    }
+}
+
+/**
+ * Helper: Check if we should update status (prevent downgrading)
+ */
+private function shouldUpdateStatus($currentStatus, $newStatus)
+{
+    $statusHierarchy = [
+        'pending' => 1,
+        'capture' => 2, 
+        'settlement' => 3,
+        'success' => 3,
+        'paid' => 3
+    ];
+    
+    $currentLevel = $statusHierarchy[$currentStatus] ?? 0;
+    $newLevel = $statusHierarchy[$newStatus] ?? 0;
+    
+    // Only update if new status is higher level
+    return $newLevel > $currentLevel;
+}
+
+/**
+ * Helper: Update order status from Midtrans response
+ */
+private function updateOrderStatusFromMidtrans($order, $status)
+{
+    $transactionStatus = $status->transaction_status;
+    $paymentType = $status->payment_type ?? $order->midtrans_payment_type;
+    $fraudStatus = $status->fraud_status ?? 'accept';
+    $transactionId = $status->transaction_id ?? $order->midtrans_transaction_id;
+
+    $updateData = [
+        'midtrans_transaction_id' => $transactionId,
+        'midtrans_payment_type' => $paymentType,
+        'updated_at' => now()
+    ];
+
+    switch ($transactionStatus) {
+        case 'capture':
+        case 'settlement':
+            $updateData['payment_status'] = 'settlement';
+            $updateData['status'] = 'processing';
+            $updateData['payment_completed_at'] = now();
+            break;
+            
+        case 'pending':
+            // Only update if currently pending
+            if ($order->payment_status === 'pending') {
+                $updateData['payment_status'] = 'pending';
+                $updateData['status'] = 'pending';
+            }
+            break;
+            
+        case 'deny':
+        case 'expire':
+        case 'cancel':
+        case 'failure':
+            // Only update to failed if currently pending
+            if ($order->payment_status === 'pending') {
+                $updateData['payment_status'] = 'failed';
+                $updateData['status'] = 'cancelled';
+                $updateData['cancelled_at'] = now();
+            }
+            break;
+    }
+
+    $order->update($updateData);
+
+    Log::info('Order status updated from checkPaymentStatus', [
+        'order_number' => $order->order_number,
+        'old_status' => $order->getOriginal('payment_status'),
+        'new_status' => $updateData['payment_status']
+    ]);
+}
 }

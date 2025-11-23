@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -18,8 +19,9 @@ class CartController extends Controller
     {
         $cartItems = $this->getCartItems();
         $total = $this->getCartTotal();
+        $originalTotal = $this->getCartOriginalTotal(); // ✅ Tambah total harga asli
         
-        return view('cart.index', compact('cartItems', 'total'));
+        return view('cart.index', compact('cartItems', 'total', 'originalTotal'));
     }
 
     public function add(Request $request)
@@ -30,130 +32,141 @@ class CartController extends Controller
             'size' => 'required|string',
         ]);
 
-        $product = Product::findOrFail($request->product_id);
+        $product = Product::with('sizes', 'discounts')->findOrFail($request->product_id);
         
-        // Check stock
-        if ($product->stock_kuantitas < $request->quantity) {
+        // CHECK STOCK PER SIZE
+        $availableStock = $product->getStockForSize($request->size);
+        if ($availableStock < $request->quantity) {
             return response()->json([
                 'success' => false,
-                'message' => 'Stok produk tidak mencukupi!'
+                'message' => 'Stok untuk size ' . $request->size . ' tidak mencukupi! Stok tersedia: ' . $availableStock
             ]);
         }
 
-        // Get current cart from session
-        $cart = Session::get('cart', []);
-        $cartKey = $product->id . '_' . $request->size;
+        $userId = Auth::id();
+        
+        // Cek apakah item sudah ada di cart
+        $existingCart = Cart::where('user_id', $userId)
+            ->where('product_id', $request->product_id)
+            ->where('size', $request->size)
+            ->first();
 
-        // If item already exists in cart, update quantity
-        if (isset($cart[$cartKey])) {
-            $newQuantity = $cart[$cartKey]['quantity'] + $request->quantity;
+        if ($existingCart) {
+            // Update quantity jika sudah ada
+            $newQuantity = $existingCart->kuantitas + $request->quantity;
             
             // Check if new quantity exceeds stock
-            if ($newQuantity > $product->stock_kuantitas) {
+            if ($newQuantity > $availableStock) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Total quantity melebihi stok yang tersedia!'
+                    'message' => 'Total quantity melebihi stok yang tersedia untuk size ' . $request->size . '!'
                 ]);
             }
             
-            $cart[$cartKey]['quantity'] = $newQuantity;
-            $cart[$cartKey]['subtotal'] = $newQuantity * $product->harga;
+            $existingCart->update([
+                'kuantitas' => $newQuantity
+            ]);
         } else {
-            // Add new item to cart
-            $cart[$cartKey] = [
-                'product_id' => $product->id,
-                'product_name' => $product->name,
-                'product_price' => $product->harga,
-                'product_image' => $product->images->first()->image_path ?? '',
+            // Tambah item baru ke cart
+            Cart::create([
+                'user_id' => $userId,
+                'product_id' => $request->product_id,
                 'size' => $request->size,
-                'quantity' => $request->quantity,
-                'subtotal' => $request->quantity * $product->harga,
-            ];
+                'kuantitas' => $request->quantity
+            ]);
         }
-
-        // Save cart to session
-        Session::put('cart', $cart);
 
         return response()->json([
             'success' => true,
             'message' => 'Produk berhasil ditambahkan ke keranjang!',
-            'cart_count' => $this->getCartCount()
+            'cart_count' => $this->getCartCount(),
+            'cart_total' => $this->getCartTotal(),
+            'cart_original_total' => $this->getCartOriginalTotal(), // ✅ Tambah total asli
+            'total_savings' => $this->getTotalSavings() // ✅ Tambah total hemat
         ]);
     }
 
     public function update(Request $request)
     {
         $request->validate([
-            'cart_key' => 'required|string',
+            'cart_id' => 'required|exists:carts,id',
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $cart = Session::get('cart', []);
-        $cartKey = $request->cart_key;
-
-        if (!isset($cart[$cartKey])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Item tidak ditemukan di keranjang!'
-            ]);
-        }
-
-        $product = Product::find($cart[$cartKey]['product_id']);
+        $cart = Cart::with(['product.sizes', 'product.discounts'])->findOrFail($request->cart_id);
         
-        if (!$product) {
+        // Pastikan cart milik user yang login
+        if ($cart->user_id !== Auth::id()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Produk tidak ditemukan!'
+                'message' => 'Unauthorized action!'
             ]);
         }
 
-        // Check stock
-        if ($product->stock_kuantitas < $request->quantity) {
+        // Check stock PER SIZE
+        $availableStock = $cart->product->getStockForSize($cart->size);
+        if ($availableStock < $request->quantity) {
             return response()->json([
                 'success' => false,
-                'message' => 'Quantity melebihi stok yang tersedia!'
+                'message' => 'Quantity melebihi stok yang tersedia untuk size ' . $cart->size . '! Stok tersedia: ' . $availableStock
             ]);
         }
 
         // Update cart item
-        $cart[$cartKey]['quantity'] = $request->quantity;
-        $cart[$cartKey]['subtotal'] = $request->quantity * $cart[$cartKey]['product_price'];
+        $cart->update([
+            'kuantitas' => $request->quantity
+        ]);
 
-        Session::put('cart', $cart);
+        // Gunakan harga diskon untuk subtotal
+        $productPrice = $cart->product->discounted_price;
+        $originalPrice = $cart->product->harga;
+        $itemSubtotal = $request->quantity * $productPrice;
+        $itemOriginalSubtotal = $request->quantity * $originalPrice;
+        $itemSavings = $itemOriginalSubtotal - $itemSubtotal;
 
         return response()->json([
             'success' => true,
             'message' => 'Keranjang berhasil diupdate!',
             'cart_total' => $this->getCartTotal(),
-            'item_subtotal' => $cart[$cartKey]['subtotal']
+            'cart_original_total' => $this->getCartOriginalTotal(),
+            'total_savings' => $this->getTotalSavings(),
+            'item_subtotal' => $itemSubtotal, // subtotal dengan diskon
+            'item_original_subtotal' => $itemOriginalSubtotal, // subtotal tanpa diskon
+            'item_savings' => $itemSavings // hemat per item
         ]);
     }
 
     public function remove(Request $request)
     {
         $request->validate([
-            'cart_key' => 'required|string',
+            'cart_id' => 'required|exists:carts,id',
         ]);
 
-        $cart = Session::get('cart', []);
-        $cartKey = $request->cart_key;
-
-        if (isset($cart[$cartKey])) {
-            unset($cart[$cartKey]);
-            Session::put('cart', $cart);
+        $cart = Cart::findOrFail($request->cart_id);
+        
+        // Pastikan cart milik user yang login
+        if ($cart->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized action!'
+            ]);
         }
+
+        $cart->delete();
 
         return response()->json([
             'success' => true,
             'message' => 'Item berhasil dihapus dari keranjang!',
             'cart_count' => $this->getCartCount(),
-            'cart_total' => $this->getCartTotal()
+            'cart_total' => $this->getCartTotal(),
+            'cart_original_total' => $this->getCartOriginalTotal(),
+            'total_savings' => $this->getTotalSavings()
         ]);
     }
 
     public function clear()
     {
-        Session::forget('cart');
+        Cart::where('user_id', Auth::id())->delete();
         
         return response()->json([
             'success' => true,
@@ -166,26 +179,44 @@ class CartController extends Controller
         return response()->json([
             'cart_items' => $this->getCartItems(),
             'cart_count' => $this->getCartCount(),
-            'cart_total' => $this->getCartTotal()
+            'cart_total' => $this->getCartTotal(),
+            'cart_original_total' => $this->getCartOriginalTotal(),
+            'total_savings' => $this->getTotalSavings()
         ]);
     }
 
-    // Private helper methods
+    // Private helper methods - UPDATED untuk menampilkan info diskon lengkap
     private function getCartItems()
     {
-        $cart = Session::get('cart', []);
         $cartItems = [];
+        
+        $carts = Cart::with(['product.images', 'product.sizes', 'product.discounts'])
+            ->where('user_id', Auth::id())
+            ->get();
 
-        foreach ($cart as $key => $item) {
-            $product = Product::with('images')->find($item['product_id']);
-            if ($product) {
-                $cartItems[$key] = [
-                    'product' => $product,
-                    'size' => $item['size'],
-                    'quantity' => $item['quantity'],
-                    'subtotal' => $item['subtotal'],
-                ];
-            }
+        foreach ($carts as $cart) {
+            // Gunakan harga diskon dari Product model
+            $productPrice = $cart->product->discounted_price;
+            $originalPrice = $cart->product->harga;
+            $hasDiscount = $cart->product->has_active_discount;
+            $discountPercentage = $cart->product->discount_percentage;
+            $savingsAmount = $originalPrice - $productPrice;
+            
+            $cartItems[] = [
+                'cart_id' => $cart->id,
+                'product' => $cart->product,
+                'size' => $cart->size,
+                'quantity' => $cart->kuantitas,
+                'price' => $productPrice, // harga setelah diskon
+                'original_price' => $originalPrice, // harga asli sebelum diskon
+                'has_discount' => $hasDiscount, // flag apakah ada diskon
+                'discount_percentage' => $discountPercentage, // persentase diskon
+                'savings_amount' => $savingsAmount, // jumlah hemat per item
+                'subtotal' => $cart->kuantitas * $productPrice, // subtotal dengan diskon
+                'original_subtotal' => $cart->kuantitas * $originalPrice, // subtotal tanpa diskon
+                'item_savings' => $cart->kuantitas * $savingsAmount, // total hemat per item
+                'available_stock' => $cart->product->getStockForSize($cart->size)
+            ];
         }
 
         return $cartItems;
@@ -193,13 +224,40 @@ class CartController extends Controller
 
     private function getCartCount()
     {
-        $cart = Session::get('cart', []);
-        return array_sum(array_column($cart, 'quantity'));
+        return Cart::where('user_id', Auth::id())->sum('kuantitas');
     }
 
     private function getCartTotal()
     {
-        $cart = Session::get('cart', []);
-        return array_sum(array_column($cart, 'subtotal'));
+        $total = 0;
+        $carts = Cart::with('product')->where('user_id', Auth::id())->get();
+        
+        foreach ($carts as $cart) {
+            // Gunakan harga diskon untuk total
+            $productPrice = $cart->product->discounted_price;
+            $total += $cart->kuantitas * $productPrice;
+        }
+        
+        return $total;
+    }
+
+    // ✅ NEW: Total harga asli (tanpa diskon)
+    private function getCartOriginalTotal()
+    {
+        $total = 0;
+        $carts = Cart::with('product')->where('user_id', Auth::id())->get();
+        
+        foreach ($carts as $cart) {
+            $originalPrice = $cart->product->harga;
+            $total += $cart->kuantitas * $originalPrice;
+        }
+        
+        return $total;
+    }
+
+    // ✅ NEW: Total hemat dari diskon
+    private function getTotalSavings()
+    {
+        return $this->getCartOriginalTotal() - $this->getCartTotal();
     }
 }

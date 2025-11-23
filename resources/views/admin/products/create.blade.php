@@ -69,11 +69,51 @@
                             @enderror
                         </div>
 
+                        {{-- SIZE MANAGEMENT SECTION --}}
                         <div class="form-group">
-                            <label for="stock_kuantitas">Stok <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control @error('stock_kuantitas') is-invalid @enderror" id="stock_kuantitas" name="stock_kuantitas" value="{{ old('stock_kuantitas') }}" min="0" required>
-                            @error('stock_kuantitas')
-                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                            <label>Management Size & Stok <span class="text-danger">*</span></label>
+                            
+                            {{-- Size Templates --}}
+                            <div class="mb-3">
+                                <label class="form-label">Template Size Cepat:</label>
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-outline-primary" onclick="addSizeTemplate('S,M,L,XL')">S,M,L,XL</button>
+                                    <button type="button" class="btn btn-outline-primary" onclick="addSizeTemplate('XS,S,M,L,XL')">XS,S,M,L,XL</button>
+                                    <button type="button" class="btn btn-outline-primary" onclick="addSizeTemplate('36,37,38,39,40')">36,37,38,39,40</button>
+                                    <button type="button" class="btn btn-outline-primary" onclick="addSizeTemplate('28,30,32,34,36')">28,30,32,34,36</button>
+                                </div>
+                            </div>
+
+                            {{-- Dynamic Size Inputs --}}
+                            <div id="sizes-container">
+                                <div class="size-input-group row mb-2">
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control size-name" name="sizes[0][size]" placeholder="Size (contoh: S, M, L)" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="number" class="form-control size-stock" name="sizes[0][stock]" placeholder="Stok" min="0" value="0" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" class="btn btn-danger btn-sm remove-size" onclick="removeSize(this)">
+                                            <i class="fas fa-trash"></i> Hapus
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Add More Size Button --}}
+                            <button type="button" class="btn btn-success btn-sm mt-2" onclick="addSize()">
+                                <i class="fas fa-plus"></i> Tambah Size
+                            </button>
+
+                            @error('sizes')
+                                <span class="invalid-feedback d-block" role="alert"><strong>{{ $message }}</strong></span>
+                            @enderror
+                            @error('sizes.*.size')
+                                <span class="invalid-feedback d-block" role="alert"><strong>{{ $message }}</strong></span>
+                            @enderror
+                            @error('sizes.*.stock')
+                                <span class="invalid-feedback d-block" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
                         </div>
 
@@ -142,8 +182,51 @@
 
 @push('scripts')
 <script>
+    let sizeCounter = 1;
+
+    function addSize() {
+        const container = document.getElementById('sizes-container');
+        const newSize = document.createElement('div');
+        newSize.className = 'size-input-group row mb-2';
+        newSize.innerHTML = `
+            <div class="col-md-4">
+                <input type="text" class="form-control size-name" name="sizes[${sizeCounter}][size]" placeholder="Size (contoh: S, M, L)" required>
+            </div>
+            <div class="col-md-4">
+                <input type="number" class="form-control size-stock" name="sizes[${sizeCounter}][stock]" placeholder="Stok" min="0" value="0" required>
+            </div>
+            <div class="col-md-4">
+                <button type="button" class="btn btn-danger btn-sm remove-size" onclick="removeSize(this)">
+                    <i class="fas fa-trash"></i> Hapus
+                </button>
+            </div>
+        `;
+        container.appendChild(newSize);
+        sizeCounter++;
+    }
+
+    function removeSize(button) {
+        const sizeGroup = button.closest('.size-input-group');
+        if (document.querySelectorAll('.size-input-group').length > 1) {
+            sizeGroup.remove();
+        } else {
+            alert('Minimal harus ada 1 size!');
+        }
+    }
+
+    function addSizeTemplate(sizes) {
+        const sizeArray = sizes.split(',');
+        sizeArray.forEach(size => {
+            addSize();
+            // Set the last added size input value
+            const sizeInputs = document.querySelectorAll('.size-name');
+            const lastSizeInput = sizeInputs[sizeInputs.length - 1];
+            lastSizeInput.value = size.trim();
+        });
+    }
+
+    // Image Preview Logic
     $(document).ready(function() {
-        // Image Preview Logic
         $('#images').on('change', function() {
             let container = $('#image-preview-container');
             container.empty();

@@ -14,7 +14,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $query = Product::query()->with(['category', 'images']);
+        $query = Product::query()->with(['category', 'images', 'sizes', 'discounts']);
 
         // Filter by category
         if (request()->has('category')) {
@@ -32,21 +32,67 @@ class ProductController extends Controller
             });
         }
 
-        // Sort options
+        // Sort options - BERUBAH: sorting berdasarkan harga setelah diskon
         if (request()->has('sort')) {
             switch (request('sort')) {
                 case 'price_asc':
-                    $query->orderBy('harga', 'asc');
+                    // Sort by discounted price (low to high)
+                    $query->orderByRaw('
+                        CASE 
+                            WHEN EXISTS (
+                                SELECT 1 FROM product_discount 
+                                JOIN discounts ON product_discount.discount_id = discounts.id 
+                                WHERE product_discount.product_id = products.id 
+                                AND discounts.start_date <= NOW() 
+                                AND discounts.end_date >= NOW()
+                            ) 
+                            THEN (products.harga - (products.harga * (
+                                SELECT discounts.percentage 
+                                FROM product_discount 
+                                JOIN discounts ON product_discount.discount_id = discounts.id 
+                                WHERE product_discount.product_id = products.id 
+                                AND discounts.start_date <= NOW() 
+                                AND discounts.end_date >= NOW() 
+                                LIMIT 1
+                            ) / 100))
+                            ELSE products.harga 
+                        END ASC
+                    ');
                     break;
+                    
                 case 'price_desc':
-                    $query->orderBy('harga', 'desc');
+                    // Sort by discounted price (high to low)
+                    $query->orderByRaw('
+                        CASE 
+                            WHEN EXISTS (
+                                SELECT 1 FROM product_discount 
+                                JOIN discounts ON product_discount.discount_id = discounts.id 
+                                WHERE product_discount.product_id = products.id 
+                                AND discounts.start_date <= NOW() 
+                                AND discounts.end_date >= NOW()
+                            ) 
+                            THEN (products.harga - (products.harga * (
+                                SELECT discounts.percentage 
+                                FROM product_discount 
+                                JOIN discounts ON product_discount.discount_id = discounts.id 
+                                WHERE product_discount.product_id = products.id 
+                                AND discounts.start_date <= NOW() 
+                                AND discounts.end_date >= NOW() 
+                                LIMIT 1
+                            ) / 100))
+                            ELSE products.harga 
+                        END DESC
+                    ');
                     break;
+                    
                 case 'name_asc':
                     $query->orderBy('name', 'asc');
                     break;
+                    
                 case 'name_desc':
                     $query->orderBy('name', 'desc');
                     break;
+                    
                 default:
                     $query->latest();
             }
@@ -56,11 +102,8 @@ class ProductController extends Controller
 
         $products = $query->paginate(12)->withQueryString();
         $categories = Category::withCount('products')->get();
-        
-        // Gunakan method dari Model Discount (REAL-TIME CHECK dengan WIB)
-        $activeDiscounts = Discount::getActiveDiscountsForProducts($products->pluck('id'));
 
-        return view('products', compact('products', 'categories', 'activeDiscounts'));
+        return view('products', compact('products', 'categories'));
     }
 
     /**
@@ -68,38 +111,20 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $product->load(['images', 'category']);
+        // Load relationships dengan discounts
+        $product->load(['images', 'category', 'sizes', 'discounts']);
         
-        // Cek discount aktif untuk produk ini (REAL-TIME)
-        $activeDiscount = Discount::getActiveDiscountForProduct($product->id);
-        
-        // Hitung harga setelah discount
-        $discountedPrice = null;
-        $savings = null;
-        
-        if ($activeDiscount) {
-            $discountedPrice = $activeDiscount->calculateDiscountedPrice($product->harga);
-            $savings = $activeDiscount->calculateSavings($product->harga);
-        }
-        
-        // Produk rekomendasi
+        // Produk rekomendasi - load discounts juga
         $recommendedProducts = Product::where('is_featured', 1)
             ->where('id', '!=', $product->id)
-            ->with('images')
+            ->with(['images', 'sizes', 'discounts'])
             ->inRandomOrder()
             ->limit(4)
             ->get();
-            
-        // Discount untuk produk rekomendasi
-        $recommendedDiscounts = Discount::getActiveDiscountsForProducts($recommendedProducts->pluck('id'));
 
         return view('products.show', compact(
             'product', 
-            'activeDiscount',
-            'discountedPrice',
-            'savings',
-            'recommendedProducts', 
-            'recommendedDiscounts'
+            'recommendedProducts'
         ));
     }
 
@@ -108,7 +133,7 @@ class ProductController extends Controller
      */
     public function search()
     {
-        $query = Product::query()->with(['images', 'category']);
+        $query = Product::query()->with(['images', 'category', 'sizes', 'discounts']);
 
         if (request()->has('q') && request('q') != '') {
             $searchTerm = request('q');
@@ -119,12 +144,75 @@ class ProductController extends Controller
             });
         }
 
+        // Apply same sorting logic as index method
+        if (request()->has('sort')) {
+            switch (request('sort')) {
+                case 'price_asc':
+                    $query->orderByRaw('
+                        CASE 
+                            WHEN EXISTS (
+                                SELECT 1 FROM product_discount 
+                                JOIN discounts ON product_discount.discount_id = discounts.id 
+                                WHERE product_discount.product_id = products.id 
+                                AND discounts.start_date <= NOW() 
+                                AND discounts.end_date >= NOW()
+                            ) 
+                            THEN (products.harga - (products.harga * (
+                                SELECT discounts.percentage 
+                                FROM product_discount 
+                                JOIN discounts ON product_discount.discount_id = discounts.id 
+                                WHERE product_discount.product_id = products.id 
+                                AND discounts.start_date <= NOW() 
+                                AND discounts.end_date >= NOW() 
+                                LIMIT 1
+                            ) / 100))
+                            ELSE products.harga 
+                        END ASC
+                    ');
+                    break;
+                    
+                case 'price_desc':
+                    $query->orderByRaw('
+                        CASE 
+                            WHEN EXISTS (
+                                SELECT 1 FROM product_discount 
+                                JOIN discounts ON product_discount.discount_id = discounts.id 
+                                WHERE product_discount.product_id = products.id 
+                                AND discounts.start_date <= NOW() 
+                                AND discounts.end_date >= NOW()
+                            ) 
+                            THEN (products.harga - (products.harga * (
+                                SELECT discounts.percentage 
+                                FROM product_discount 
+                                JOIN discounts ON product_discount.discount_id = discounts.id 
+                                WHERE product_discount.product_id = products.id 
+                                AND discounts.start_date <= NOW() 
+                                AND discounts.end_date >= NOW() 
+                                LIMIT 1
+                            ) / 100))
+                            ELSE products.harga 
+                        END DESC
+                    ');
+                    break;
+                    
+                case 'name_asc':
+                    $query->orderBy('name', 'asc');
+                    break;
+                    
+                case 'name_desc':
+                    $query->orderBy('name', 'desc');
+                    break;
+                    
+                default:
+                    $query->latest();
+            }
+        } else {
+            $query->latest();
+        }
+
         $products = $query->paginate(12)->withQueryString();
         $categories = Category::withCount('products')->get();
-        
-        // Gunakan method dari Model (REAL-TIME CHECK)
-        $activeDiscounts = Discount::getActiveDiscountsForProducts($products->pluck('id'));
 
-        return view('search', compact('products', 'categories', 'activeDiscounts'));
+        return view('search', compact('products', 'categories'));
     }
 }

@@ -1,559 +1,644 @@
 @extends('layout.app')
 
 @section('content')
+
 <style>
-    body {
-        background-color: white !important;
-    }
+/* ========================================
+   PRODUCT DETAIL PAGE - VERTICAL IMAGE SCROLL
+   ======================================== */
 
-    .product-detail-container {
-        padding: 3rem 0;
-        background-color: #fff;
-    }
+body {
+    background-color: white !important;
+}
 
-    .product-image-section {
-        display: flex;
-        gap: 20px;
-        align-items: flex-start;
-        flex-wrap: wrap;
-    }
+.product-detail-container {
+    padding: 3rem 0;
+    background-color: #fff;
+}
 
-    .thumbnail-gallery { 
-        display: flex; 
-        flex-direction: column; 
-        gap: 15px; 
-        overflow-y: auto; 
-        height: 100%; 
-        max-height: 500px; 
-        top: 8rem; 
-        padding-right: 10px; 
-    } 
-    
-    .thumbnail-gallery img { 
-        width: 80px; 
-        height: 80px; 
-        cursor: pointer; 
-        object-fit: cover; 
-        border: 1px solid transparent; 
-        transition: border-color 0.2s ease, transform 0.2s ease; 
-        margin-top: 2px; 
-    }
+/* ========================================
+   IMAGE SECTION - VERTICAL DISPLAY WITH THUMBNAILS
+   ======================================== */
 
-    .thumbnail-gallery img.active,
-    .thumbnail-gallery img:hover {
-        border-color: #422D1C;
-        transform: translateY(-2px);
-    }
+.product-image-section {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    width: 100%;
+}
 
-    .main-image-display {
-        flex: 1;
-        min-height: 500px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
+/* Thumbnail Gallery - Show Again */
+.thumbnail-gallery { 
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 10px;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Hide scrollbar for thumbnails */
+.thumbnail-gallery::-webkit-scrollbar {
+    display: none;
+}
+
+.thumbnail-gallery img { 
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    object-fit: cover;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.thumbnail-gallery img.active,
+.thumbnail-gallery img:hover {
+    border-color: #422D1C;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(66, 45, 28, 0.2);
+}
+
+/* Main Image Display - Show All Images Vertically */
+.main-image-display {
+    flex: 1;
+    width: 100%;
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: relative;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+    padding-right: 10px;
+}
+
+/* Each Image Container - NO BORDER */
+.main-image {
+    width: 100%;
+    height: auto;
+    max-height: 700px;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    transition: transform 0.3s ease;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    scroll-margin-top: 20px;
+}
+
+.main-image:hover {
+    transform: scale(1.02);
+    cursor: zoom-in;
+}
+
+/* Discount Badge Overlay */
+.discount-badge-overlay {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: linear-gradient(135deg, rgb(229, 98, 62) 0%, rgb(224, 13, 6) 100%);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 25px;
+    z-index: 10;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+}
+
+/* ========================================
+   PRODUCT INFO SECTION - STICKY (NO SCROLL)
+   ======================================== */
+
+.product-info-wrapper {
+    padding-left: 2rem;
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+    max-height: none;
+    overflow: visible;
+}
+
+.product-title-detail { 
+    font-size: 30px !important; 
+    font-weight: 500 !important; 
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+} 
+
+.product-price-detail { 
+    font-size: 20px !important; 
+    font-weight: 500 !important; 
+    color: #8B4513 !important; 
+    margin-bottom: 1.5rem; 
+}
+
+.product-description-detail {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 2rem;
+}
+
+/* ========================================
+   COUNTDOWN TIMER
+   ======================================== */
+
+.product-countdown-timer {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 0.5rem !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 40px;
+}
+
+.countdown-value {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+
+.countdown-label {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    margin-top: 3px;
+}
+
+.countdown-separator {
+    font-size: 18px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* ========================================
+   SIZE & QUANTITY CONTROLS
+   ======================================== */
+
+.size-option {
+    display: inline-block;
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.size-option.active,
+.size-option:hover {
+    background-color: #422D1C;
+    color: #fff;
+    border-color: #422D1C;
+}
+
+.size-option.out-of-stock {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f5f5f5;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.quantity-btn {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quantity-btn:hover {
+    background: #e0e0e0;
+}
+
+.quantity-input {
+    width: 60px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-left: none;
+    border-right: none;
+    height: 40px;
+}
+
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* ========================================
+   ACTION BUTTONS
+   ======================================== */
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.add-to-cart-btn {
+    background: #422D1C;
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 1rem 2.5rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.add-to-cart-btn:hover {
+    background: #8B4513;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.buy-now-btn {
+    background: #8B4513;
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 1rem 2.5rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.buy-now-btn:hover {
+    background: #422D1C;
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ========================================
+   CUSTOM ALERT MODAL
+   ======================================== */
+
+.custom-alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(2px);
+}
+
+.custom-alert {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    position: relative;
+    transform: scale(0.7);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.custom-alert.show {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.custom-alert.success .alert-icon {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.5rem;
+    animation: checkmark 0.6s ease-in-out;
+}
+
+.custom-alert.error .alert-icon {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.5rem;
+    animation: shake 0.6s ease-in-out;
+}
+
+.custom-alert.warning .alert-icon {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.5rem;
+    animation: pulse 1s infinite;
+}
+
+@keyframes checkmark {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.alert-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.alert-message {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.alert-button {
+    background: linear-gradient(135deg, #422D1C, #8B4513);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.alert-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 45, 28, 0.3);
+}
+
+.alert-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #999;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.alert-close:hover {
+    background: #f5f5f5;
+    color: #666;
+}
+
+/* ========================================
+   TOAST NOTIFICATIONS
+   ======================================== */
+
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+}
+
+.custom-toast {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    margin-bottom: 10px;
+    min-width: 300px;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    border-left: 4px solid #4CAF50;
+}
+
+.custom-toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.custom-toast.error { border-left-color: #f44336; }
+.custom-toast.warning { border-left-color: #ff9800; }
+
+.toast-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+
+.toast-icon.success { background: #4CAF50; }
+.toast-icon.error { background: #f44336; }
+.toast-icon.warning { background: #ff9800; }
+
+.toast-content {
+    flex-grow: 1;
+}
+
+.toast-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+    color: #333;
+}
+
+.toast-message {
+    font-size: 0.8rem;
+    color: #666;
+    margin: 0;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.toast-close:hover {
+    background: #f5f5f5;
+    color: #666;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+    .product-info-wrapper {
+        padding-left: 0;
+        padding-top: 2rem;
         position: relative;
+        top: 0;
+        max-height: none;
     }
 
     .main-image {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-        display: block;
-        transition: transform 0.3s ease;
-    }
-
-    .main-image:hover {
-        transform: scale(1.05);
-        cursor: zoom-in;
-    }
-
-    .product-info-wrapper {
-        padding-left: 2rem;
-        flex: 1;
-    }
-
-    .product-title-detail { 
-        font-size: 30px !important; 
-        font-weight: 500 !important; 
-        margin-bottom: 0.5rem; 
-    } 
-    
-    .product-price-detail { 
-        font-size: 20px !important; 
-        font-weight: 500 !important; 
-        color: #8B4513 !important; 
-        margin-bottom: 1.5rem; 
-    }
-
-    /* Discount Badge on Image */
-    .discount-badge-overlay {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-        background: linear-gradient(135deg, rgb(229, 98, 62) 0%, rgb(224, 13, 6) 100%);
-        color: white;
-        font-size: 14px;
-        font-weight: 700;
-        padding: 8px 16px;
-        border-radius: 25px;
-        z-index: 10;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
-    }
-
-    /* Countdown Timer for Product Detail */
-    .product-countdown-timer {
-        background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(10px);
-        color: white;
-        padding: 12px 20px;
-        border-radius: 12px;
-        font-size: 13px;
-        font-weight: 600;
-        display: inline-flex;
-        gap: 12px;
-        align-items: center;
-        margin-top: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    .countdown-unit {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-width: 40px;
-    }
-
-    .countdown-value {
-        font-size: 18px;
-        font-weight: 700;
-        line-height: 1;
-        color: #fff;
-    }
-
-    .countdown-label {
-        font-size: 9px;
-        color: rgba(255, 255, 255, 0.7);
-        text-transform: uppercase;
-        margin-top: 3px;
-    }
-
-    .countdown-separator {
-        font-size: 18px;
-        font-weight: 700;
-        color: rgba(255, 255, 255, 0.5);
-    }
-
-    .product-description-detail {
-        font-size: 1rem;
-        line-height: 1.6;
-        color: #555;
-        margin-bottom: 2rem;
+        max-height: 400px;
     }
 
     .action-buttons {
-        display: flex;
-        gap: 1rem;
-        margin-top: 1.5rem;
+        flex-direction: column;
     }
 
-    .add-to-cart-btn {
-        background: #422D1C;
-        border: none;
-        color: white;
-        font-size: 1.1rem;
-        font-weight: 600;
-        padding: 1rem 2.5rem;
-        border-radius: 4px;
-        transition: all 0.3s ease;
-        flex: 1;
-    }
-
-    .add-to-cart-btn:hover {
-        background: #8B4513;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        color: white;
-    }
-
+    .add-to-cart-btn,
     .buy-now-btn {
-        background: #8B4513;
-        border: none;
-        color: white;
-        font-size: 1.1rem;
-        font-weight: 600;
-        padding: 1rem 2.5rem;
-        border-radius: 4px;
-        transition: all 0.3s ease;
-        flex: 1;
-    }
-
-    .buy-now-btn:hover {
-        background: #422D1C;
-        color: white;
-        box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
-        transform: translateY(-2px);
-    }
-
-    .size-option {
-        display: inline-block;
-        padding: 8px 15px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        margin-right: 10px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .size-option.active,
-    .size-option:hover {
-        background-color: #422D1C;
-        color: #fff;
-        border-color: #422D1C;
-    }
-
-    .quantity-control {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-    }
-
-    .quantity-btn {
-        background: #f0f0f0;
-        border: 1px solid #ccc;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-    }
-
-    .quantity-btn:hover {
-        background: #e0e0e0;
-    }
-
-    .quantity-input {
-        width: 60px;
-        text-align: center;
-        border: 1px solid #ccc;
-        border-left: none;
-        border-right: none;
-        height: 40px;
-    }
-
-    .quantity-input::-webkit-outer-spin-button,
-    .quantity-input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    .btn-loading {
-        position: relative;
-        pointer-events: none;
-    }
-
-    .btn-loading::after {
-        content: '';
-        position: absolute;
-        width: 16px;
-        height: 16px;
-        top: 50%;
-        left: 50%;
-        margin-left: -8px;
-        margin-top: -8px;
-        border: 2px solid transparent;
-        border-top-color: #ffffff;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    /* Custom Alert & Toast Styles */
-    .custom-alert-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
         width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 9999;
-        display: none;
-        justify-content: center;
-        align-items: center;
-        backdrop-filter: blur(2px);
+        padding: 0.8rem;
     }
 
     .custom-alert {
-        background: white;
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        text-align: center;
-        max-width: 400px;
-        width: 90%;
-        position: relative;
-        transform: scale(0.7);
-        opacity: 0;
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .custom-alert.show {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-    .custom-alert.success .alert-icon {
-        background: linear-gradient(135deg, #4CAF50, #45a049);
-        color: white;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem;
-        font-size: 1.5rem;
-        animation: checkmark 0.6s ease-in-out;
-    }
-
-    .custom-alert.error .alert-icon {
-        background: linear-gradient(135deg, #f44336, #d32f2f);
-        color: white;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem;
-        font-size: 1.5rem;
-        animation: shake 0.6s ease-in-out;
-    }
-
-    .custom-alert.warning .alert-icon {
-        background: linear-gradient(135deg, #ff9800, #f57c00);
-        color: white;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem;
-        font-size: 1.5rem;
-        animation: pulse 1s infinite;
-    }
-
-    @keyframes checkmark {
-        0% { transform: scale(0); opacity: 0; }
-        50% { transform: scale(1.3); }
-        100% { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
-    }
-
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-    }
-
-    .alert-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: #333;
-    }
-
-    .alert-message {
-        color: #666;
-        font-size: 0.95rem;
-        margin-bottom: 1.5rem;
-        line-height: 1.5;
-    }
-
-    .alert-button {
-        background: linear-gradient(135deg, #422D1C, #8B4513);
-        color: white;
-        border: none;
-        padding: 0.75rem 2rem;
-        border-radius: 8px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 0.95rem;
-    }
-
-    .alert-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(66, 45, 28, 0.3);
-    }
-
-    .alert-close {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        background: none;
-        border: none;
-        font-size: 1.2rem;
-        color: #999;
-        cursor: pointer;
-        width: 30px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: all 0.2s ease;
-    }
-
-    .alert-close:hover {
-        background: #f5f5f5;
-        color: #666;
+        margin: 1rem;
+        max-width: none;
     }
 
     .toast-container {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 10000;
+        top: 10px;
+        right: 10px;
+        left: 10px;
     }
 
     .custom-toast {
-        background: white;
-        border-radius: 12px;
-        padding: 1rem 1.25rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-        margin-bottom: 10px;
-        min-width: 300px;
-        max-width: 400px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        transform: translateX(100%);
-        opacity: 0;
-        transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-        border-left: 4px solid #4CAF50;
+        min-width: auto;
+        max-width: none;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .main-image {
+        max-height: 600px;
     }
 
-    .custom-toast.show {
-        transform: translateX(0);
-        opacity: 1;
+    .product-info-wrapper {
+        top: 80px;
     }
-
-    .custom-toast.error { border-left-color: #f44336; }
-    .custom-toast.warning { border-left-color: #ff9800; }
-
-    .toast-icon {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 0.75rem;
-        flex-shrink: 0;
-    }
-
-    .toast-icon.success { background: #4CAF50; }
-    .toast-icon.error { background: #f44336; }
-    .toast-icon.warning { background: #ff9800; }
-
-    .toast-content {
-        flex-grow: 1;
-    }
-
-    .toast-title {
-        font-weight: 600;
-        font-size: 0.9rem;
-        margin-bottom: 2px;
-        color: #333;
-    }
-
-    .toast-message {
-        font-size: 0.8rem;
-        color: #666;
-        margin: 0;
-    }
-
-    .toast-close {
-        background: none;
-        border: none;
-        color: #999;
-        cursor: pointer;
-        padding: 0;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: all 0.2s ease;
-        flex-shrink: 0;
-    }
-
-    .toast-close:hover {
-        background: #f5f5f5;
-        color: #666;
-    }
-
-    @media (max-width: 768px) {
-        .product-image-section {
-            flex-direction: column;
-        }
-
-        .product-info-wrapper {
-            padding-left: 0;
-            padding-top: 2rem;
-        }
-
-        .main-image-display {
-            min-height: 350px;
-        }
-
-        .action-buttons {
-            flex-direction: column;
-        }
-
-        .add-to-cart-btn,
-        .buy-now-btn {
-            width: 100%;
-            padding: 0.8rem;
-        }
-
-        .custom-alert {
-            margin: 1rem;
-            max-width: none;
-        }
-
-        .toast-container {
-            top: 10px;
-            right: 10px;
-            left: 10px;
-        }
-
-        .custom-toast {
-            min-width: auto;
-            max-width: none;
-        }
-    }
+}
 </style>
 
 <div class="product-detail-container">
     <div class="container">
         <div class="row">
-            <div class="col-md-6">
+                <div class="col-md-6">
                 <div class="product-image-section">
+                    {{-- Thumbnail Gallery --}}
                     @if($product->images->count() > 1)
                         <div class="thumbnail-gallery">
                             @foreach($product->images as $thumb)
@@ -562,18 +647,13 @@
                         </div>
                     @endif
 
+                    {{-- Main Images Display - ALL IMAGES VERTICALLY --}}
                     <div class="main-image-display">
-                        {{-- Discount Badge on Image --}}
-                        @if($activeDiscount && $activeDiscount->is_valid)
-                            <div class="discount-badge-overlay">
-                                -{{ $activeDiscount->percentage }}%
-                            </div>
-                        @endif
-
-                        <img id="main-product-image" 
-                             src="{{ $product->images->first()->image_path ?? 'path/to/placeholder.jpg' }}" 
-                             class="main-image" 
-                             alt="{{ $product->name }}">
+                        @foreach($product->images as $image)
+                            <img src="{{ $image->image_path }}" 
+                                 class="main-image" 
+                                 alt="{{ $product->name }}">
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -583,23 +663,23 @@
                     <h1 class="product-title-detail">{{ $product->name }}</h1>
 
                     {{-- Price with Discount --}}
-                    @if($activeDiscount && $activeDiscount->is_valid)
+                    @if($product->has_active_discount)
                         <p class="product-price-detail d-flex align-items-center gap-2">
                             <span class="text-muted" style="text-decoration: line-through;">
                                 Rp {{ number_format($product->harga, 0, ',', '.') }}
                             </span>
                             <span class="text-danger fw-bold">
-                                Rp {{ number_format($discountedPrice, 0, ',', '.') }}
+                                Rp {{ number_format($product->discounted_price, 0, ',', '.') }}
                             </span>
                         </p>
                         <div class="mb-3">
                             <span class="badge bg-success">
-                                Hemat Rp {{ number_format($savings, 0, ',', '.') }}
+                                Hemat Rp {{ number_format($product->savings_amount, 0, ',', '.') }}
                             </span>
                         </div>
 
-                        {{-- Countdown Timer --}}
-                        <div class="product-countdown-timer" data-end-date="{{ $activeDiscount->end_date_iso }}">
+                        {{-- Countdown Timer with Space --}}
+                        <div class="product-countdown-timer mb-4" data-end-date="{{ $product->discount_end_date_iso }}" style="margin-bottom: 0.5rem !important;">
                             <span style="font-size: 12px; opacity: 0.9;">⏰ Berakhir dalam:</span>
                             <div class="countdown-unit">
                                 <span class="countdown-value days">00</span>
@@ -627,48 +707,64 @@
                         </p>
                     @endif
 
-                    <p class="product-description-detail">{{ $product->deskripsi }}</p>
+                    {{-- Product Description with Space --}}
+                    <p class="product-description-detail mt-3">{{ $product->deskripsi }}</p>
 
                     <form id="product-form" method="POST">
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                         <input type="hidden" name="product_name" value="{{ $product->name }}">
-                        <input type="hidden" name="product_price" value="{{ $activeDiscount && $activeDiscount->is_valid ? $discountedPrice : $product->harga }}">
+                        <input type="hidden" name="product_price" value="{{ $product->has_active_discount ? $product->discounted_price : $product->harga }}">
                         <input type="hidden" name="product_image" value="{{ $product->images->first()->image_path ?? '' }}">
 
+                        {{-- SIZE SELECTION --}}
                         <div class="mb-4">
-                            <h6 class="font-weight-bold mb-2">Pilih Ukuran:</h6>
+                            <h6 class="font-weight-bold mb-2">Pilih Ukuran: <span class="text-danger">*</span></h6>
                             <div class="size-options">
-                                @foreach(['S','M','L','XL','XXL'] as $size)
-                                    <span class="size-option" data-size="{{ $size }}">{{ $size }}</span>
-                                @endforeach
+                                @if($product->sizes->count() > 0)
+                                    @foreach($product->sizes as $size)
+                                        <span class="size-option {{ $size->stock == 0 ? 'out-of-stock' : '' }}" 
+                                              data-size="{{ $size->size }}" 
+                                              data-stock="{{ $size->stock }}"
+                                              {{ $size->stock == 0 ? 'disabled' : '' }}>
+                                            {{ $size->size }}
+                                            @if($size->stock == 0)
+                                                <small class="stock-label">(Habis)</small>
+                                            @endif
+                                        </span>
+                                    @endforeach
+                                @else
+                                    <p class="text-danger">Size tidak tersedia</p>
+                                @endif
                             </div>
-                            <input type="hidden" name="size" id="selected-size" value="">
+                            <input type="hidden" name="size" id="selected-size" value="" required>
+                            <div class="invalid-feedback" id="size-error">Silakan pilih ukuran</div>
                         </div>
 
+                        {{-- QUANTITY --}}
                         <div class="mb-4">
                             <h6 class="font-weight-bold mb-2">Jumlah:</h6>
                             <div class="quantity-control">
                                 <button type="button" class="quantity-btn" id="decrease-qty">-</button>
-                                <input type="number" class="quantity-input" name="quantity" id="product-qty" value="1" min="1" max="{{ $product->stock_kuantitas }}" readonly>
+                                <input type="number" class="quantity-input" name="quantity" id="product-qty" value="1" min="1" max="1" readonly>
                                 <button type="button" class="quantity-btn" id="increase-qty">+</button>
                             </div>
-                            <p class="text-muted">Stok Tersedia: <span id="stock-value">{{ $product->stock_kuantitas }}</span></p>
+                            <p class="text-muted">Stok Tersedia: <span id="stock-value">0</span></p>
+                            <div class="invalid-feedback" id="quantity-error">Jumlah tidak valid</div>
                         </div>
 
                         <div class="action-buttons">
-                            <button type="button" class="btn add-to-cart-btn" id="add-to-cart">
+                            <button type="button" class="btn add-to-cart-btn" id="add-to-cart" disabled>
                                 <i class="bi bi-bag-plus-fill me-2"></i> Tambah ke Keranjang
                             </button>
-                            <a href="{{ route('checkout.index', ['product_id' => $product->id, 'quantity' => 1]) }}"
-                               class="btn buy-now-btn" id="buy-now">
+                            <a href="#" class="btn buy-now-btn" id="buy-now" style="pointer-events: none; opacity: 0.6;">
                                <i class="bi bi-lightning-fill me-2"></i> Beli Sekarang
                             </a>
                         </div>
                     </form>
                 </div>
             </div>
-        </div>
+        </div>{{-- Tutup row --}}
 
         {{-- Recommended Products --}}
         @if($recommendedProducts->count() > 0)
@@ -678,17 +774,14 @@
                 <div class="row g-3">
                     @foreach($recommendedProducts as $recommendedProduct)
                         <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                            @include('partials.product-card', [
-                                'product' => $recommendedProduct,
-                                'activeDiscounts' => $recommendedDiscounts
-                            ])
+                            @include('partials.product-card', ['product' => $recommendedProduct])
                         </div>
                     @endforeach
                 </div>
             </div>
         @endif
-    </div>
-</div>
+    </div>{{-- Tutup container --}}
+</div>{{-- Tutup product-detail-container --}}
 
 <!-- Custom Alert Modal -->
 <div class="custom-alert-overlay" id="customAlertOverlay">
@@ -746,17 +839,17 @@ document.addEventListener('DOMContentLoaded', function() {
         setInterval(updateProductCountdown, 1000);
     }
 
-    // Rest of your JavaScript code...
-    const mainImage = document.getElementById('main-product-image');
-    const thumbnails = document.querySelectorAll('.thumbnail-gallery img');
-    const sizeOptions = document.querySelectorAll('.size-option');
+    // PERBAIKAN: Hapus variabel yang tidak diperlukan
+    const sizeOptions = document.querySelectorAll('.size-option:not(.out-of-stock)');
     const decreaseBtn = document.getElementById('decrease-qty');
     const increaseBtn = document.getElementById('increase-qty');
     const quantityInput = document.getElementById('product-qty');
-    const stockValue = parseInt(document.getElementById('stock-value').innerText);
+    const stockValueEl = document.getElementById('stock-value');
     const addToCartBtn = document.getElementById('add-to-cart');
     const buyNowBtn = document.getElementById('buy-now');
     const selectedSizeInput = document.getElementById('selected-size');
+
+    let currentStock = 0;
 
     // Custom Alert Functions
     function showCustomAlert(type, title, message, callback = null) {
@@ -829,27 +922,31 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(closeToast, duration);
     }
 
-    // Thumbnail Click
-    thumbnails.forEach(thumbnail => {
-        thumbnail.addEventListener('click', function() {
-            mainImage.src = this.src;
-            thumbnails.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
-
     // Size Selection
     sizeOptions.forEach(option => {
         option.addEventListener('click', function() {
+            if (this.classList.contains('out-of-stock')) return;
+            
             sizeOptions.forEach(o => o.classList.remove('active'));
             this.classList.add('active');
             selectedSizeInput.value = this.dataset.size;
+            
+            // Update stock info based on selected size
+            currentStock = parseInt(this.dataset.stock);
+            stockValueEl.textContent = currentStock;
+            quantityInput.max = currentStock;
+            quantityInput.value = Math.min(1, currentStock);
+            
+            // Enable buttons
+            addToCartBtn.disabled = false;
+            buyNowBtn.style.pointerEvents = 'auto';
+            buyNowBtn.style.opacity = '1';
         });
     });
     
+    // Auto select first available size
     if (sizeOptions.length > 0) {
-        sizeOptions[0].classList.add('active');
-        selectedSizeInput.value = sizeOptions[0].dataset.size;
+        sizeOptions[0].click();
     }
 
     // Quantity Control
@@ -860,7 +957,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     increaseBtn.addEventListener('click', function() {
         let currentQty = parseInt(quantityInput.value);
-        if (currentQty < stockValue) quantityInput.value = currentQty + 1;
+        if (currentQty < currentStock) quantityInput.value = currentQty + 1;
     });
 
     // Validation
@@ -873,7 +970,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showCustomAlert('warning', 'Jumlah Tidak Valid', 'Jumlah produk minimal 1!');
             return false;
         }
-        if (parseInt(quantityInput.value) > stockValue) {
+        if (parseInt(quantityInput.value) > currentStock) {
             showCustomAlert('error', 'Stok Tidak Mencukupi', 'Jumlah produk melebihi stok yang tersedia!');
             return false;
         }
@@ -964,5 +1061,53 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Thumbnail Click - Smooth Scroll to Image
+const mainImages = document.querySelectorAll('.main-image');
+const thumbnails = document.querySelectorAll('.thumbnail-gallery img');
+
+thumbnails.forEach((thumbnail, index) => {
+    thumbnail.addEventListener('click', function() {
+        // Remove active from all thumbnails
+        thumbnails.forEach(t => t.classList.remove('active'));
+        
+        // Add active to clicked thumbnail
+        this.classList.add('active');
+        
+        // Smooth scroll to corresponding image
+        if (mainImages[index]) {
+            mainImages[index].scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+        }
+    });
+});
+
+// Observer to highlight thumbnail based on visible image
+const observerOptions = {
+    root: null,
+    rootMargin: '-50% 0px -50% 0px',
+    threshold: 0
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const index = Array.from(mainImages).indexOf(entry.target);
+            thumbnails.forEach(t => t.classList.remove('active'));
+            if (thumbnails[index]) {
+                thumbnails[index].classList.add('active');
+            }
+        }
+    });
+}, observerOptions);
+
+mainImages.forEach(img => observer.observe(img));
+
+// Set first thumbnail as active on load
+if (thumbnails.length > 0) {
+    thumbnails[0].classList.add('active');
+}
 </script>
 @endpush

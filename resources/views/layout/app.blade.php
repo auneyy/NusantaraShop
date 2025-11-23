@@ -12,13 +12,14 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <link rel="icon" href="{{ asset('storage/product_images/logobos.png') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   @stack('styles')
   
   <style>
     body {
       font-family: 'Manrope', sans-serif;
       background-color: #fff;
-      padding-top: 80px; /* Sesuaikan dengan tinggi navbar */
+      padding-top: 80px;
     }
 
     /* Navbar Base Styles */
@@ -41,11 +42,6 @@
       background-color: rgba(255, 255, 255, 0.95) !important;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
       backdrop-filter: blur(20px);
-    }
-
-    /* Navbar Hidden State (saat scroll down) */
-    .navbar.navbar-hidden {
-      transform: translateY(-100%);
     }
 
     /* Logo Animation */
@@ -261,7 +257,6 @@
       padding: 3rem 0 1.5rem;
       box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
       border-top: 1px solid #f0f0f0;
-      margin-top: 4rem;
     }
 
     .footer h5 {
@@ -473,25 +468,215 @@
       }
     }
 
-    /* Loading Animation */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+/* Modal Overlay */
+.search-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85); /* Background overlay hitam */
+  z-index: 99999;
+}
 
-    .fade-in-up {
-      animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+.search-modal-overlay.active {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* Modal Content - Di atas, height 1/4 layar, width full */
+.search-modal-content {
+  background: #ffffff;
+  width: 100%;
+  height: 25vh;
+  min-height: 250px;
+  padding: 40px 50px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-modal-overlay.active .search-modal-content {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Close Button */
+.search-modal-close {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  background: transparent;
+  border: none;
+  font-size: 2.2rem;
+  color: #1a1a1a;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  line-height: 1;
+  z-index: 10;
+}
+
+.search-modal-close:hover {
+  color: #999999;
+  transform: rotate(90deg);
+}
+
+/* Modal Title */
+.search-modal-title {
+  font-size: 2.8rem;
+  font-weight: 300;
+  color: #1a1a1a;
+  text-align: center;
+  margin-bottom: 40px;
+  letter-spacing: 2px;
+}
+
+/* Modal Search Form */
+.modal-search-form {
+  width: 100%;
+  max-width: 800px;
+  padding: 0 40px;
+}
+
+.modal-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1.5px solid #1a1a1a;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.modal-search-wrapper:focus-within {
+  border-color: #422D1C;
+  box-shadow: 0 0 0 3px rgba(66, 45, 28, 0.1);
+}
+
+.modal-search-input {
+  width: 100%;
+  border: none;
+  padding: 18px 65px 18px 28px;
+  font-size: 1rem;
+  color: #1a1a1a;
+  background: transparent;
+  outline: none;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+.modal-search-input::placeholder {
+  color: #999999;
+  font-weight: 300;
+}
+
+.modal-search-btn {
+  position: absolute;
+  right: 0;
+  background: #1a1a1a;
+  border: none;
+  padding: 18px 28px;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-search-btn:hover {
+  background: #422D1C;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .search-modal-content {
+    padding: 30px 40px;
+    height: 30vh;
+    min-height: 220px;
+  }
+
+  .search-modal-close {
+    top: 20px;
+    right: 25px;
+    font-size: 1.8rem;
+    width: 45px;
+    height: 45px;
+  }
+
+  .search-modal-title {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+  }
+
+  .modal-search-form {
+    padding: 0 30px;
+  }
+
+  .modal-search-input {
+    padding: 16px 55px 16px 22px;
+    font-size: 0.95rem;
+  }
+
+  .modal-search-btn {
+    padding: 16px 24px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-modal-content {
+    padding: 25px 30px;
+    height: 35vh;
+    min-height: 200px;
+  }
+
+  .search-modal-close {
+    top: 15px;
+    right: 20px;
+    font-size: 1.6rem;
+    width: 40px;
+    height: 40px;
+  }
+
+  .search-modal-title {
+    font-size: 1.6rem;
+    margin-bottom: 25px;
+  }
+
+  .modal-search-form {
+    padding: 0 20px;
+  }
+
+  .modal-search-input {
+    padding: 15px 50px 15px 20px;
+    font-size: 0.9rem;
+  }
+
+  .modal-search-btn {
+    padding: 15px 20px;
+    font-size: 1rem;
+  }
+}
   </style>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Back history prevention
         if (window.history && window.history.pushState) {
             window.addEventListener('load', function() {
                 window.history.pushState({}, '', window.location.href);
@@ -502,6 +687,7 @@
             });
         }
 
+        // Auth check
         window.addEventListener('pageshow', function(event) {
             if (event.persisted || 
                 (window.performance && window.performance.getEntriesByType("navigation")[0].type === "back_forward")) {
@@ -525,6 +711,7 @@
             }
         });
         
+        // Cache clear
         if (window.location.pathname.includes('/home') || 
             window.location.pathname.includes('/cart') ||
             window.location.pathname.includes('/profile')) {
@@ -628,7 +815,7 @@
             <i class="bi bi-bag"></i>
           </a>
           
-          <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal">
+          <a href="#" class="search-trigger">
             <i class="bi bi-search"></i>
           </a>
           @endauth
@@ -642,23 +829,30 @@
     <i class="bi bi-arrow-up"></i>
   </button>
 
-  <!-- Search Modal -->
-  <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="searchModalLabel">Cari Produk</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <!-- Clean Search Modal Structure -->
+  <div class="search-modal-overlay" id="searchModal">
+    <div class="search-modal-content">
+      <button class="search-modal-close">
+        <i class="bi bi-x"></i>
+      </button>
+      
+      <h2 class="search-modal-title">Search</h2>
+      
+      <form action="{{ route('search') }}" method="GET" class="modal-search-form">
+        <div class="modal-search-wrapper">
+          <input 
+            type="text" 
+            name="q" 
+            class="modal-search-input" 
+            placeholder="Search for products..."
+            autocomplete="off"
+            id="modalSearchInput"
+            required>
+          <button type="submit" class="modal-search-btn">
+            <i class="bi bi-search"></i>
+          </button>
         </div>
-        <div class="modal-body">
-          <form action="{{ url('/products') }}" method="GET">
-            <div class="mb-3">
-              <input type="text" name="search" class="form-control" placeholder="Cari produk batik..." required>
-            </div>
-            <button type="submit" class="btn btn-primary">Cari</button>
-          </form>
-        </div>
-      </div>
+      </form>
     </div>
   </div>
 
@@ -730,13 +924,11 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <!-- Navbar Scroll Animation Script -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const navbar = document.querySelector('.navbar');
       const scrollToTopBtn = document.getElementById('scrollToTop');
       let lastScrollTop = 0;
-      let scrollTimeout;
 
       // Navbar scroll effect
       window.addEventListener('scroll', function() {
@@ -748,13 +940,6 @@
         } else {
           navbar.classList.remove('scrolled');
         }
-
-        // Hide navbar on scroll down, show on scroll up (Optional - uncomment jika ingin efek hide)
-        // if (scrollTop > lastScrollTop && scrollTop > 100) {
-        //   navbar.classList.add('navbar-hidden');
-        // } else {
-        //   navbar.classList.remove('navbar-hidden');
-        // }
 
         lastScrollTop = scrollTop;
 
@@ -774,7 +959,56 @@
         });
       });
 
-      // Smooth scroll for anchor links
+      // SEARCH MODAL FUNCTIONALITY - FIXED
+      function openSearchModal() {
+        const modal = document.getElementById('searchModal');
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Focus on input after animation
+        setTimeout(() => {
+          const input = document.getElementById('modalSearchInput');
+          if (input) input.focus();
+        }, 400);
+      }
+
+      function closeSearchModal() {
+        const modal = document.getElementById('searchModal');
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+
+      // Event listeners untuk search modal
+      const modal = document.getElementById('searchModal');
+      const closeBtn = document.querySelector('.search-modal-close');
+      
+      // Close ketika klik overlay
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          closeSearchModal();
+        }
+      });
+      
+      // Close ketika klik tombol close
+      closeBtn.addEventListener('click', closeSearchModal);
+      
+      // Close ketika tekan Escape
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+          closeSearchModal();
+        }
+      });
+      
+      // Trigger modal ketika klik search icon di navbar
+      const searchIcons = document.querySelectorAll('.search-trigger');
+      searchIcons.forEach(icon => {
+        icon.addEventListener('click', function(e) {
+          e.preventDefault();
+          openSearchModal();
+        });
+      });
+
+      // Smooth scroll untuk anchor links
       document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
           e.preventDefault();
@@ -792,5 +1026,4 @@
 
   @stack('scripts')
 </body>
-
 </html>

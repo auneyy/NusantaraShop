@@ -19,11 +19,58 @@ class DiscountController extends Controller
         $this->imageKitService = $imageKitService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $discounts = Discount::with('products')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $query = Discount::with('products');
+
+        // Search functionality
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('subtitle', 'like', "%{$search}%")
+                  ->orWhereHas('products', function($productQuery) use ($search) {
+                      $productQuery->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter by status
+        if ($request->has('status') && $request->status != '') {
+            $now = Carbon::now('Asia/Jakarta');
+            
+            if ($request->status === 'active') {
+                $query->where('start_date', '<=', $now)
+                      ->where('end_date', '>=', $now);
+            } elseif ($request->status === 'upcoming') {
+                $query->where('start_date', '>', $now);
+            } elseif ($request->status === 'expired') {
+                $query->where('end_date', '<', $now);
+            }
+        }
+
+        // Filter by percentage range
+        if ($request->has('min_percentage') && $request->min_percentage != '') {
+            $query->where('percentage', '>=', $request->min_percentage);
+        }
+
+        if ($request->has('max_percentage') && $request->max_percentage != '') {
+            $query->where('percentage', '<=', $request->max_percentage);
+        }
+
+        // Filter by date range
+        if ($request->has('start_date_filter') && $request->start_date_filter != '') {
+            $query->whereDate('start_date', '>=', $request->start_date_filter);
+        }
+
+        if ($request->has('end_date_filter') && $request->end_date_filter != '') {
+            $query->whereDate('end_date', '<=', $request->end_date_filter);
+        }
+
+        $discounts = $query->orderBy('created_at', 'desc')
+                          ->paginate(10)
+                          ->appends($request->except('page'));
+
         return view('admin.discounts.index', compact('discounts'));
     }
 
@@ -198,27 +245,27 @@ class DiscountController extends Controller
     }
 
     public function checkStatus(Request $request)
-{
-    $productIds = $request->input('product_ids', []);
-    
-    $activeDiscounts = Discount::active()
-        ->whereHas('products', function($query) use ($productIds) {
-            $query->whereIn('products.id', $productIds);
-        })
-        ->with('products')
-        ->get();
-    
-    return response()->json([
-        'success' => true,
-        'discounts' => $activeDiscounts->map(function($discount) {
-            return [
-                'id' => $discount->id,
-                'percentage' => $discount->percentage,
-                'end_date' => $discount->end_date->toIso8601String(),
-                'time_remaining' => $discount->time_remaining,
-                'product_ids' => $discount->products->pluck('id'),
-            ];
-        })
-    ]);
-}
+    {
+        $productIds = $request->input('product_ids', []);
+        
+        $activeDiscounts = Discount::active()
+            ->whereHas('products', function($query) use ($productIds) {
+                $query->whereIn('products.id', $productIds);
+            })
+            ->with('products')
+            ->get();
+        
+        return response()->json([
+            'success' => true,
+            'discounts' => $activeDiscounts->map(function($discount) {
+                return [
+                    'id' => $discount->id,
+                    'percentage' => $discount->percentage,
+                    'end_date' => $discount->end_date->toIso8601String(),
+                    'time_remaining' => $discount->time_remaining,
+                    'product_ids' => $discount->products->pluck('id'),
+                ];
+            })
+        ]);
+    }
 }

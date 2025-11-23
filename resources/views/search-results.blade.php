@@ -2,540 +2,379 @@
 
 @section('content')
 <style>
-  .search-results-container {
-    min-height: 80vh;
-    padding: 40px 0;
-    background: #f8f9fa;
-  }
-
-  .search-header {
-    background: white;
-    padding: 30px 0;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  }
-
-  .search-query-highlight {
-    color: #422D1C;
-    font-weight: 600;
-  }
-
-  .search-stats {
-    color: #6c757d;
-    font-size: 1rem;
-    margin-top: 10px;
-  }
-
-  .search-filters {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  }
-
-  .filter-section {
-    margin-bottom: 25px;
-  }
-
-  .filter-title {
-    color: #422D1C;
-    font-weight: 600;
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-  }
-
-  .filter-title i {
-    margin-right: 8px;
-    font-size: 1rem;
-  }
-
-  .filter-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .filter-option {
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
-    padding: 8px 15px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-    text-decoration: none;
-    color: #495057;
-  }
-
-  .filter-option:hover,
-  .filter-option.active {
-    background: #422D1C;
-    border-color: #422D1C;
-    color: white;
-  }
-
-  .price-range-inputs {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .price-input {
-    width: 120px;
-    padding: 8px 12px;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    font-size: 0.9rem;
-  }
-
-  .price-input:focus {
-    outline: none;
-    border-color: #422D1C;
-  }
-
-  .sort-dropdown {
-    background: white;
-    border: 2px solid #e9ecef;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    cursor: pointer;
-  }
-
-  .sort-dropdown:focus {
-    outline: none;
-    border-color: #422D1C;
-  }
-
-  .products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 25px;
-    margin-bottom: 40px;
-  }
-
-  .product-card {
-    background: white;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    transition: all 0.4s ease;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .product-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  }
-
-  .product-image {
-    width: 100%;
-    height: 280px;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-  }
-
-  .product-card:hover .product-image {
-    transform: scale(1.08);
-  }
-
-  .product-info {
-    padding: 20px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .product-category {
-    color: #8B4513;
-    font-size: 0.85rem;
-    font-weight: 500;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .product-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #422D1C;
-    margin-bottom: 12px;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    flex-grow: 1;
-  }
-
-  .product-price {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #8B4513;
-    margin-bottom: 15px;
-  }
-
-  .product-description {
-    font-size: 0.9rem;
-    color: #6c757d;
-    line-height: 1.5;
-    margin-bottom: 15px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .btn-view-product {
-    background: linear-gradient(135deg, #422D1C 0%, #8B4513 100%);
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-    margin-top: auto;
-  }
-
-  .btn-view-product:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(66, 45, 28, 0.3);
-    color: white;
-  }
-
-  .no-results {
-    text-align: center;
-    padding: 80px 20px;
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    margin: 40px 0;
-  }
-
-  .no-results-icon {
-    font-size: 5rem;
-    color: #dee2e6;
-    margin-bottom: 25px;
-  }
-
-  .no-results h3 {
-    color: #422D1C;
-    font-weight: 600;
-    font-size: 1.8rem;
-    margin-bottom: 15px;
-  }
-
-  .no-results p {
-    color: #6c757d;
-    font-size: 1.1rem;
-    margin-bottom: 30px;
-    line-height: 1.6;
-  }
-
-  .btn-back-shopping {
-    background: linear-gradient(135deg, #422D1C 0%, #8B4513 100%);
-    color: white;
-    border: none;
-    padding: 15px 35px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 1rem;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.3s ease;
-  }
-
-  .btn-back-shopping:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(66, 45, 28, 0.3);
-    color: white;
-  }
-
-  .pagination-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 50px;
-  }
-
-  .pagination {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  }
-
-  .page-link {
-    color: #422D1C;
-    border: none;
-    padding: 10px 15px;
-    margin: 0 2px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-  }
-
-  .page-link:hover,
-  .page-item.active .page-link {
-    background-color: #422D1C;
-    color: white;
-  }
-
-  .results-summary {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 25px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  }
-
-  .clear-filters-btn {
-    background: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.3s ease;
-  }
-
-  .clear-filters-btn:hover {
-    background: #c82333;
-    color: white;
-  }
-
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .products-grid {
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
+    body {
+        background-color: white !important;
+    }
+    
+    .content-wrapper {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
     }
 
-    .search-results-container {
-      padding: 20px 0;
+    .product-card-wrapper {
+        width: 100%;
+        max-width: none;
+        margin: 0 auto;
     }
 
-    .search-header {
-      padding: 20px 0;
+    .product-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
     }
 
-    .search-filters {
-      padding: 20px;
+    .product-card-link:hover {
+        text-decoration: none;
     }
 
-    .filter-options {
-      justify-content: center;
+    .minimalist-product-card {
+        border: none;
+        border-radius: 0;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: #ffffff;
+        position: relative;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     }
 
-    .price-range-inputs {
-      justify-content: center;
-      flex-wrap: wrap;
+    .minimalist-product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     }
 
-    .product-image {
-      height: 220px;
+    .product-image-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4 / 5;
+        overflow: hidden;
     }
 
-    .product-info {
-      padding: 15px;
+    .product-image-primary,
+    .product-image-secondary {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: opacity 0.4s ease;
     }
-  }
+
+    .product-image-secondary {
+        opacity: 0;
+    }
+
+    .minimalist-product-card:hover .product-image-primary {
+        opacity: 0;
+    }
+
+    .minimalist-product-card:hover .product-image-secondary {
+        opacity: 1;
+    }
+
+    .card-body-clean {
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .product-title {
+        font-size: 16px !important;
+        font-weight: 500;
+        color: black;
+        margin-bottom: 0.25rem;
+    }
+
+    .product-price {
+        font-size: 14px !important;
+        font-weight: 500;
+        color: #8B4513;
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title h2 {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        margin-top: 1.5rem;
+    }
+
+    /* Search Header Styles */
+    .search-header-section {
+        background: #ffffff;
+        padding: 60px 0 40px;
+        border-bottom: 1px solid #e5e5e5;
+        margin-bottom: 2rem;
+    }
+
+    .search-title {
+        font-size: 2.5rem;
+        font-weight: 400;
+        color: #2c2c2c;
+        text-align: center;
+        margin-bottom: 40px;
+        letter-spacing: 0.5px;
+    }
+
+    .search-box-container {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .search-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        background: #ffffff;
+        border: 2px solid #2c2c2c;
+        border-radius: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .search-input-wrapper:focus-within {
+        border-color: #422D1C;
+        box-shadow: 0 4px 12px rgba(66, 45, 28, 0.15);
+    }
+
+    .search-input {
+        width: 100%;
+        border: none;
+        padding: 18px 60px 18px 24px;
+        font-size: 1rem;
+        color: #2c2c2c;
+        background: transparent;
+        outline: none;
+    }
+
+    .search-input::placeholder {
+        color: #999;
+        font-weight: 300;
+    }
+
+    .search-icon-btn {
+        position: absolute;
+        right: 0;
+        background: transparent;
+        border: none;
+        padding: 18px 24px;
+        cursor: pointer;
+        color: #2c2c2c;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-icon-btn:hover {
+        color: #422D1C;
+    }
+
+    .close-search-btn {
+        position: absolute;
+        right: 60px;
+        background: transparent;
+        border: none;
+        padding: 18px 12px;
+        cursor: pointer;
+        color: #999;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+
+    .close-search-btn:hover {
+        color: #2c2c2c;
+    }
+
+    /* Results Info */
+    .results-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
+    }
+
+    .results-count {
+        font-size: 1.1rem;
+        color: #2c2c2c;
+        font-weight: 400;
+    }
+
+    /* Sorting Controls */
+    .sorting-controls {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .sort-select {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background-color: #fff;
+        font-size: 14px;
+        color: #2d3748;
+        cursor: pointer;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .sort-select:hover {
+        border-color: #422D1C;
+    }
+
+    .sort-select:focus {
+        border-color: #422D1C;
+        box-shadow: 0 0 0 2px rgba(66, 45, 28, 0.15);
+        outline: none;
+    }
+
+    /* No Results */
+    .no-results {
+        text-align: center;
+        padding: 100px 20px;
+    }
+
+    .no-results-icon {
+        font-size: 4rem;
+        color: #d0d0d0;
+        margin-bottom: 30px;
+    }
+
+    .no-results-title {
+        font-size: 1.8rem;
+        font-weight: 400;
+        color: #2c2c2c;
+        margin-bottom: 15px;
+    }
+
+    .no-results-text {
+        font-size: 1rem;
+        color: #666;
+        line-height: 1.6;
+        max-width: 600px;
+        margin: 0 auto 30px;
+    }
+
+    .btn-home {
+        display: inline-block;
+        background: #2c2c2c;
+        color: #ffffff;
+        padding: 14px 32px;
+        text-decoration: none;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        border: 1px solid #2c2c2c;
+    }
+
+    .btn-home:hover {
+        background: #422D1C;
+        border-color: #422D1C;
+        color: #ffffff;
+    }
 </style>
 
-<div class="search-results-container">
-  <div class="search-header">
-    <div class="container">
-      <div class="row">
-        <div class="col-12">
-          <h1>
-            <i class="bi bi-search me-3"></i>Hasil Pencarian
-            @if(!empty($query))
-              untuk "<span class="search-query-highlight">{{ $query }}</span>"
-            @endif
-          </h1>
-          <div class="search-stats">
-            Ditemukan <strong>{{ $products->total() }}</strong> produk
-            @if(!empty($query))
-              yang cocok dengan pencarian Anda
-            @endif
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="container">
-    @if($products->count() > 0)
-      <!-- Search Filters -->
-      <div class="search-filters">
-        <form method="GET" action="{{ route('search') }}" id="searchForm">
-          <input type="hidden" name="search" value="{{ $query }}">
-          
-          <div class="row">
-            <!-- Category Filter -->
-            @if(isset($categories) && $categories->count() > 0)
-            <div class="col-md-6 col-lg-4">
-              <div class="filter-section">
-                <div class="filter-title">
-                  <i class="bi bi-grid"></i>Kategori
-                </div>
-                <div class="filter-options">
-                  <a href="{{ request()->fullUrlWithQuery(['category' => '']) }}" 
-                     class="filter-option {{ empty($category) ? 'active' : '' }}">
-                    Semua
-                  </a>
-                  @foreach($categories->take(4) as $cat)
-                    <a href="{{ request()->fullUrlWithQuery(['category' => $cat->slug]) }}" 
-                       class="filter-option {{ $category == $cat->slug ? 'active' : '' }}">
-                      {{ $cat->name }}
-                    </a>
-                  @endforeach
-                </div>
-              </div>
-            </div>
-            @endif
-
-            <!-- Price Range Filter -->
-            <div class="col-md-6 col-lg-4">
-              <div class="filter-section">
-                <div class="filter-title">
-                  <i class="bi bi-currency-dollar"></i>Rentang Harga
-                </div>
-                <div class="price-range-inputs">
-                  <input type="number" name="min_price" value="{{ $minPrice ?? '' }}" 
-                         placeholder="Min" class="price-input">
-                  <span>-</span>
-                  <input type="number" name="max_price" value="{{ $maxPrice ?? '' }}" 
-                         placeholder="Max" class="price-input">
-                  <button type="submit" class="btn btn-sm" style="background: #422D1C; color: white;">
-                    <i class="bi bi-search"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Sort Options -->
-            <div class="col-md-6 col-lg-4">
-              <div class="filter-section">
-                <div class="filter-title">
-                  <i class="bi bi-sort-down"></i>Urutkan
-                </div>
-                <select name="sort_by" class="sort-dropdown" onchange="this.form.submit()">
-                  <option value="latest" {{ ($sortBy ?? '') == 'latest' ? 'selected' : '' }}>
-                    Terbaru
-                  </option>
-                  <option value="price_low" {{ ($sortBy ?? '') == 'price_low' ? 'selected' : '' }}>
-                    Harga Terendah
-                  </option>
-                  <option value="price_high" {{ ($sortBy ?? '') == 'price_high' ? 'selected' : '' }}>
-                    Harga Tertinggi
-                  </option>
-                  <option value="name" {{ ($sortBy ?? '') == 'name' ? 'selected' : '' }}>
-                    Nama A-Z
-                  </option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Clear Filters -->
-          @if(!empty($category) || !empty($minPrice) || !empty($maxPrice) || !empty($sortBy))
-            <div class="mt-3">
-              <a href="{{ route('search') }}?search={{ $query }}" class="clear-filters-btn">
-                <i class="bi bi-x-circle me-1"></i>Hapus Filter
-              </a>
-            </div>
-          @endif
-        </form>
-      </div>
-
-      <!-- Results Summary -->
-      <div class="results-summary">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            Menampilkan {{ $products->firstItem() }}-{{ $products->lastItem() }} 
-            dari {{ $products->total() }} produk
-          </div>
-          <div class="text-muted">
-            Halaman {{ $products->currentPage() }} dari {{ $products->lastPage() }}
-          </div>
-        </div>
-      </div>
-
-      <!-- Products Grid -->
-      <div class="products-grid">
-        @foreach($products as $product)
-          <div class="product-card">
-            @if($product->images && $product->images->count() > 0)
-              <img src="{{ asset($product->images->first()->image_path) }}" 
-                   alt="{{ $product->name }}" class="product-image">
-            @else
-              <img src="{{ asset('storage/product_images/default.jpg') }}" 
-                   alt="{{ $product->name }}" class="product-image">
-            @endif
+<div class="content-wrapper">
+    <!-- Search Header -->
+    <div class="search-header-section">
+        <div class="container">
+            <h1 class="search-title">Search Results</h1>
             
-            <div class="product-info">
-              @if($product->category)
-                <div class="product-category">{{ $product->category->name }}</div>
-              @endif
-              
-              <h5 class="product-title">{{ $product->name }}</h5>
-              
-              @if($product->description)
-                <p class="product-description">{{ $product->description }}</p>
-              @endif
-              
-              <div class="product-price">
-                Rp {{ number_format($product->price, 0, ',', '.') }}
-              </div>
-              
-              <a href="{{ route('products.show', $product->slug ?? $product->id) }}" 
-                 class="btn-view-product">
-                <i class="bi bi-eye me-2"></i>Lihat Detail
-              </a>
+            <div class="search-box-container">
+                <form method="GET" action="{{ route('search') }}">
+                    <div class="search-input-wrapper">
+                        <input 
+                            type="text" 
+                            name="q"
+                            class="search-input" 
+                            placeholder="Search for products..."
+                            value="{{ $searchTerm ?? '' }}"
+                            autocomplete="off">
+                        
+                        @if(!empty($searchTerm))
+                            <button type="button" class="close-search-btn" onclick="document.querySelector('.search-input').value=''; this.form.submit();">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        @endif
+                        
+                        <button type="submit" class="search-icon-btn">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
             </div>
-          </div>
-        @endforeach
-      </div>
-
-      <!-- Pagination -->
-      @if($products->hasPages())
-        <div class="pagination-container">
-          {{ $products->appends(request()->query())->links() }}
         </div>
-      @endif
+    </div>
 
-    @else
-      <!-- No Results -->
-      <div class="no-results">
-        <div class="no-results-icon">
-          <i class="bi bi-search"></i>
-        </div>
-        <h3>Tidak ada produk yang ditemukan</h3>
-        <p>
-          @if(!empty($query))
-            Maaf, kami tidak dapat menemukan produk yang sesuai dengan pencarian 
-            "<strong>{{ $query }}</strong>".
-          @else
-            Tidak ada produk yang tersedia saat ini.
-          @endif
-          <br>
-          Coba gunakan kata kunci yang berbeda atau jelajahi kategori produk kami.
-        </p>
-        <a href="{{ route('home') }}" class="btn-back-shopping">
-          <i class="bi bi-house me-2"></i>Kembali Berbelanja
-        </a>
-      </div>
-    @endif
-  </div>
+    <div class="container">
+        @if($products->count() > 0)
+            <!-- Results Info & Controls -->
+            <div class="results-info">
+                <div class="results-count">
+                    <strong>{{ $products->total() }}</strong> results found for "<strong>{{ $searchTerm }}</strong>"
+                </div>
+                
+                <!-- Sorting Controls -->
+                <div class="sorting-controls">
+                    <form method="GET" action="{{ route('search') }}">
+                        <input type="hidden" name="q" value="{{ $searchTerm }}">
+                        @if(!empty($category))
+                            <input type="hidden" name="category" value="{{ $category }}">
+                        @endif
+                        @if(!empty($minPrice))
+                            <input type="hidden" name="min_price" value="{{ $minPrice }}">
+                        @endif
+                        @if(!empty($maxPrice))
+                            <input type="hidden" name="max_price" value="{{ $maxPrice }}">
+                        @endif
+                        
+                        <select name="sort_by" class="sort-select" onchange="this.form.submit()">
+                            <option value="latest" {{ ($sortBy ?? '') == 'latest' ? 'selected' : '' }}>Terbaru</option>
+                            <option value="name" {{ ($sortBy ?? '') == 'name' ? 'selected' : '' }}>Nama A-Z</option>
+                            <option value="price_low" {{ ($sortBy ?? '') == 'price_low' ? 'selected' : '' }}>Harga Terendah</option>
+                            <option value="price_high" {{ ($sortBy ?? '') == 'price_high' ? 'selected' : '' }}>Harga Tertinggi</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="row g-3">
+                @foreach($products as $product)
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="product-card-wrapper">
+                            @include('partials.product-card', ['product' => $product])
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-4">
+                {{ $products->appends(request()->query())->links() }}
+            </div>
+
+        @else
+            <!-- No Results -->
+            <div class="no-results">
+                <div class="no-results-icon">
+                    <i class="bi bi-search"></i>
+                </div>
+                <h2 class="no-results-title">No products found</h2>
+                <p class="no-results-text">
+                    @if(!empty($searchTerm))
+                        We couldn't find any products matching "<strong>{{ $searchTerm }}</strong>".
+                        <br>Try different keywords or browse our categories.
+                    @else
+                        No products available at the moment.
+                    @endif
+                </p>
+                <a href="{{ route('home') ?? url('/') }}" class="btn-home">Continue Shopping</a>
+            </div>
+        @endif
+    </div>
 </div>
-
 @endsection

@@ -69,6 +69,10 @@
         color: #dc2626;
     }
 
+    .stat-change.neutral {
+        color: #64748b;
+    }
+
     /* Chart Container */
     .chart-container {
         background: #fff;
@@ -167,26 +171,7 @@
         transform: translateY(-1px);
     }
 
-    .btn-secondary {
-        background: #f8fafc;
-        color: #64748b;
-        border-color: #e2e8f0;
-        font-size: 0.8rem;
-    }
-
-    .btn-secondary:hover,
-    .btn-secondary:focus {
-        background: #e2e8f0;
-        color: var(--primary-color);
-        border-color: #e2e8f0;
-    }
-
-    /* Table Styling - No Border Radius */
-    .table-container {
-        background: #fff;
-        overflow: hidden;
-    }
-
+    /* Table Styling */
     .table {
         margin-bottom: 0;
         border-collapse: separate;
@@ -255,6 +240,11 @@
         color: #991b1b;
     }
 
+    .status-info {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
     .order-id {
         font-weight: 600;
         color: var(--primary-color);
@@ -265,10 +255,6 @@
         color: #1e293b;
     }
 
-    .product-name {
-        color: #64748b;
-    }
-
     .order-total {
         font-weight: 600;
         color: #1e293b;
@@ -277,6 +263,21 @@
     .order-time {
         font-size: 0.8rem;
         color: #64748b;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 
     @media (max-width: 768px) {
@@ -312,10 +313,10 @@
                     <i class="fas fa-money-bill-wave"></i>
                 </div>
             </div>
-            <div class="stat-value">Rp 24,8 Juta</div>
-            <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>+12.5% dari kemarin</span>
+            <div class="stat-value">Rp {{ number_format($totalSalesToday, 0, ',', '.') }}</div>
+            <div class="stat-change {{ $salesChange >= 0 ? 'positive' : 'negative' }}">
+                <i class="fas fa-arrow-{{ $salesChange >= 0 ? 'up' : 'down' }}"></i>
+                <span>{{ abs(round($salesChange, 1)) }}% dari kemarin</span>
             </div>
         </div>
     </div>
@@ -328,10 +329,10 @@
                     <i class="fas fa-shopping-cart"></i>
                 </div>
             </div>
-            <div class="stat-value">87</div>
-            <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>+8.3% dari kemarin</span>
+            <div class="stat-value">{{ $newOrdersToday }}</div>
+            <div class="stat-change {{ $ordersChange >= 0 ? 'positive' : 'negative' }}">
+                <i class="fas fa-arrow-{{ $ordersChange >= 0 ? 'up' : 'down' }}"></i>
+                <span>{{ abs(round($ordersChange, 1)) }}% dari kemarin</span>
             </div>
         </div>
     </div>
@@ -339,15 +340,15 @@
     <div class="col-xl-3 col-md-6">
         <div class="stat-card">
             <div class="stat-header">
-                <div class="stat-title">Pengguna Aktif</div>
+                <div class="stat-title">Pengguna Baru</div>
                 <div class="stat-icon">
                     <i class="fas fa-user-friends"></i>
                 </div>
             </div>
-            <div class="stat-value">1,234</div>
-            <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>+15.2% dari bulan lalu</span>
+            <div class="stat-value">{{ $newUsersToday }}</div>
+            <div class="stat-change {{ $usersChange >= 0 ? 'positive' : 'negative' }}">
+                <i class="fas fa-arrow-{{ $usersChange >= 0 ? 'up' : 'down' }}"></i>
+                <span>{{ abs(round($usersChange, 1)) }}% dari kemarin</span>
             </div>
         </div>
     </div>
@@ -360,10 +361,10 @@
                     <i class="fas fa-chart-bar"></i>
                 </div>
             </div>
-            <div class="stat-value">456</div>
-            <div class="stat-change negative">
-                <i class="fas fa-arrow-down"></i>
-                <span>-2.1% dari kemarin</span>
+            <div class="stat-value">{{ $productsSoldToday }}</div>
+            <div class="stat-change {{ $productsChange >= 0 ? 'positive' : 'negative' }}">
+                <i class="fas fa-arrow-{{ $productsChange >= 0 ? 'up' : 'down' }}"></i>
+                <span>{{ abs(round($productsChange, 1)) }}% dari kemarin</span>
             </div>
         </div>
     </div>
@@ -372,12 +373,11 @@
 <!-- Sales Chart -->
 <div class="chart-container mb-4 fade-in">
     <div class="chart-header">
-        <div class="chart-title">Grafik Penjualan</div>
+        <div class="chart-title">Grafik Penjualan 7 Hari Terakhir</div>
         <div class="chart-filters">
-            <button class="filter-btn active" data-period="7">7 Hari</button>
-            <button class="filter-btn" data-period="30">30 Hari</button>
-            <button class="filter-btn" data-period="90">3 Bulan</button>
-            <button class="filter-btn" data-period="365">1 Tahun</button>
+            <button class="filter-btn active" data-days="7">7 Hari</button>
+            <button class="filter-btn" data-days="30">30 Hari</button>
+            <button class="filter-btn" data-days="90">3 Bulan</button>
         </div>
     </div>
     <div class="chart-content">
@@ -385,6 +385,7 @@
     </div>
 </div>
 
+<!-- Recent Orders -->
 <div class="data-section fade-in">
     <div class="section-header">
         <div class="section-title">Pesanan Terbaru</div>
@@ -411,7 +412,12 @@
                     @forelse($recentOrders as $order)
                         <tr>
                             <td><span class="order-id">#{{ $order->order_number }}</span></td>
-                            <td><span class="customer-name">{{ $order->shipping_name }}</span></td>
+                            <td>
+                                <span class="customer-name">{{ $order->shipping_name }}</span>
+                                @if($order->user)
+                                    <br><small class="text-muted">{{ $order->user->email }}</small>
+                                @endif
+                            </td>
                             <td><span class="order-total">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</span></td>
                             <td>
                                 @php
@@ -429,9 +435,7 @@
                                     $orderStatusClass = 'status-danger';
                                     if($order->status == 'delivered') {
                                         $orderStatusClass = 'status-success';
-                                    } elseif($order->status == 'processing') {
-                                        $orderStatusClass = 'status-info';
-                                    } elseif($order->status == 'shipped') {
+                                    } elseif(in_array($order->status, ['processing', 'shipped'])) {
                                         $orderStatusClass = 'status-info';
                                     } elseif($order->status == 'pending') {
                                         $orderStatusClass = 'status-warning';
@@ -439,11 +443,14 @@
                                 @endphp
                                 <span class="status-badge {{ $orderStatusClass }}">{{ $order->status_label }}</span>
                             </td>
-                            <td><span class="order-time">{{ $order->created_at->diffForHumans() }}</span></td>
+                            <td><span class="order-time">{{ $order->order_date->diffForHumans() }}</span></td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center">Tidak ada pesanan terbaru.</td>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                Tidak ada pesanan terbaru.
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -457,35 +464,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 
 <script>
-    const salesData = {
-        '7': {
-            labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
-            data: [12.5, 19.2, 15.8, 25.1, 22.4, 18.7, 24.8]
-        },
-        '30': {
-            labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
-            data: [85.4, 92.1, 78.6, 96.3]
-        },
-        '90': {
-            labels: ['Jan', 'Feb', 'Mar'],
-            data: [320.5, 285.7, 412.8]
-        },
-        '365': {
-            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-            data: [1250.4, 1380.2, 1150.8, 1420.6]
-        }
-    };
-
+    // Inisialisasi chart dengan data dari controller
     const ctx = document.getElementById('salesChart').getContext('2d');
     let salesChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: salesData['7'].labels,
+            labels: @json($chartData['labels']),
             datasets: [{
                 label: 'Penjualan (Juta Rupiah)',
-                data: salesData['7'].data,
+                data: @json($chartData['sales']),
                 borderColor: 'var(--primary-color)',
-                backgroundColor: 'rgba(67, 56, 202, 0.1)',
+                backgroundColor: 'rgba(66, 45, 28, 0.1)',
                 borderWidth: 3,
                 fill: true,
                 tension: 0.4,
@@ -513,7 +502,7 @@
                     displayColors: false,
                     callbacks: {
                         label: function(context) {
-                            return 'Rp ' + context.parsed.y + ' Juta';
+                            return 'Rp ' + context.parsed.y.toFixed(1) + ' Juta';
                         }
                     }
                 }
@@ -531,7 +520,7 @@
                             size: 12
                         },
                         callback: function(value) {
-                            return 'Rp ' + value + 'Jt';
+                            return 'Rp ' + value.toFixed(0) + 'Jt';
                         }
                     }
                 },
@@ -555,22 +544,47 @@
         }
     });
 
+    // Filter chart data
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             
-            const period = this.getAttribute('data-period');
-            const data = salesData[period];
+            const days = this.getAttribute('data-days');
             
-            salesChart.data.labels = data.labels;
-            salesChart.data.datasets[0].data = data.data;
-            salesChart.update('active');
+            // Show loading
+            this.innerHTML = '<span class="loading-spinner"></span> Loading...';
             
-            console.log('Filter selected:', this.textContent);
+            // Fetch new data
+            fetch(`{{ route('admin.chart.data') }}?days=${days}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update chart
+                    salesChart.data.labels = data.labels;
+                    salesChart.data.datasets[0].data = data.sales;
+                    salesChart.update('active');
+                    
+                    // Reset button text
+                    this.textContent = this.getAttribute('data-days') + ' Hari';
+                    if (days === '7') this.textContent = '7 Hari';
+                    if (days === '30') this.textContent = '30 Hari';
+                    if (days === '90') this.textContent = '3 Bulan';
+                })
+                .catch(error => {
+                    console.error('Error fetching chart data:', error);
+                    this.textContent = this.getAttribute('data-days') + ' Hari';
+                });
         });
     });
 
+    // Auto refresh stats every 30 seconds
+    setInterval(function() {
+        // You can implement auto-refresh here if needed
+        // For now, we'll just log to console
+        console.log('Dashboard stats would refresh now...');
+    }, 30000);
+
+    // Hover effects
     document.querySelectorAll('.stat-card').forEach(card => {
         card.addEventListener('mouseenter', function() {
             this.style.transform = 'translateY(-4px)';
@@ -580,25 +594,5 @@
             this.style.transform = 'translateY(-2px)';
         });
     });
-
-    document.querySelectorAll('.table tbody tr').forEach(row => {
-        row.addEventListener('click', function() {
-            document.querySelectorAll('.table tbody tr').forEach(r => r.classList.remove('table-active'));
-            this.classList.add('table-active');
-        });
-    });
-
-    setInterval(function() {
-        console.log('Auto-refreshing dashboard data...');
-        
-        const totalSales = document.querySelector('.stat-value');
-        if (totalSales && totalSales.textContent.includes('24,8')) {
-            totalSales.style.transition = 'all 0.3s ease';
-            totalSales.style.transform = 'scale(1.1)';
-            setTimeout(() => {
-                totalSales.style.transform = 'scale(1)';
-            }, 300);
-        }
-    }, 30000);
 </script>
 @endpush
