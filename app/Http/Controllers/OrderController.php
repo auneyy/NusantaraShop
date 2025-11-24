@@ -14,20 +14,27 @@ class OrderController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('verified')->except(['index', 'show']);
     }
 
     /**
      * Display a listing of user's orders.
      */
     public function index()
-    {
-        $orders = Order::where('user_id', Auth::id())
-                      ->with(['orderItems.product.images'])
-                      ->orderBy('created_at', 'desc')
-                      ->paginate(10);
+{
+    $orders = Order::where('user_id', Auth::id())
+                  ->with([
+                      'orderItems.product.images',
+                      'reviews' => function($query) {
+                          $query->where('user_id', Auth::id());
+                      }
+                  ])
+                  ->orderBy('created_at', 'desc')
+                  ->paginate(10);
 
-        return view('orders.index', compact('orders'));
-    }
+    return view('orders.index', compact('orders'));
+}
+    
 
     /**
      * Display the specified order.
@@ -457,5 +464,182 @@ private function updateOrderStatusFromMidtrans($order, $status)
         'old_status' => $order->getOriginal('payment_status'),
         'new_status' => $updateData['payment_status']
     ]);
+}
+
+
+/**
+ * Mark order as delivered by customer
+ * Mark order as delivered by customer
+ * 
+ * @param \Illuminate\Http\Request $request
+ * @param string|\App\Models\Order $order Order number or Order model (route model binding)
+ * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+ */
+public function markAsDelivered(Request $request, $order)
+{
+    try {
+        DB::beginTransaction();
+
+        // Handle both Order model (from route model binding) and order number
+        if (!$order instanceof \App\Models\Order) {
+            $order = Order::where('order_number', $order)
+                         ->where('user_id', Auth::id())
+                         ->first();
+        }
+
+        if (!$order) {
+            $message = 'Pesanan tidak ditemukan atau Anda tidak memiliki akses.';
+            
+            if ($request->ajax() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 404);
+            }
+            
+            return redirect()->route('orders.index')->with('error', $message);
+        }
+        
+        // Check if the order belongs to the authenticated user
+        if ($order->user_id !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki izin untuk mengubah status pesanan ini.'
+            ], 403);
+        }
+        
+        // Only allow if order is in 'dikirim' status
+        if ($order->status !== 'dikirim') {
+            $message = 'Pesanan belum dalam status dikirim. Status saat ini: ' . ucfirst($order->status);
+            
+            if ($request->ajax() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 400);
+            }
+            
+            return redirect()->route('orders.show', $order->order_number)->with('error', $message);
+        }
+
+        // Update order status to diterima
+        $order->update([
+            'status' => 'diterima',
+            'delivered_at' => now()
+        ]);
+
+        DB::commit();
+
+        Log::info('Order marked as delivered by customer', [
+            'order_number' => $order->order_number,
+            'user_id' => Auth::id(),
+            'delivered_at' => now()
+        ]);
+
+        $message = 'Pesanan berhasil ditandai sebagai diterima. Anda dapat memberikan review sekarang!';
+
+        if ($request->ajax() || $request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'order' => [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'status' => $order->status,
+                    'delivered_at' => $order->delivered_at ? $order->delivered_at->format('d M Y, H:i') : null
+                ]
+            ]);
+        }
+
+        return redirect()->route('orders.show', $order->order_number)->with('success', $message);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        
+        Log::error('Error marking order as delivered', [
+            'order_number' => $order->order_number ?? 'unknown',
+            'user_id' => Auth::id(),
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+
+        $message = 'Terjadi kesalahan. Silakan coba lagi.';
+
+        if ($request->ajax() || $request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => $message
+            ], 500);
+        }
+
+        return redirect()->route('orders.index')->with('error', $message);
+    }
+}
+
+/**
+ * Get order items for review
+ */
+/**
+ * Get order items for review
+ */
+public function getOrderItems($orderId)
+{
+    try {
+        $order = Order::where('id', $orderId)
+                     ->where('user_id', Auth::id())
+                     ->with(['orderItems.product.images', 'reviews'])
+                     ->firstOrFail();
+
+        // Only allow if order is delivered
+        if ($order->status !== 'delivered') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan belum dapat di-review. Status: ' . ucfirst($order->status)
+            ], 400);
+        }
+
+        // Get items with review status
+        $items = $order->orderItems->map(function($item) use ($order) {
+            $hasReview = $order->reviews()
+                              ->where('product_id', $item->product_id)
+                              ->exists();
+            
+            return [
+                'id' => $item->id,
+                'product_id' => $item->product_id,
+                'product_name' => $item->product_name,
+                'size' => $item->size,
+                'quantity' => $item->quantity,
+                'price' => $item->product_price,
+                'image' => $item->product->images->first()->image_path ?? null,
+                'has_review' => $hasReview
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'order_id' => $order->id,
+            'order_number' => $order->order_number,
+            'items' => $items
+        ]);
+
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Pesanan tidak ditemukan.'
+        ], 404);
+
+    } catch (\Exception $e) {
+        Log::error('Error fetching order items', [
+            'order_id' => $orderId,
+            'user_id' => Auth::id(),
+            'error' => $e->getMessage()
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal memuat item pesanan.'
+        ], 500);
+    }
 }
 }

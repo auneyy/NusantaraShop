@@ -244,41 +244,86 @@
         flex-wrap: wrap;
     }
 
-    .btn-pay {
+    .btn-pay, .btn-received, .btn-confirm-delivery, .btn-add-review {
         padding: 0.5rem 1rem;
-        background: #4f46e5;
         color: white;
         border: none;
         border-radius: 6px;
-        font-weight: 600;
         font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 0.875rem;
         cursor: pointer;
         transition: all 0.2s ease;
-        text-decoration: none;
-        display: inline-block;
     }
-
-    .btn-pay:hover {
-        background: #d68910;
-        color: white;
-        text-decoration: none;
+    
+    .btn-pay {
+        background: #4f46e5;
     }
-
-    .btn-cancel {
-        padding: 0.5rem 1rem;
-        background: transparent;
-        color: #dc3545;
-        border: 1px solid #dc3545;
+    
+    .btn-received {
+        background: #10b981;
+    }
+    
+    .btn-received:hover {
+        background: #0d9f6e;
+    }
+    
+    .btn-received:disabled {
+        background: #d1fae5;
+        cursor: not-allowed;
+    }
+    
+    /* Review Form Styles */
+    .review-form {
+        margin-top: 1.5rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    
+    .review-form h5 {
+        margin-bottom: 1rem;
+        color: #212529;
+        font-weight: 600;
+    }
+    
+    .rating-stars {
+        margin-bottom: 1rem;
+    }
+    
+    .rating-stars i {
+        font-size: 1.5rem;
+        color: #ffc107;
+        cursor: pointer;
+        margin-right: 0.25rem;
+    }
+    
+    .review-textarea {
+        width: 100%;
+        min-height: 100px;
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
         border-radius: 6px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
+        margin-bottom: 1rem;
+        resize: vertical;
     }
-
-    .btn-cancel:hover {
-        background: #dc3545;
-        color: white;
+    
+    .review-images-preview {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .review-image-preview {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
     }
 
     /* Top Actions */
@@ -643,6 +688,83 @@
             text-align: center;
         }
     }
+
+
+    .btn-confirm-delivery {
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.btn-confirm-delivery:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-confirm-delivery:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Status Badge Delivered */
+.status-delivered {
+    background: #d4edda;
+    color: #155724;
+}
+
+/* Button untuk Review */
+.btn-add-review {
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-add-review:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* Spinner untuk loading */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 </style>
 
 <div class="orders-container">
@@ -679,6 +801,7 @@
                     <tr>
                         <th>Item</th>
                         <th>Status</th>
+                        <th>Aksi</th>
                         <th>Total</th>
                         <th>Details</th>
                     </tr>
@@ -732,30 +855,67 @@
                         <td class="total-cell">
                             Rp {{ number_format($order->grand_total, 0, ',', '.') }}
                         </td>
-                        <td class="details-cell">
-                            <div class="action-buttons">
-                                <a href="{{ route('orders.show', $order->order_number) }}" class="btn-details">
-                                    Order Details
-                                </a>
-                                
-                                @if($order->payment_method === 'midtrans' && ($order->payment_status === 'pending' || !isset($order->payment_status)) && $order->status !== 'cancelled')
-                                    <a href="{{ route('orders.show', $order->order_number) }}" class="btn-pay">
-                                        Bayar
-                                    </a>
-                                @endif
-                                
-                                @if(($order->payment_status === 'pending' || !isset($order->payment_status)) && $order->status !== 'cancelled')
-                                    <form action="{{ route('orders.cancel', $order->order_number) }}" method="POST" style="display: inline;" 
-                                          class="cancel-form" data-order-number="{{ $order->order_number }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn-cancel">
-                                            Batalkan
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-                        </td>
+                        {{-- Update bagian Action Buttons di dalam tbody --}}
+<td class="details-cell">
+    <div class="action-buttons">
+        <a href="{{ route('orders.show', $order->order_number) }}" class="btn-details">
+            Order Details
+        </a>
+        
+        {{-- Tombol Bayar untuk Midtrans --}}
+        @if($order->payment_method === 'midtrans' && ($order->payment_status === 'pending' || !isset($order->payment_status)) && $order->status !== 'cancelled')
+            <a href="{{ route('orders.show', $order->order_number) }}" class="btn-pay">
+                Bayar
+            </a>
+        @endif
+        
+        {{-- Tombol Konfirmasi Penerimaan - BAGIAN BARU --}}
+        @if(in_array($order->status, ['dikirim', 'shipped']))
+            <button onclick="confirmDelivery('{{ $order->order_number }}')" 
+                    class="btn-confirm-delivery"
+                    id="confirm-btn-{{ $order->order_number }}">
+                Konfirmasi Diterima
+            </button>
+        {{-- Status Diterima dengan tombol Review --}}
+        @elseif(in_array($order->status, ['diterima', 'delivered']))
+            <div class="d-flex flex-column gap-2">
+                <span class="status-badge status-delivered">✓ Pesanan Diterima</span>
+                {{-- Check if any item can be reviewed --}}
+                @php
+                    $hasUnreviewedItems = false;
+                    foreach($order->orderItems as $item) {
+                        if(!$order->hasReviewForProduct($item->product_id)) {
+                            $hasUnreviewedItems = true;
+                            break;
+                        }
+                    }
+                @endphp
+                
+                @if($hasUnreviewedItems)
+                    <button onclick="showReviewModal('{{ $order->id }}')" 
+                            class="btn-add-review">
+                        📝 Beri Ulasan
+                    </button>
+                @else
+                    <small class="text-muted">Semua produk sudah direview</small>
+                @endif
+            </div>
+        {{-- Tombol Batalkan untuk pending --}}
+        @elseif(($order->payment_status === 'pending' || !isset($order->payment_status)) && $order->status !== 'cancelled')
+            <form action="{{ route('orders.cancel', $order->order_number) }}" 
+                  method="POST" 
+                  style="display: inline;" 
+                  class="cancel-form" 
+                  data-order-number="{{ $order->order_number }}">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn-cancel">
+                    Batalkan
+                </button>
+            </form>
+        @endif
+    </div>
+</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -855,94 +1015,278 @@
     </div>
 </div>
 
+<!-- Review Modal -->
+<div id="reviewModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 600px;">
+        <span class="close-modal">&times;</span>
+        <h4 class="modal-title">Beri Ulasan</h4>
+        <div class="modal-body">
+            <form id="reviewForm" class="review-form" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="order_id" id="reviewOrderId">
+                <input type="hidden" name="product_id" id="reviewProductId">
+                
+                <div class="mb-3">
+                    <label class="form-label">Rating</label>
+                    <div class="rating-stars">
+                        @for($i = 1; $i <= 5; $i++)
+                            <i class="fas fa-star" data-rating="{{ $i }}"></i>
+                        @endfor
+                        <input type="hidden" name="rating" id="ratingInput" value="5" required>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="comment" class="form-label">Ulasan Anda</label>
+                    <textarea name="comment" id="comment" class="review-textarea" placeholder="Bagaimana pengalaman Anda dengan produk ini?" required></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="reviewImages" class="form-label">Unggah Foto (Maks. 3)</label>
+                    <input type="file" name="images[]" id="reviewImages" class="form-control" multiple accept="image/*">
+                    <small class="text-muted">Format: JPG, PNG, maksimal 2MB per gambar</small>
+                    
+                    <div class="review-images-preview mt-2" id="imagePreview"></div>
+                </div>
+                
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary" id="cancelReview">Batal</button>
+                    <button type="submit" class="btn btn-primary">Kirim Ulasan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
 let currentCancelForm = null;
-let currentFilter = 'all';
+let currentRating = 5;
 
-document.addEventListener('DOMContentLoaded', function() {
-    initializeFilterTabs();
-    initializeCancelForms();
-
-    // Auto-refresh for pending orders
-    const pendingRows = document.querySelectorAll('[data-status="pending"]');
-    if (pendingRows.length > 0) {
-        setInterval(() => {
-            pendingRows.forEach(row => {
-                const orderNumber = row.querySelector('.order-number').textContent.trim();
-                checkOrderPaymentStatus(orderNumber);
+// Initialize rating stars
+function initRatingStars() {
+    const stars = document.querySelectorAll('.rating-stars i');
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            currentRating = rating;
+            document.getElementById('ratingInput').value = rating;
+            
+            // Update stars display
+            stars.forEach((s, index) => {
+                if (index < rating) {
+                    s.classList.add('fas');
+                    s.classList.remove('far');
+                } else {
+                    s.classList.add('far');
+                    s.classList.remove('fas');
+                }
             });
-        }, 30000);
-    }
-
-    // Close modal handlers
-    document.getElementById('cancelModal').addEventListener('click', function(e) {
-        if (e.target === this) hideCancelModal();
+        });
     });
+}
 
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') hideCancelModal();
+// Handle image preview
+function handleImagePreview(input) {
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = '';
+    
+    if (input.files.length > 3) {
+        alert('Maksimal 3 gambar yang dapat diunggah');
+        input.value = '';
+        return;
+    }
+    
+    Array.from(input.files).forEach(file => {
+        if (!file.type.match('image.*')) {
+            alert('Hanya file gambar yang diizinkan');
+            input.value = '';
+            return;
+        }
+        
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Ukuran file maksimal 2MB');
+            input.value = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'review-image-preview';
+            preview.appendChild(img);
+        }
+        reader.readAsDataURL(file);
+    });
+}
+
+// Show review modal
+function showReviewModal(orderId, productId) {
+    document.getElementById('reviewOrderId').value = orderId;
+    document.getElementById('reviewProductId').value = productId;
+    document.getElementById('reviewModal').style.display = 'flex';
+}
+
+// Close review modal
+function closeReviewModal() {
+    document.getElementById('reviewModal').style.display = 'none';
+    document.getElementById('reviewForm').reset();
+    document.getElementById('imagePreview').innerHTML = '';
+    currentRating = 5;
+    
+    // Reset stars
+    const stars = document.querySelectorAll('.rating-stars i');
+    stars.forEach((star, index) => {
+        star.className = index < 5 ? 'fas fa-star' : 'far fa-star';
+    });
+}
+
+// Mark order as delivered
+function markAsDelivered(button, orderId) {
+    if (!confirm('Apakah Anda yakin pesanan sudah diterima?')) {
+        return;
+    }
+    
+    const buttonText = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...';
+    
+    fetch(`/orders/${orderId}/mark-delivered`, {
+        method: 'POST',
+        headers: {
+            'X-CSRT-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update UI
+            const statusElement = document.querySelector(`#order-${orderId}-status`);
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <span class="status-badge status-delivered">Diterima</span>
+                    <small class="text-muted d-block">${data.delivered_at}</small>
+                `;
+            }
+            
+            // Hide the received button
+            button.style.display = 'none';
+            
+            // Show success message
+            alert('Pesanan berhasil ditandai sebagai Diterima');
+            
+            // Show review button or form
+            const reviewButton = document.createElement('button');
+            reviewButton.className = 'btn btn-primary btn-sm';
+            reviewButton.innerHTML = 'Beri Ulasan';
+            reviewButton.onclick = () => showReviewModal(orderId, button.dataset.productId);
+            
+            const actionsCell = button.closest('td');
+            if (actionsCell) {
+                actionsCell.innerHTML = '';
+                actionsCell.appendChild(reviewButton);
+            }
+        } else {
+            alert(data.message || 'Gagal memperbarui status pesanan');
+            button.disabled = false;
+            button.innerHTML = buttonText;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan. Silakan coba lagi.');
+        button.disabled = false;
+        button.innerHTML = buttonText;
+    });
+}
+
+// Handle review form submission
+// Handle review form submission
+// Handle review form submission
+document.getElementById('reviewForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitButton = this.querySelector('button[type="submit"]');
+    const buttonText = submitButton.innerHTML;
+    
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Mengirim...';
+    
+    // ✅ GANTI ROUTE INI
+    fetch('{{ route("reviews.store") }}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Ulasan berhasil dikirim. Terima kasih!', 'success');
+            closeReviewModal();
+            
+            // Reload after 2 seconds
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            throw new Error(data.message || 'Gagal mengirim ulasan');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast(error.message || 'Terjadi kesalahan. Silakan coba lagi.', 'error');
+        submitButton.disabled = false;
+        submitButton.innerHTML = buttonText;
     });
 });
 
-function initializeFilterTabs() {
-    const tabs = document.querySelectorAll('.tab-button');
+// Initialize when document is ready
+document.addEventListener('DOMContentLoaded', function() {
+    initRatingStars();
     
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            const filter = this.getAttribute('data-filter');
-            
-            tabs.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            
-            filterOrders(filter);
-            currentFilter = filter;
+    // Close modals when clicking outside
+    const modals = document.querySelectorAll('.modal-overlay');
+    modals.forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                if (this.id === 'cancelModal') {
+                    closeCancelModal();
+                } else if (this.id === 'reviewModal') {
+                    closeReviewModal();
+                }
+            }
         });
     });
-}
-
-function filterOrders(filter) {
-    const rows = document.querySelectorAll('.order-row');
-    const noResults = document.getElementById('noResultsMessage');
-    const tbody = document.getElementById('ordersTableBody');
-    let visibleCount = 0;
     
-    rows.forEach(row => {
-        const status = row.getAttribute('data-status');
-        const shouldShow = filter === 'all' || status === filter;
-        
-        row.style.display = shouldShow ? '' : 'none';
-        if (shouldShow) visibleCount++;
-    });
+    // Close buttons
+    document.querySelector('.close-modal')?.addEventListener('click', closeReviewModal);
+    document.getElementById('cancelReview')?.addEventListener('click', closeReviewModal);
     
-    if (visibleCount === 0) {
-        tbody.style.display = 'none';
-        noResults.style.display = 'block';
-    } else {
-        tbody.style.display = '';
-        noResults.style.display = 'none';
+    // Image preview
+    const imageInput = document.getElementById('reviewImages');
+    if (imageInput) {
+        imageInput.addEventListener('change', function() {
+            handleImagePreview(this);
+        });
     }
-}
-
-function initializeCancelForms() {
-    const forms = document.querySelectorAll('.cancel-form');
-    forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            showCancelModal(this);
-        });
-    });
-}
+});
 
 function showCancelModal(form) {
     currentCancelForm = form;
-    document.getElementById('cancelModal').classList.add('show');
+    document.getElementById('cancelModal').style.display = 'flex';
 }
 
-function hideCancelModal() {
-    document.getElementById('cancelModal').classList.remove('show');
+function closeCancelModal() {
+    document.getElementById('cancelModal').style.display = 'none';
     currentCancelForm = null;
 }
 
@@ -1044,6 +1388,36 @@ function checkEmptyState() {
     }
 }
 
+function confirmDelivery(orderId, orderNumber) {
+    if (confirm('Apakah Anda yakin pesanan sudah diterima?')) {
+        fetch(`/orders/${orderId}/mark-delivered`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ _token: '{{ csrf_token() }}' })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                // Reload the page after a short delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                showToast(data.message || 'Terjadi kesalahan', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Terjadi kesalahan saat memproses permintaan', 'error');
+        });
+    }
+}
+
 function showToast(message, type = 'success') {
     const container = document.getElementById('toastContainer');
     
@@ -1103,6 +1477,108 @@ function checkOrderPaymentStatus(orderNumber) {
         .catch(error => {
             console.log('Error checking payment status:', error);
         });
+}
+
+function confirmDelivery(orderNumber) {
+    if (!confirm('Apakah Anda yakin pesanan sudah diterima dengan baik?')) {
+        return;
+    }
+    
+    const button = document.getElementById('confirm-btn-' + orderNumber);
+    if (!button) return;
+    
+    const originalText = button.innerHTML;
+    button.disabled = true;
+    button.classList.add('btn-loading');
+    button.innerHTML = 'Memproses...';
+    
+    fetch(`/orders/${orderNumber}/mark-delivered`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showToast('success', 'Berhasil!', data.message);
+            
+            // Update UI: Reload page setelah 1.5 detik
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            throw new Error(data.message || 'Gagal memproses konfirmasi');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('error', 'Gagal!', error.message || 'Terjadi kesalahan saat memproses konfirmasi');
+        
+        // Restore button
+        button.disabled = false;
+        button.classList.remove('btn-loading');
+        button.innerHTML = originalText;
+    });
+}
+
+/**
+ * Show review modal for order
+ */
+function showReviewModal(orderId) {
+    document.getElementById('reviewOrderId').value = orderId;
+    
+    // Fetch order items
+    fetch(`/orders/${orderId}/items`, {
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.items.length > 0) {
+            // Get first unreviewable item
+            const item = data.items.find(i => !i.has_review);
+            if (item) {
+                document.getElementById('reviewProductId').value = item.product_id;
+                document.getElementById('reviewModal').style.display = 'flex';
+            } else {
+                showToast('info', 'Info', 'Semua produk sudah direview');
+            }
+        } else {
+            showToast('error', 'Error', 'Tidak ada produk yang dapat direview');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('error', 'Error', 'Gagal memuat data produk');
+    });
+}
+
+/**
+ * Close review modal
+ */
+function closeReviewModal() {
+    document.getElementById('reviewModal').style.display = 'none';
+    document.getElementById('reviewForm').reset();
+    document.getElementById('imagePreview').innerHTML = '';
+    currentRating = 5;
+    
+    // Reset stars
+    const stars = document.querySelectorAll('.rating-stars i');
+    stars.forEach((star, index) => {
+        star.className = index < 5 ? 'fas fa-star' : 'far fa-star';
+    });
 }
 </script>
 

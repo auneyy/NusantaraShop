@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Order extends Model
 {
@@ -36,15 +37,18 @@ class Order extends Model
         'order_date',
         'shipped_date',
         'delivered_date',
+        'delivered_at', // Tambahkan ini
     ];
-
+    
+    // Dan di casts
     protected $casts = [
         'order_date' => 'datetime',
         'shipped_date' => 'datetime',
         'delivered_date' => 'datetime',
+        'delivered_at' => 'datetime', // Tambahkan ini
         'payment_completed_at' => 'datetime',
         'tracking_history' => 'array',
-         'estimated_delivery' => 'datetime',
+        'estimated_delivery' => 'datetime',
     ];
 
     // Relationships
@@ -60,17 +64,19 @@ class Order extends Model
 
     // Accessors
     public function getStatusLabelAttribute()
-    {
-        $labels = [
-            'pending' => 'Menunggu Pembayaran',
-            'processing' => 'Diproses',
-            'shipped' => 'Dikirim',
-            'delivered' => 'Diterima',
-            'cancelled' => 'Dibatalkan',
-        ];
+{
+    $labels = [
+        'pending' => 'Menunggu Pembayaran',
+        'processing' => 'Diproses',
+        'shipped' => 'Dikirim',
+        'dikirim' => 'Dikirim',  // Tambahkan ini
+        'delivered' => 'Diterima',
+        'diterima' => 'Diterima', // Tambahkan ini
+        'cancelled' => 'Dibatalkan',
+    ];
 
-        return $labels[$this->status] ?? 'Unknown';
-    }
+    return $labels[$this->status] ?? 'Unknown';
+}
 
    public function getPaymentStatusLabelAttribute()
 {
@@ -326,5 +332,76 @@ private function getEstimatedDays($zone)
     ];
     
     return $estimations[$zone] ?? 5;
+}
+
+/**
+ * Relationship: Order has many reviews
+ */
+public function reviews()
+{
+    return $this->hasMany(Review::class);
+}
+
+/**
+ * Check if order can be reviewed (status delivered)
+ */
+public function canBeReviewed()
+{
+    return $this->status === 'delivered';
+}
+
+/**
+ * Check if user already reviewed specific product in this order
+ */
+public function hasReviewForProduct($productId)
+{
+    return $this->reviews()->where('product_id', $productId)->exists();
+}
+
+/**
+ * Get all reviewed products in this order
+ */
+public function reviewedProducts()
+{
+    return $this->reviews()->pluck('product_id')->toArray();
+}
+
+/**
+ * Get all unreviewable products in this order
+ */
+public function unreviewedProducts()
+{
+    $reviewedProductIds = $this->reviewedProducts();
+    
+    return $this->orderItems()
+               ->whereNotIn('product_id', $reviewedProductIds)
+               ->get();
+}
+
+/**
+ * Check if all products in order have been reviewed
+ */
+public function allProductsReviewed()
+{
+    $totalProducts = $this->orderItems()->distinct('product_id')->count();
+    $reviewedProducts = $this->reviews()->count();
+    
+    return $totalProducts === $reviewedProducts;
+}
+
+/**
+ * Get review completion percentage
+ */
+public function reviewCompletionPercentage()
+{
+    $totalProducts = $this->orderItems()->distinct('product_id')->count();
+    
+    if ($totalProducts === 0) {
+        return 0;
+    }
+    
+    $reviewedProducts = $this->reviews()->count();
+    
+    return round(($reviewedProducts / $totalProducts) * 100);
 }
 }

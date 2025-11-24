@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Discount;
+use App\Models\Review;
 
 class ProductController extends Controller
 {
@@ -32,7 +33,7 @@ class ProductController extends Controller
             });
         }
 
-        // Sort options - BERUBAH: sorting berdasarkan harga setelah diskon
+        // Sort options - sorting berdasarkan harga setelah diskon
         if (request()->has('sort')) {
             switch (request('sort')) {
                 case 'price_asc':
@@ -111,8 +112,36 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        // Load relationships dengan discounts
+        // Load relationships including reviews with pagination
         $product->load(['images', 'category', 'sizes', 'discounts']);
+        
+        // ✅ Load reviews with pagination (10 per page)
+        $reviews = Review::where('product_id', $product->id)
+            ->with('user:id,name')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+        
+        // ✅ Calculate review statistics
+        $totalReviews = $product->total_reviews ?? 0;
+        $averageRating = $product->rating_rata ?? 0;
+        
+        // ✅ Get rating distribution (1-5 stars)
+        $ratingDistribution = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $ratingDistribution[$i] = Review::where('product_id', $product->id)
+                ->where('rating', $i)
+                ->count();
+        }
+        
+        // ✅ Calculate rating percentages
+        $ratingPercentages = [];
+        if ($totalReviews > 0) {
+            foreach ($ratingDistribution as $rating => $count) {
+                $ratingPercentages[$rating] = round(($count / $totalReviews) * 100, 1);
+            }
+        } else {
+            $ratingPercentages = array_fill(1, 5, 0);
+        }
         
         // Produk rekomendasi - load discounts juga
         $recommendedProducts = Product::where('is_featured', 1)
@@ -124,7 +153,12 @@ class ProductController extends Controller
 
         return view('products.show', compact(
             'product', 
-            'recommendedProducts'
+            'recommendedProducts',
+            'reviews',
+            'totalReviews',
+            'averageRating',
+            'ratingDistribution',
+            'ratingPercentages'
         ));
     }
 

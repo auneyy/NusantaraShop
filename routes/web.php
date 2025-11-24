@@ -57,6 +57,8 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
     // Products Resource (menggunakan controller publik yang benar)
     Route::get('/products', [PublicProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product:slug}', [PublicProductController::class, 'show'])->name('products.show');
+    
+    // Reviews API
 
     // API Routes untuk AJAX (jika ada)
     Route::prefix('api')->group(function () {
@@ -98,6 +100,36 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
 
     Route::middleware('auth')->group(function () {
 
+        Route::prefix('orders')->name('orders.')->group(function () {
+            Route::get('/', [OrderController::class, 'index'])->name('index');
+            Route::get('/{orderNumber}', [OrderController::class, 'show'])->name('show');
+            Route::match(['POST', 'DELETE'], '/{orderNumber}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+            Route::patch('/{order}/cancel', [ProfileController::class, 'cancelOrder'])->name('cancel.profile');
+            Route::get('/{orderNumber}/check-payment-status', [OrderController::class, 'checkPaymentStatus'])->name('check-payment-status');
+            
+            // ✅ TAMBAHKAN INI
+            Route::get('/{orderId}/items', [OrderController::class, 'getOrderItems'])->name('items');
+        });
+
+        Route::prefix('reviews')->name('reviews.')->group(function () {
+            Route::post('/store', [App\Http\Controllers\ReviewController::class, 'store'])->name('store');
+            Route::get('/user', [App\Http\Controllers\ReviewController::class, 'getUserReviews'])->name('user');
+            Route::put('/{id}', [App\Http\Controllers\ReviewController::class, 'update'])->name('update');
+            Route::delete('/{id}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('destroy');
+            Route::post('/can-review', [App\Http\Controllers\ReviewController::class, 'canReview'])->name('can-review');
+        });
+
+        Route::prefix('api/products')->name('api.products.')->group(function () {
+            Route::post('/reviews', [App\Http\Controllers\ReviewController::class, 'store'])
+                ->name('reviews.store');
+            Route::get('/{product}/reviews', [App\Http\Controllers\ReviewController::class, 'getProductReviews'])
+                ->name('reviews');
+        });
+
+        // Order status update
+        Route::post('/orders/{order}/mark-delivered', [OrderController::class, 'markAsDelivered'])
+            ->name('orders.mark-delivered');
+            
         // Check discount status
         Route::get('/api/discounts/check-status', [DiscountController::class, 'checkStatus'])->name('api.discounts.check-status');
         

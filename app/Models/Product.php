@@ -48,6 +48,14 @@ class Product extends Model
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
 
+    /**
+     * Get all reviews for the product.
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public function discounts()
     {
         return $this->belongsToMany(Discount::class, 'product_discount')->withTimestamps();
@@ -164,5 +172,147 @@ class Product extends Model
             ->where('stock', '>', 0)
             ->pluck('size')
             ->toArray();
+    }
+
+    // ============================================
+    // REVIEW RELATED METHODS
+    // ============================================
+
+    /**
+     * Get average rating (override database value with live calculation)
+     */
+    public function getRatingRataAttribute()
+    {
+        // Prioritas: gunakan live calculation jika ada reviews
+        $liveRating = $this->reviews()->avg('rating');
+        
+        if ($liveRating !== null) {
+            return round($liveRating, 1);
+        }
+        
+        // Fallback ke database value
+        return $this->attributes['rating_rata'] ?? 0;
+    }
+
+    /**
+     * Get total reviews count (override database value with live calculation)
+     */
+    public function getTotalReviewsAttribute()
+    {
+        // Prioritas: gunakan live count jika ada reviews
+        $liveCount = $this->reviews()->count();
+        
+        if ($liveCount > 0) {
+            return $liveCount;
+        }
+        
+        // Fallback ke database value
+        return $this->attributes['total_reviews'] ?? 0;
+    }
+
+    /**
+     * Get rating distribution for all star levels
+     *
+     * @return array
+     */
+    public function getRatingDistribution()
+    {
+        $distribution = [];
+        
+        for ($i = 1; $i <= 5; $i++) {
+            $distribution[$i] = $this->reviews()
+                ->where('rating', $i)
+                ->count();
+        }
+        
+        return $distribution;
+    }
+
+    /**
+     * Get percentage of reviews for each rating
+     *
+     * @return array
+     */
+    public function getRatingPercentages()
+    {
+        $total = $this->total_reviews;
+        
+        if ($total == 0) {
+            return array_fill(1, 5, 0);
+        }
+        
+        $distribution = $this->getRatingDistribution();
+        $percentages = [];
+        
+        foreach ($distribution as $rating => $count) {
+            $percentages[$rating] = round(($count / $total) * 100, 1);
+        }
+        
+        return $percentages;
+    }
+
+    /**
+     * Scope: Load products with review statistics
+     */
+    public function scopeWithReviewStats($query)
+    {
+        return $query->withCount('reviews')
+                     ->withAvg('reviews', 'rating');
+    }
+
+    /**
+     * Update product rating statistics
+     * Call this method after a review is added/updated/deleted
+     */
+    public function updateRatingStats()
+    {
+        $this->rating_rata = $this->reviews()->avg('rating') ?? 0;
+        $this->total_reviews = $this->reviews()->count();
+        $this->save();
+    }
+
+    /**
+     * Get verified reviews only
+     */
+    public function verifiedReviews()
+    {
+        return $this->reviews()->where('is_verified', true);
+    }
+
+    /**
+     * Get reviews with images
+     */
+    public function reviewsWithImages()
+    {
+        return $this->reviews()->whereNotNull('images');
+    }
+
+    /**
+     * Get recent reviews (last 30 days)
+     */
+    public function recentReviews($days = 30)
+    {
+        return $this->reviews()
+            ->where('created_at', '>=', now()->subDays($days));
+    }
+
+    /**
+     * Check if product has reviews
+     *
+     * @return bool
+     */
+    public function hasReviews()
+    {
+        return $this->reviews()->exists();
+    }
+
+    /**
+     * Get average rating formatted
+     *
+     * @return string
+     */
+    public function getFormattedRatingAttribute()
+    {
+        return number_format($this->rating_rata, 1);
     }
 }
