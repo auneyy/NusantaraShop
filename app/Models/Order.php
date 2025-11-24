@@ -39,7 +39,7 @@ class Order extends Model
         'delivered_date',
         'delivered_at', // Tambahkan ini
     ];
-    
+
     // Dan di casts
     protected $casts = [
         'order_date' => 'datetime',
@@ -96,7 +96,7 @@ class Order extends Model
 
     // Debug untuk cek apa yang terjadi
     if (!array_key_exists($this->payment_status, $labels)) {
-        \Log::warning('Unknown payment_status detected in accessor', [
+        Log::warning('Unknown payment_status detected in accessor', [
             'order_number' => $this->order_number ?? 'N/A',
             'payment_status' => $this->payment_status,
             'available_labels' => array_keys($labels)
@@ -164,7 +164,7 @@ class Order extends Model
 const TRACKING_STATUSES = [
     'pending' => 'Menunggu Konfirmasi',
     'confirmed' => 'Pesanan Dikonfirmasi',
-    'processing' => 'Pesanan Diproses', 
+    'processing' => 'Pesanan Diproses',
     'packed' => 'Pesanan Dikemas',
     'shipped' => 'Pesanan Dikirim',
     'in_transit' => 'Dalam Perjalanan',
@@ -181,14 +181,14 @@ public function getTrackingStatusLabelAttribute()
 public function addTrackingHistory($status, $location, $description)
 {
     $history = $this->tracking_history ?? [];
-    
+
     $history[] = [
         'status' => $status,
         'location' => $location,
         'description' => $description,
         'timestamp' => now()->toDateTimeString()
     ];
-    
+
     $this->update([
         'tracking_history' => $history,
         'current_tracking_status' => $status
@@ -200,14 +200,14 @@ public function generateTrackingTimeline()
     $orderDate = $this->order_date;
     $destinationCity = $this->shipping_city;
     $courier = $this->courier_name;
-    
+
     // Tentukan zona berdasarkan kota tujuan
     $zone = $this->getShippingZone($destinationCity);
     $estimatedDays = $this->getEstimatedDays($zone);
-    
+
     // Generate timeline berdasarkan estimasi
     $timeline = [];
-    
+
     // 1. Order Placed
     $timeline[] = [
         'status' => 'pending',
@@ -215,25 +215,25 @@ public function generateTrackingTimeline()
         'description' => 'Pesanan diterima dan menunggu konfirmasi',
         'timestamp' => $orderDate->toDateTimeString()
     ];
-    
+
     // 2. Confirmed (1 jam setelah order)
     $confirmedTime = $orderDate->copy()->addHour();
     $timeline[] = [
-        'status' => 'confirmed', 
+        'status' => 'confirmed',
         'location' => 'Jakarta',
         'description' => 'Pesanan dikonfirmasi dan sedang dipersiapkan',
         'timestamp' => $confirmedTime->toDateTimeString()
     ];
-    
+
     // 3. Processing (3 jam setelah konfirmasi)
     $processingTime = $confirmedTime->copy()->addHours(3);
     $timeline[] = [
         'status' => 'processing',
-        'location' => 'Jakarta', 
+        'location' => 'Jakarta',
         'description' => 'Pesanan sedang diproses',
         'timestamp' => $processingTime->toDateTimeString()
     ];
-    
+
     // 4. Packed (6 jam setelah processing)
     $packedTime = $processingTime->copy()->addHours(6);
     $timeline[] = [
@@ -242,7 +242,7 @@ public function generateTrackingTimeline()
         'description' => 'Pesanan telah dikemas dan siap dikirim',
         'timestamp' => $packedTime->toDateTimeString()
     ];
-    
+
     // 5. Shipped (hari berikutnya)
     $shippedTime = $packedTime->copy()->addDay();
     $timeline[] = [
@@ -251,7 +251,7 @@ public function generateTrackingTimeline()
         'description' => "Pesanan dikirim via {$courier} menuju {$destinationCity}",
         'timestamp' => $shippedTime->toDateTimeString()
     ];
-    
+
     // 6. In Transit (berdasarkan estimasi zona)
     $transitTime = $shippedTime->copy()->addDays(ceil($estimatedDays * 0.6));
     $timeline[] = [
@@ -260,7 +260,7 @@ public function generateTrackingTimeline()
         'description' => "Pesanan dalam perjalanan ke {$destinationCity}",
         'timestamp' => $transitTime->toDateTimeString()
     ];
-    
+
     // 7. Out for Delivery (hari H-1)
     $deliveryTime = $shippedTime->copy()->addDays($estimatedDays - 1);
     $timeline[] = [
@@ -269,7 +269,7 @@ public function generateTrackingTimeline()
         'description' => 'Pesanan sedang diantar kurir',
         'timestamp' => $deliveryTime->toDateTimeString()
     ];
-    
+
     // 8. Delivered (hari H)
     $deliveredTime = $shippedTime->copy()->addDays($estimatedDays);
     $timeline[] = [
@@ -278,14 +278,14 @@ public function generateTrackingTimeline()
         'description' => 'Pesanan telah diterima',
         'timestamp' => $deliveredTime->toDateTimeString()
     ];
-    
+
     // Simpan timeline dan estimasi
     $this->update([
         'tracking_history' => $timeline,
         'current_tracking_status' => 'pending',
         'estimated_delivery' => $deliveredTime
     ]);
-    
+
     return $timeline;
 }
 
@@ -303,7 +303,7 @@ private function getShippingZone($city)
         'SULAWESI' => ['Makassar', 'Manado', 'Palu', 'Kendari'],
         'PAPUA' => ['Jayapura', 'Sorong', 'Merauke']
     ];
-    
+
     foreach ($zones as $zone => $cities) {
         foreach ($cities as $zoneCity) {
             if (str_contains(strtolower($city), strtolower($zoneCity))) {
@@ -311,7 +311,7 @@ private function getShippingZone($city)
             }
         }
     }
-    
+
     return 'OTHER';
 }
 
@@ -330,7 +330,7 @@ private function getEstimatedDays($zone)
         'PAPUA' => 7,
         'OTHER' => 5
     ];
-    
+
     return $estimations[$zone] ?? 5;
 }
 
@@ -372,7 +372,7 @@ public function reviewedProducts()
 public function unreviewedProducts()
 {
     $reviewedProductIds = $this->reviewedProducts();
-    
+
     return $this->orderItems()
                ->whereNotIn('product_id', $reviewedProductIds)
                ->get();
@@ -385,7 +385,7 @@ public function allProductsReviewed()
 {
     $totalProducts = $this->orderItems()->distinct('product_id')->count();
     $reviewedProducts = $this->reviews()->count();
-    
+
     return $totalProducts === $reviewedProducts;
 }
 
@@ -395,13 +395,13 @@ public function allProductsReviewed()
 public function reviewCompletionPercentage()
 {
     $totalProducts = $this->orderItems()->distinct('product_id')->count();
-    
+
     if ($totalProducts === 0) {
         return 0;
     }
-    
+
     $reviewedProducts = $this->reviews()->count();
-    
+
     return round(($reviewedProducts / $totalProducts) * 100);
 }
 }
