@@ -4,12 +4,8 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <a href="{{ route('admin.discounts.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Tambah Diskon
-        </a>
-    </div>
 
+    {{-- Pesan notifikasi --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -17,10 +13,116 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    {{-- Search Section --}}
     <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Pencarian Diskon</h6>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('admin.discounts.index') }}" method="GET">
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <input type="text" class="form-control" name="search" 
+                               value="{{ request('search') }}" 
+                               placeholder="Cari berdasarkan judul, subjudul, atau nama produk...">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Cari
+                        </button>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <a href="{{ route('admin.discounts.index') }}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-times"></i> Clear
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Filter Section --}}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filter Diskon</h6>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('admin.discounts.index') }}" method="GET">
+                <div class="row">
+                    {{-- Filter Status --}}
+                    <div class="col-md-2 mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">Semua Status</option>
+                            <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
+                            <option value="upcoming" {{ request('status') == 'upcoming' ? 'selected' : '' }}>Akan Datang</option>
+                            <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>Kadaluarsa</option>
+                        </select>
+                    </div>
+
+                    {{-- Filter Percentage Range --}}
+                    <div class="col-md-2 mb-3">
+                        <label for="min_percentage" class="form-label">Persentase Min</label>
+                        <input type="number" class="form-control" id="min_percentage" name="min_percentage" 
+                               value="{{ request('min_percentage') }}" placeholder="0" min="1" max="100">
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label for="max_percentage" class="form-label">Persentase Max</label>
+                        <input type="number" class="form-control" id="max_percentage" name="max_percentage" 
+                               value="{{ request('max_percentage') }}" placeholder="100" min="1" max="100">
+                    </div>
+
+                    {{-- Filter Date Range --}}
+                    <div class="col-md-2 mb-3">
+                        <label for="start_date_filter" class="form-label">Mulai Dari</label>
+                        <input type="date" class="form-control" id="start_date_filter" name="start_date_filter" 
+                               value="{{ request('start_date_filter') }}">
+                    </div>
+
+                    <div class="col-md-2 mb-3">
+                        <label for="end_date_filter" class="form-label">Sampai Dengan</label>
+                        <input type="date" class="form-control" id="end_date_filter" name="end_date_filter" 
+                               value="{{ request('end_date_filter') }}">
+                    </div>
+
+                    {{-- Action Buttons --}}
+                    <div class="col-md-2 mb-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-outline-primary w-100 me-2">
+                            <i class="fas fa-filter"></i> Filter
+                        </button>
+                        <a href="{{ route('admin.discounts.index') }}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-refresh"></i>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Header dengan Tombol Tambah --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{{ route('admin.discounts.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Tambah Diskon
+        </a>
+    </div>
+
+    {{-- Discounts Table --}}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Daftar Diskon</h6>
+            <span class="badge bg-primary">Total: {{ $discounts->total() }} diskon</span>
+        </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -38,21 +140,23 @@
                     <tbody>
                         @forelse($discounts as $discount)
                             <tr data-discount-id="{{ $discount->id }}" 
-                                data-end-date="{{ $discount->end_date->toIso8601String() }}"
-                                data-start-date="{{ $discount->start_date->toIso8601String() }}">
-                                <td>{{ $loop->iteration }}</td>
-                            <td>
-    @if($discount->banner_image)
-        <img src="{{ $discount->banner_image }}" alt="Banner" style="max-width: 100px; max-height: 60px;" class="img-thumbnail">
-    @else
-        <span class="text-muted">Tidak ada gambar</span>
-    @endif
-</td>
+                                data-end-date="{{ $discount->end_date_iso }}"
+                                data-start-date="{{ $discount->start_date_iso }}">
+                                <td>{{ $loop->iteration + ($discounts->currentPage() - 1) * $discounts->perPage() }}</td>
+                                <td>
+                                    @if($discount->banner_image)
+                                        <img src="{{ $discount->banner_image }}" alt="Banner" style="max-width: 100px; max-height: 60px;" class="img-thumbnail">
+                                    @else
+                                        <span class="text-muted">Tidak ada gambar</span>
+                                    @endif
+                                </td>
                                 <td>{{ $discount->title }}</td>
                                 <td>{{ $discount->subtitle ?? '-' }}</td>
-                                <td>{{ $discount->percentage }}%</td>
-                                <td>{{ $discount->start_date->format('d M Y H:i') }}</td>
-                                <td>{{ $discount->end_date->format('d M Y H:i') }}</td>
+                                <td>
+                                    <span class="badge bg-primary">{{ $discount->percentage }}%</span>
+                                </td>
+                                <td>{{ $discount->formatted_start_date }}</td>
+                                <td>{{ $discount->formatted_end_date }}</td>
                                 <td>
                                     @php
                                         $status = $discount->status;
@@ -63,9 +167,9 @@
                                             default => 'bg-secondary'
                                         };
                                         $statusText = match($status) {
-                                            'active' => 'Active',
-                                            'upcoming' => 'Upcoming',
-                                            'expired' => 'Expired',
+                                            'active' => 'Aktif',
+                                            'upcoming' => 'Akan Datang',
+                                            'expired' => 'Kadaluarsa',
                                             default => 'Unknown'
                                         };
                                     @endphp
@@ -88,21 +192,19 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <div class="btn-group">
-                                        <a href="{{ route('admin.discounts.show', $discount->id) }}" class="btn btn-info btn-sm">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ route('admin.discounts.edit', $discount->id) }}" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form action="{{ route('admin.discounts.destroy', $discount->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus diskon ini?')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
+                                    <a href="{{ route('admin.discounts.show', $discount->id) }}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i> Detail
+                                    </a>
+                                    <a href="{{ route('admin.discounts.edit', $discount->id) }}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <form action="{{ route('admin.discounts.destroy', $discount->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus diskon ini?')">
+                                            <i class="fas fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @empty
@@ -113,9 +215,156 @@
                     </tbody>
                 </table>
             </div>
+
+            {{-- Pagination SAMA PERSIS --}}
+            @if($discounts->hasPages())
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div class="text-muted">
+                    Menampilkan {{ $discounts->firstItem() }} - {{ $discounts->lastItem() }} dari {{ $discounts->total() }} diskon
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        {{-- Previous Page Link --}}
+                        @if ($discounts->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link">‹</span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $discounts->previousPageUrl() }}" rel="prev">‹</a>
+                            </li>
+                        @endif
+
+                        {{-- Pagination Elements --}}
+                        @php
+                            $elements = $discounts->links()->elements;
+                            $currentPage = $discounts->currentPage();
+                            $lastPage = $discounts->lastPage();
+                            
+                            $start = max(1, $currentPage - 2);
+                            $end = min($lastPage, $currentPage + 2);
+                            
+                            if ($currentPage <= 3) {
+                                $end = min(5, $lastPage);
+                            }
+                            
+                            if ($currentPage >= $lastPage - 2) {
+                                $start = max(1, $lastPage - 4);
+                            }
+                        @endphp
+
+                        {{-- First Page Link --}}
+                        @if ($start > 1)
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $discounts->url(1) }}">1</a>
+                            </li>
+                            @if ($start > 2)
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            @endif
+                        @endif
+
+                        {{-- Page Numbers --}}
+                        @for ($page = $start; $page <= $end; $page++)
+                            @if ($page == $currentPage)
+                                <li class="page-item active" aria-current="page">
+                                    <span class="page-link">{{ $page }}</span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $discounts->url($page) }}">{{ $page }}</a>
+                                </li>
+                            @endif
+                        @endfor
+
+                        {{-- Last Page Link --}}
+                        @if ($end < $lastPage)
+                            @if ($end < $lastPage - 1)
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            @endif
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $discounts->url($lastPage) }}">{{ $lastPage }}</a>
+                            </li>
+                        @endif
+
+                        {{-- Next Page Link --}}
+                        @if ($discounts->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $discounts->nextPageUrl() }}" rel="next">›</a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link">›</span>
+                            </li>
+                        @endif
+                    </ul>
+                </nav>
+            </div>
+            @endif
         </div>
     </div>
 </div>
+
+<style>
+.pagination {
+    margin-bottom: 0;
+}
+
+.page-item .page-link {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+}
+
+.page-item.active .page-link {
+    background-color: #4e73df;
+    border-color: #4e73df;
+    color: white;
+}
+
+.page-item:not(.active) .page-link:hover {
+    background-color: #e9ecef;
+    color: #2e59d9;
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #f8f9fa;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.table-responsive {
+    border-radius: 0.35rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    margin: 0.1rem;
+}
+
+.countdown-cell {
+    min-width: 120px;
+}
+
+.time-remaining {
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.status-badge {
+    min-width: 80px;
+    display: inline-block;
+    text-align: center;
+}
+</style>
 @endsection
 
 @push('scripts')
@@ -139,12 +388,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (now < startDate) {
                 status = 'upcoming';
                 statusClass = 'bg-warning';
-                statusText = 'Upcoming';
+                statusText = 'Akan Datang';
                 countdownCell.innerHTML = '<small class="text-warning"><i class="fas fa-calendar-alt"></i> Belum dimulai</small>';
             } else if (now >= startDate && now <= endDate) {
                 status = 'active';
                 statusClass = 'bg-success';
-                statusText = 'Active';
+                statusText = 'Aktif';
                 
                 // Hitung countdown
                 const distance = endDate - now;
@@ -170,7 +419,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 status = 'expired';
                 statusClass = 'bg-secondary';
-                statusText = 'Expired';
+                statusText = 'Kadaluarsa';
                 countdownCell.innerHTML = '<small class="text-muted">-</small>';
             }
             
@@ -187,23 +436,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush
-
-@push('styles')
-<style>
-.countdown-cell {
-    min-width: 120px;
-}
-
-.time-remaining {
-    font-weight: 600;
-    color: #4a5568;
-}
-
-.status-badge {
-    min-width: 80px;
-    display: inline-block;
-    text-align: center;
-}
-</style>
 @endpush

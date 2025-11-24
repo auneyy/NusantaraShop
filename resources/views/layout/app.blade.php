@@ -12,6 +12,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <link rel="icon" href="{{ asset('storage/product_images/logobos.png') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   @stack('styles')
   
   <style>
@@ -378,6 +379,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Back history prevention
         if (window.history && window.history.pushState) {
             window.addEventListener('load', function() {
                 window.history.pushState({}, '', window.location.href);
@@ -388,6 +390,7 @@
             });
         }
 
+        // Auth check
         window.addEventListener('pageshow', function(event) {
             if (event.persisted || 
                 (window.performance && window.performance.getEntriesByType("navigation")[0].type === "back_forward")) {
@@ -411,6 +414,7 @@
             }
         });
         
+        // Cache clear
         if (window.location.pathname.includes('/home') || 
             window.location.pathname.includes('/cart') ||
             window.location.pathname.includes('/profile')) {
@@ -511,7 +515,7 @@
             <i class="bi bi-bag"></i>
           </a>
           
-          <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal">
+          <a href="#" class="search-trigger">
             <i class="bi bi-search"></i>
           </a>
           @else
@@ -609,5 +613,4 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </body>
-
 </html>

@@ -5,25 +5,19 @@ return [
     |--------------------------------------------------------------------------
     | Midtrans Sandbox Configuration
     |--------------------------------------------------------------------------
-    |
-    | Configuration for Midtrans payment gateway integration
-    | Set to Sandbox environment for testing
-    |
     */
 
-    // Server Key (Required for backend operations) - Sandbox
-    'server_key' => env('MIDTRANS_SERVER_KEY', 'SB-Mid-server-LJyYObIwMMrJodITmBRs-hoT'),
+    // Server Key - PAKAI DEFAULT VALUE TANPA SB-
+    'server_key' => env('MIDTRANS_SERVER_KEY', 'Mid-server-LJyYObIwMMrJodITmBRs-hoT'),
 
-    // Client Key (Required for frontend Snap.js) - Sandbox
-    'client_key' => env('MIDTRANS_CLIENT_KEY', 'SB-Mid-client-5s3E2HrBPogzkp5a'),
+    // Client Key - PAKAI DEFAULT VALUE TANPA SB-  
+    'client_key' => env('MIDTRANS_CLIENT_KEY', 'Mid-client-5s3E2HrBPogzkp5a'),
 
-    // Merchant ID (Optional, for additional validation)
+    // Merchant ID
     'merchant_id' => env('MIDTRANS_MERCHANT_ID', 'G724728516'),
 
-    // Environment Configuration - Default to Sandbox
+    // Environment Configuration - HAPUS DUPLIKAT!
     'is_production' => env('MIDTRANS_IS_PRODUCTION', false),
-
-    // Security Configuration
     'is_sanitized' => env('MIDTRANS_IS_SANITIZED', true),
     'is_3ds' => env('MIDTRANS_IS_3DS', true),
 
@@ -46,22 +40,6 @@ return [
         'error' => env('APP_URL') . '/payment/failed'
     ],
 
-    // Sandbox Testing Cards & Payment Methods
-    'sandbox_cards' => [
-        'success' => [
-            'number' => '4811 1111 1111 1114',
-            'cvv' => '123',
-            'exp_month' => '12',
-            'exp_year' => '2025'
-        ],
-        'failure' => [
-            'number' => '4911 1111 1111 1113',
-            'cvv' => '123', 
-            'exp_month' => '12',
-            'exp_year' => '2025'
-        ]
-    ],
-
     // Default settings for transactions
     'defaults' => [
         'enabled_payments' => [
@@ -81,21 +59,5 @@ return [
             'indomaret',
             'alfamart'
         ],
-        
-        'credit_card' => [
-            'secure' => true,
-            'channel' => 'migs',
-            'bank' => 'bca',
-            'installment' => [
-                'required' => false,
-                'terms' => [
-                    'bni' => [3, 6, 12],
-                    'mandiri' => [3, 6, 12],
-                    'cimb' => [3],
-                    'bca' => [3, 6, 12],
-                    'offline' => [6, 12]
-                ]
-            ]
-        ]
     ]
 ];

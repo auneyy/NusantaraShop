@@ -23,7 +23,7 @@ html, body {
 
 .hero-help {
   position: relative;
-  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), 
+  background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.1)), 
               url('/storage/product_images/heroimagebantuan.png') center/cover no-repeat;
   min-height: 85vh;
   display: flex;

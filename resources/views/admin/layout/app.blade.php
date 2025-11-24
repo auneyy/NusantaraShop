@@ -429,7 +429,7 @@
                     </li>
 
                     <li class="nav-item">
-                       <a href="{{ route('admin.pendapatan') }}" class="nav-link {{ request()->routeIs('admin.pendapatan') ? 'active' : '' }}">
+                       <a href="{{ route('admin.laporan.pendapatan') }}" class="nav-link {{ request()->routeIs('admin.laporan.pendapatan') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-chart-line"></i>
                             Laporan Pendapatan
                         </a>

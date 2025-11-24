@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Discount;
 use Illuminate\Http\Request;
 
@@ -9,55 +10,48 @@ class PromoController extends Controller
 {
     public function index(Request $request)
     {
-        $discountedProducts = [];
         $currentDate = now()->format('Y-m-d');
 
-        // Ambil semua diskon aktif beserta produk + gambarnya
-        $activeDiscounts = Discount::where('start_date', '<=', $currentDate)
-            ->where('end_date', '>=', $currentDate)
-            ->with('products.images')
-            ->get();
+        // Ambil produk yang memiliki diskon aktif
+        $discountedProducts = Product::whereHas('discounts', function($query) use ($currentDate) {
+            $query->where('start_date', '<=', $currentDate)
+                  ->where('end_date', '>=', $currentDate);
+        })
+        ->with(['images', 'discounts' => function($query) use ($currentDate) {
+            $query->where('start_date', '<=', $currentDate)
+                  ->where('end_date', '>=', $currentDate);
+        }])
+        ->get();
 
-        // Hitung harga diskon per produk
-        foreach ($activeDiscounts as $discount) {
-            foreach ($discount->products as $product) {
-                $discountAmount = $discount->percentage ?? 0;
-                $discountPrice = $product->price - ($product->price * ($discountAmount / 100));
-
-                // Kalau produk sudah ada, pilih harga diskon terendah
-                if (isset($discountedProducts[$product->id])) {
-                    $discountedProducts[$product->id]->discount_price = min(
-                        $discountedProducts[$product->id]->discount_price,
-                        $discountPrice
-                    );
-                } else {
-                    $product->discount_price = $discountPrice;
-                    $discountedProducts[$product->id] = $product;
-                }
-            }
-        }
-
-        // Ubah associative array jadi indexed array
-        $discountedProducts = array_values($discountedProducts);
-
-        // Sorting
+        // **SORTING BERDASARKAN HARGA SETELAH DISKON**
         $sort = $request->get('sort');
         if ($sort) {
-            if ($sort === 'az') {
-                usort($discountedProducts, fn($a, $b) => strcmp($a->name, $b->name));
-            } elseif ($sort === 'za') {
-                usort($discountedProducts, fn($a, $b) => strcmp($b->name, $a->name));
-            } elseif ($sort === 'low_high') {
-                usort($discountedProducts, fn($a, $b) => $a->discount_price <=> $b->discount_price);
-            } elseif ($sort === 'high_low') {
-                usort($discountedProducts, fn($a, $b) => $b->discount_price <=> $a->discount_price);
-            } elseif ($sort === 'best_selling') {
-                // Kalau ada kolom penjualan
-                usort($discountedProducts, fn($a, $b) => $b->sold_count <=> $a->sold_count);
+            switch($sort) {
+                case 'az':
+                    $discountedProducts = $discountedProducts->sortBy('name')->values();
+                    break;
+                case 'za':
+                    $discountedProducts = $discountedProducts->sortByDesc('name')->values();
+                    break;
+                case 'low_high':
+                    // Sorting berdasarkan discounted_price (harga setelah diskon)
+                    $discountedProducts = $discountedProducts->sortBy('discounted_price')->values();
+                    break;
+                case 'high_low':
+                    // Sorting berdasarkan discounted_price (harga setelah diskon)
+                    $discountedProducts = $discountedProducts->sortByDesc('discounted_price')->values();
+                    break;
+                default:
+                    $discountedProducts = $discountedProducts->sortByDesc('created_at')->values();
             }
         }
 
-        $discountCount = count($discountedProducts);
+        $discountCount = $discountedProducts->count();
+        
+        // Ambil diskon aktif untuk keperluan lain (jika needed)
+        $activeDiscounts = Discount::where('start_date', '<=', $currentDate)
+            ->where('end_date', '>=', $currentDate)
+            ->get();
 
         return view('promo', compact('discountedProducts', 'discountCount', 'activeDiscounts'));
     }

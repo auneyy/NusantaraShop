@@ -21,6 +21,17 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HelpController;
+use App\Http\Controllers\Admin\LaporanController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\Admin\AdminController;
+
+Route::post('/webhook/midtrans', [CheckoutController::class, 'midtransNotification'])
+     ->name('webhook.midtrans')
+     ->withoutMiddleware(['web']); // Hapus semua web middleware
+
+Route::post('/payment/notification', [CheckoutController::class, 'midtransNotification'])
+     ->name('payment.notification')
+     ->withoutMiddleware(['web']);
 
 // Middleware untuk mencegah back history di seluruh aplikasi
 Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(function () {
@@ -129,7 +140,6 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::post('/process', [CheckoutController::class, 'process'])->name('process');
             Route::get('/success', [CheckoutController::class, 'success'])->name('success');
             Route::get('/check-payment-status/{orderNumber}', [CheckoutController::class, 'checkPaymentStatus'])->name('check-payment-status');
-            Route::post('/midtrans/notification', [CheckoutController::class, 'midtransNotification'])->name('midtrans.notification');
         });
 
         // AI Chat Routes
@@ -146,8 +156,9 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     });
 
-    // TAMBAHAN: Route untuk webhook Midtrans (tanpa middleware auth karena dipanggil oleh Midtrans server)
-    Route::post('/webhook/midtrans', [CheckoutController::class, 'midtransNotification'])->name('webhook.midtrans');
+    // // TAMBAHAN: Route untuk webhook Midtrans (tanpa middleware auth karena dipanggil oleh Midtrans server)
+    // Route::post('/webhook/midtrans', [CheckoutController::class, 'midtransNotification'])->name('webhook.midtrans');
+    // Route::post('/midtrans/notification', [CheckoutController::class, 'midtransNotification'])->name('midtrans.notification');
 
     // ==========================
     // 👑 ADMIN ROUTES
@@ -158,7 +169,8 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
         ->name('admin.')
         ->group(function () {
             // Admin Dashboard
-            Route::get('/dashboard', [AdminOrderController::class, 'dashboard'])->name('dashboard');
+            Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+            Route::get('/chart-data', [AdminController::class, 'getChartData'])->name('chart.data');
 
             // Products
             Route::resource('products', AdminProductController::class);
@@ -187,8 +199,17 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::resource('messages', MessageController::class)->only(['index','show']);
 
             // Laporan Pendapatan
-            Route::get('/pendapatan', fn () => view('admin.pendapatan'))->name('pendapatan');
-                
+         Route::get('/laporan/pendapatan', [LaporanController::class, 'pendapatan'])->name('laporan.pendapatan');
+    Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.export-excel');
+    Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.export-pdf');
+
+            // Pesan Masuk
+            Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+            Route::get('/messages/{id}', [MessageController::class, 'show'])->name('messages.show');
+            Route::patch('/messages/{id}/mark-as-read', [MessageController::class, 'markAsRead'])->name('messages.markAsRead');
+            Route::patch('/messages/{id}/mark-as-unread', [MessageController::class, 'markAsUnread'])->name('messages.markAsUnread');
+            Route::delete('/messages/{id}', [MessageController::class, 'destroy'])->name('messages.destroy');
+                        
             // Admin Logout
             Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
         });

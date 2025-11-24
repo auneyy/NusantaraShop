@@ -59,19 +59,24 @@
 </style>
 
 <div class="filter-sidebar">
-
     <!-- Filter Kategori -->
     <div class="filter-section">
         <div class="filter-header" onclick="toggleFilter('categoryFilter')">
             Kategori <span>+</span>
         </div>
         <div id="categoryFilter" class="filter-options">
-            <a href="{{ route('products.index') }}" 
-               class="filter-option {{ request('category') ? '' : 'active' }}">
+            @php
+                $currentParams = request()->except('category', 'page');
+            @endphp
+            <a href="{{ route('products.index', $currentParams) }}" 
+               class="filter-option {{ !request('category') ? 'active' : '' }}">
                Semua
             </a>
             @foreach($categories->sortBy('name') as $category)
-                <a href="{{ route('products.index', ['category' => $category->slug]) }}"
+                @php
+                    $params = array_merge($currentParams, ['category' => $category->slug]);
+                @endphp
+                <a href="{{ route('products.index', $params) }}"
                    class="filter-option {{ request('category') == $category->slug ? 'active' : '' }}">
                    {{ $category->name }} ({{ $category->products_count }})
                 </a>
@@ -82,24 +87,68 @@
     <!-- Filter Harga -->
     <div class="filter-section">
         <div class="filter-header" onclick="toggleFilter('priceFilter')">
-            Harga <span>+</span>
+            Urutkan <span>+</span>
         </div>
         <div id="priceFilter" class="filter-options">
-            <a href="{{ route('products.index', ['sort' => 'asc']) }}"
-               class="filter-option {{ request('sort') == 'asc' ? 'active' : '' }}">
+            @php
+                $currentParams = request()->except('sort', 'page');
+            @endphp
+            
+            <!-- Default/Terbaru -->
+            <a href="{{ route('products.index', $currentParams) }}"
+               class="filter-option {{ !request('sort') ? 'active' : '' }}">
+               Terbaru
+            </a>
+
+              <!-- Nama A-Z -->
+            <a href="{{ route('products.index', array_merge($currentParams, ['sort' => 'name_asc'])) }}"
+               class="filter-option {{ request('sort') == 'name_asc' ? 'active' : '' }}">
+               Nama A-Z
+            </a>
+            
+            <!-- Nama Z-A -->
+            <a href="{{ route('products.index', array_merge($currentParams, ['sort' => 'name_desc'])) }}"
+               class="filter-option {{ request('sort') == 'name_desc' ? 'active' : '' }}">
+               Nama Z-A
+            </a>
+            
+            <!-- Harga Terendah ke Tertinggi -->
+            <a href="{{ route('products.index', array_merge($currentParams, ['sort' => 'price_asc'])) }}"
+               class="filter-option {{ request('sort') == 'price_asc' ? 'active' : '' }}">
                Harga Terendah
             </a>
-            <a href="{{ route('products.index', ['sort' => 'desc']) }}"
-               class="filter-option {{ request('sort') == 'desc' ? 'active' : '' }}">
+            
+            <!-- Harga Tertinggi ke Terendah -->
+            <a href="{{ route('products.index', array_merge($currentParams, ['sort' => 'price_desc'])) }}"
+               class="filter-option {{ request('sort') == 'price_desc' ? 'active' : '' }}">
                Harga Tertinggi
             </a>
         </div>
     </div>
-
 </div>
 
 <script>
     function toggleFilter(id) {
-        document.getElementById(id).classList.toggle('show');
+        const element = document.getElementById(id);
+        element.classList.toggle('show');
+        
+        // Update icon +/-
+        const header = element.previousElementSibling;
+        const span = header.querySelector('span');
+        span.textContent = element.classList.contains('show') ? '−' : '+';
     }
+
+    // Auto expand active filter
+    document.addEventListener('DOMContentLoaded', function() {
+        const activeFilters = document.querySelectorAll('.filter-option.active');
+        activeFilters.forEach(active => {
+            const filterSection = active.closest('.filter-options');
+            if (filterSection) {
+                filterSection.classList.add('show');
+                const header = filterSection.previousElementSibling;
+                const span = header.querySelector('span');
+                span.textContent = '−';
+            }
+        });
+    });
 </script>

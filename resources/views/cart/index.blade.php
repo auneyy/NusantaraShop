@@ -645,8 +645,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($cartItems as $key => $item)
-                                <tr class="cart-item-row" id="cart-item-{{ $key }}">
+                                @foreach($cartItems as $item)
+                                <tr class="cart-item-row" id="cart-item-{{ $item['cart_id'] }}">
                                     <td>
                                         <div class="product-detail">
                                             <img src="{{ $item['product']->images->first()->image_path ?? 'path/to/placeholder.jpg' }}" 
@@ -654,25 +654,32 @@
                                             <div class="product-info">
                                                 <p class="product-name">{{ $item['product']->name }}</p>
                                                 <p class="product-size">Ukuran: {{ $item['size'] }}</p>
+                                                <p class="stock-info {{ $item['available_stock'] < $item['quantity'] ? 'stock-warning' : '' }}">
+                                                    Stok tersedia: {{ $item['available_stock'] }}
+                                                </p>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="quantity-cell" data-label="Jumlah: ">
                                         <div class="quantity-selector">
-                                            <button class="qty-btn-new" onclick="updateQuantity('{{ $key }}', -1)">-</button>
-                                            <input type="text" class="qty-display" id="qty-{{ $key }}" 
+                                            <button class="qty-btn-new" 
+                                                    onclick="updateQuantity('{{ $item['cart_id'] }}', -1)"
+                                                    {{ $item['quantity'] <= 1 ? 'disabled' : '' }}>-</button>
+                                            <input type="text" class="qty-display" id="qty-{{ $item['cart_id'] }}" 
                                                    value="{{ $item['quantity'] }}" readonly>
-                                            <button class="qty-btn-new" onclick="updateQuantity('{{ $key }}', 1)">+</button>
+                                            <button class="qty-btn-new" 
+                                                    onclick="updateQuantity('{{ $item['cart_id'] }}', 1)"
+                                                    {{ $item['quantity'] >= $item['available_stock'] ? 'disabled' : '' }}>+</button>
                                         </div>
                                     </td>
                                     <td class="price-cell" data-label="Harga: ">
                                         Rp {{ number_format($item['product']->harga, 0, ',', '.') }}
                                     </td>
                                     <td class="total-cell" data-label="Total: ">
-                                        <span id="item-total-{{ $key }}">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</span>
+                                        <span id="item-total-{{ $item['cart_id'] }}">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</span>
                                     </td>
                                     <td>
-                                        <button class="delete-btn" onclick="confirmRemoveItem('{{ $key }}', '{{ $item['product']->name }}')">
+                                        <button class="delete-btn" onclick="confirmRemoveItem('{{ $item['cart_id'] }}', '{{ $item['product']->name }}')">
                                             <span style="color: red; font-weight: bold;">Hapus</span>
                                         </button>
                                     </td>
@@ -701,30 +708,24 @@
             
             @if(count($cartItems) > 0)
             <div class="col-lg-4">
-                <div class="summary-section">
-                    <h3 class="summary-title">Rangkuman Pemesanan</h3>
+                <!-- Contoh di cart view -->
+<div class="summary">
+    <div class="original-total">
+        <span>Total Harga:</span>
+        <span class="text-muted text-decoration-line-through">Rp {{ number_format($originalTotal, 0, ',', '.') }}</span>
+    </div>
+    
+    <div class="discount-savings">
+        <span>Hemat:</span>
+        <span class="text-success">-Rp {{ number_format($totalSavings, 0, ',', '.') }}</span>
+    </div>
+    
+    <div class="final-total">
+        <span>Total Bayar:</span>
+        <span class="fw-bold">Rp {{ number_format($total, 0, ',', '.') }}</span>
+    </div>
+</div>
                     
-                    <div class="summary-row">
-                        <span class="summary-label">Items {{ array_sum(array_column($cartItems, 'quantity')) }}</span>
-                        <span class="summary-value" id="cart-subtotal">Rp {{ number_format($total, 0, ',', '.') }}</span>
-                    </div>
-                    
-                    <div class="promo-section">
-                        <p class="promo-title">Promo Code</p>
-                        <div class="promo-input-group">
-                            <input type="text" class="promo-input" placeholder="Masukkan kodemu">
-                            <button class="promo-btn">Terapkan</button>
-                        </div>
-                    </div>
-                    
-                    <div class="total-section">
-                        <div class="total-row">
-                            <span>Total Harga</span>
-                            <span id="cart-total">Rp {{ number_format($total + 15000, 0, ',', '.') }}</span>
-                        </div>
-                    </div>
-                    
-                   <!-- UPDATED: Checkout button menuju halaman checkout -->
                    <a href="{{ route('checkout.index') }}" class="checkout-btn">
                         Lanjut Pembayaran
                    </a>
@@ -737,7 +738,7 @@
 
 <script>
 // Modern Alert Functions
-let currentCartKey = null;
+let currentCartId = null;
 
 function showModernAlert(title, message, type = 'warning', onConfirm = null) {
     const overlay = document.getElementById('modernAlert');
@@ -825,25 +826,25 @@ function showToast(title, message, type = 'success', duration = 4000) {
     }, duration);
 }
 
-function confirmRemoveItem(cartKey, productName) {
-    currentCartKey = cartKey;
+function confirmRemoveItem(cartId, productName) {
+    currentCartId = cartId;
     showModernAlert(
         'Hapus Produk',
         `Apakah Anda yakin ingin menghapus "${productName}" dari keranjang?`,
         'warning',
-        () => removeItem(cartKey)
+        () => removeItem(cartId)
     );
 }
 
-function updateQuantity(cartKey, change) {
-    const qtyInput = document.getElementById('qty-' + cartKey);
+function updateQuantity(cartId, change) {
+    const qtyInput = document.getElementById('qty-' + cartId);
     const currentQty = parseInt(qtyInput.value);
     const newQty = currentQty + change;
     
     if (newQty < 1) return;
     
     // Show loading
-    const cartItem = document.getElementById('cart-item-' + cartKey);
+    const cartItem = document.getElementById('cart-item-' + cartId);
     cartItem.style.opacity = '0.6';
     
     fetch('/cart/update', {
@@ -854,7 +855,7 @@ function updateQuantity(cartKey, change) {
             'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify({
-            cart_key: cartKey,
+            cart_id: cartId,
             quantity: newQty
         })
     })
@@ -863,7 +864,7 @@ function updateQuantity(cartKey, change) {
         if (data.success) {
             qtyInput.value = newQty;
             // Update item total
-            const itemTotal = document.getElementById('item-total-' + cartKey);
+            const itemTotal = document.getElementById('item-total-' + cartId);
             itemTotal.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.item_subtotal);
             
             // Update cart total
@@ -871,10 +872,15 @@ function updateQuantity(cartKey, change) {
             
             // Show success toast
             showToast('Berhasil!', 'Jumlah produk berhasil diupdate', 'success', 3000);
+            
+            // Reload to update stock info
+            setTimeout(() => {
+                location.reload();
+            }, 500);
         } else {
             showToast('Error!', data.message, 'error');
+            cartItem.style.opacity = '1';
         }
-        cartItem.style.opacity = '1';
     })
     .catch(error => {
         console.error('Error:', error);
@@ -883,7 +889,7 @@ function updateQuantity(cartKey, change) {
     });
 }
 
-function removeItem(cartKey) {
+function removeItem(cartId) {
     fetch('/cart/remove', {
         method: 'POST',
         headers: {
@@ -892,14 +898,14 @@ function removeItem(cartKey) {
             'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify({
-            cart_key: cartKey
+            cart_id: cartId
         })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             // Animate item removal
-            const cartItem = document.getElementById('cart-item-' + cartKey);
+            const cartItem = document.getElementById('cart-item-' + cartId);
             cartItem.style.transform = 'translateX(-100%)';
             cartItem.style.opacity = '0';
             
@@ -925,45 +931,13 @@ function removeItem(cartKey) {
     });
 }
 
-function clearCart() {
-    showModernAlert(
-        'Kosongkan Keranjang',
-        'Apakah Anda yakin ingin mengosongkan seluruh keranjang belanja?',
-        'warning',
-        () => {
-            fetch('/cart/clear', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showToast('Berhasil!', 'Keranjang berhasil dikosongkan', 'success');
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1000);
-                } else {
-                    showToast('Error!', 'Gagal mengosongkan keranjang', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('Error!', 'Terjadi kesalahan', 'error');
-            });
-        }
-    );
-}
-
 function updateCartSummary(newTotal) {
     const subtotalElement = document.getElementById('cart-subtotal');
     const totalElement = document.getElementById('cart-total');
     
     if (subtotalElement && totalElement) {
         subtotalElement.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(newTotal);
-        totalElement.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(newTotal + 15000);
+        totalElement.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(newTotal);
     }
 }
 

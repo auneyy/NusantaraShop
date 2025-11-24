@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -23,14 +24,24 @@ class CheckoutController extends Controller
     {
         // Jika ada data dari form "Beli Sekarang"
         if ($request->has('product_id')) {
-            $product = Product::with('images')->findOrFail($request->product_id);
+            $product = Product::with('images', 'discounts')->findOrFail($request->product_id);
+            
+            // Gunakan harga diskon
+            $productPrice = $product->discounted_price;
+            $originalPrice = $product->harga;
+            $hasDiscount = $product->has_active_discount;
+            $discountPercentage = $product->discount_percentage;
             
             $checkoutItems = [
                 [
                     'product' => $product,
                     'quantity' => $request->quantity ?? 1,
                     'size' => $request->size ?? 'M',
-                    'subtotal' => $product->harga * ($request->quantity ?? 1)
+                    'price' => $productPrice, // harga setelah diskon
+                    'original_price' => $originalPrice, // harga asli
+                    'has_discount' => $hasDiscount,
+                    'discount_percentage' => $discountPercentage,
+                    'subtotal' => $productPrice * ($request->quantity ?? 1) // subtotal dengan diskon
                 ]
             ];
             
@@ -39,7 +50,7 @@ class CheckoutController extends Controller
             $totalWeight = $product->berat * ($request->quantity ?? 1);
             $source = 'direct';
         } else {
-            // Ambil dari keranjang (session)
+            // Ambil dari keranjang (database)
             $cartItems = $this->getCartItems();
             
             if (empty($cartItems)) {
@@ -55,7 +66,11 @@ class CheckoutController extends Controller
                     'product' => $item['product'],
                     'quantity' => $item['quantity'],
                     'size' => $item['size'],
-                    'subtotal' => $item['subtotal']
+                    'price' => $item['price'], // harga setelah diskon
+                    'original_price' => $item['original_price'], // harga asli
+                    'has_discount' => $item['has_discount'],
+                    'discount_percentage' => $item['discount_percentage'],
+                    'subtotal' => $item['subtotal'] // subtotal dengan diskon
                 ];
                 $total += $item['subtotal'];
                 $totalWeight += $item['product']->berat * $item['quantity'];
@@ -124,25 +139,38 @@ class CheckoutController extends Controller
 
             // Membuat order items
             foreach ($request->items as $item) {
-                $product = Product::findOrFail($item['product_id']);
+                $product = Product::with('discounts')->findOrFail($item['product_id']);
                 
-                // Cek stok
-                if ($product->stock_kuantitas < $item['quantity']) {
-                    throw new \Exception("Stok produk {$product->name} tidak mencukupi.");
-                }
+              // Cek stok per size
+$availableStock = $product->getStockForSize($item['size']);
+if ($availableStock < $item['quantity']) {
+    throw new \Exception("Stok produk {$product->name} untuk size {$item['size']} tidak mencukupi.");
+}
+
+                // Gunakan harga diskon
+                $productPrice = $product->discounted_price;
+                $originalPrice = $product->harga;
+                $hasDiscount = $product->has_active_discount;
+                $discountPercentage = $product->discount_percentage;
 
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
                     'product_name' => $product->name,
-                    'product_price' => $product->harga,
+                    'product_price' => $productPrice, // harga setelah diskon
+                    'original_price' => $originalPrice, // harga asli
+                    'has_discount' => $hasDiscount,
+                    'discount_percentage' => $discountPercentage,
                     'quantity' => $item['quantity'],
                     'size' => $item['size'],
-                    'subtotal' => $product->harga * $item['quantity'],
+                    'subtotal' => $productPrice * $item['quantity'], // subtotal dengan diskon
                 ]);
 
-                // Kurangi stok produk
-                $product->decrement('stock_kuantitas', $item['quantity']);
+               // Kurangi stok produk per size
+$sizeRecord = $product->sizes()->where('size', $item['size'])->first();
+if ($sizeRecord) {
+    $sizeRecord->decrement('stock', $item['quantity']);
+}
             }
 
             // Jika payment method adalah midtrans, buat snap token
@@ -163,7 +191,8 @@ class CheckoutController extends Controller
 
             // Jika dari keranjang, hapus keranjang setelah checkout berhasil
             if (!$request->has('direct_buy')) {
-                Session::forget('cart');
+                // Hapus dari database cart
+                Cart::where('user_id', Auth::id())->delete();
             }
 
             // Always return JSON for AJAX requests
@@ -314,11 +343,11 @@ class CheckoutController extends Controller
                 ]
             ];
 
-            // Add item details
+            // Add item details - gunakan harga diskon dari order items
             foreach ($order->orderItems as $item) {
                 $params['item_details'][] = [
                     'id' => 'item_' . $item->product_id . '_' . $item->size,
-                    'price' => (int) $item->product_price,
+                    'price' => (int) $item->product_price, // harga setelah diskon
                     'quantity' => (int) $item->quantity,
                     'name' => substr($item->product_name . ' (' . $item->size . ')', 0, 50),
                 ];
@@ -375,25 +404,27 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Enhanced webhook notification handler
+     * Enhanced webhook notification handler - SIMPLIFIED VERSION
      */
     public function midtransNotification(Request $request)
     {
         try {
-            // Set Midtrans config
-            \Midtrans\Config::$serverKey = config('midtrans.server_key');
-            \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+            $notification = $request->all();
+            
+            Log::info('Midtrans Notification Received (Raw):', $notification);
 
-            // Get notification
-            $notif = new \Midtrans\Notification();
+            $transactionStatus = $notification['transaction_status'] ?? null;
+            $paymentType = $notification['payment_type'] ?? 'unknown';
+            $orderId = $notification['order_id'] ?? null;
+            $fraudStatus = $notification['fraud_status'] ?? 'accept';
+            $transactionId = $notification['transaction_id'] ?? null;
 
-            $transactionStatus = $notif->transaction_status;
-            $paymentType = $notif->payment_type;
-            $orderId = $notif->order_id;
-            $fraudStatus = $notif->fraud_status ?? 'accept';
-            $transactionId = $notif->transaction_id ?? null;
+            if (!$orderId || !$transactionStatus) {
+                Log::error('Invalid notification data', ['notification' => $notification]);
+                return response()->json(['status' => 'error', 'message' => 'Invalid notification data'], 400);
+            }
 
-            Log::info('Midtrans notification received', [
+            Log::info('Midtrans notification processed', [
                 'order_id' => $orderId,
                 'transaction_status' => $transactionStatus,
                 'payment_type' => $paymentType,
@@ -411,6 +442,11 @@ class CheckoutController extends Controller
 
             // Process notification based on transaction status
             $this->processPaymentNotification($order, $transactionStatus, $paymentType, $fraudStatus, $transactionId);
+
+            Log::info('Notification processing completed successfully', [
+                'order_number' => $orderId,
+                'final_payment_status' => $order->fresh()->payment_status
+            ]);
 
             return response()->json(['status' => 'success']);
 
@@ -616,48 +652,65 @@ class CheckoutController extends Controller
     /**
      * Restore product stock when order is cancelled
      */
-    private function restoreStock($order)
-    {
-        try {
-            foreach ($order->orderItems as $item) {
-                $product = Product::find($item->product_id);
-                if ($product) {
-                    $product->increment('stock_kuantitas', $item->quantity);
+private function restoreStock($order)
+{
+    try {
+        foreach ($order->orderItems as $item) {
+            $product = Product::find($item->product_id);
+            if ($product) {
+                // Restore stock per size
+                $sizeRecord = $product->sizes()->where('size', $item->size)->first();
+                if ($sizeRecord) {
+                    $sizeRecord->increment('stock', $item->quantity);
                     
                     Log::info('Stock restored', [
                         'product_id' => $product->id,
                         'product_name' => $product->name,
+                        'size' => $item->size,
                         'quantity_restored' => $item->quantity,
-                        'new_stock' => $product->fresh()->stock_kuantitas
+                        'new_stock' => $sizeRecord->fresh()->stock
                     ]);
                 }
             }
-        } catch (\Exception $e) {
-            Log::error('Error restoring stock', [
-                'order_number' => $order->order_number,
-                'error' => $e->getMessage()
-            ]);
         }
+    } catch (\Exception $e) {
+        Log::error('Error restoring stock', [
+            'order_number' => $order->order_number,
+            'error' => $e->getMessage()
+        ]);
     }
+}
 
     /**
-     * Helper method untuk mendapatkan cart items dari session
+     * Helper method untuk mendapatkan cart items dari database
      */
     private function getCartItems()
     {
-        $cart = Session::get('cart', []);
         $cartItems = [];
+        
+        $carts = Cart::with(['product.images', 'product.sizes', 'product.discounts'])
+            ->where('user_id', Auth::id())
+            ->get();
 
-        foreach ($cart as $key => $item) {
-            $product = Product::with('images')->find($item['product_id']);
-            if ($product) {
-                $cartItems[$key] = [
-                    'product' => $product,
-                    'size' => $item['size'],
-                    'quantity' => $item['quantity'],
-                    'subtotal' => $item['subtotal'],
-                ];
-            }
+        foreach ($carts as $cart) {
+            // Gunakan harga diskon
+            $productPrice = $cart->product->discounted_price;
+            $originalPrice = $cart->product->harga;
+            $hasDiscount = $cart->product->has_active_discount;
+            $discountPercentage = $cart->product->discount_percentage;
+            
+            $cartItems[] = [
+                'cart_id' => $cart->id,
+                'product' => $cart->product,
+                'size' => $cart->size,
+                'quantity' => $cart->kuantitas,
+                'price' => $productPrice, // harga setelah diskon
+                'original_price' => $originalPrice, // harga asli
+                'has_discount' => $hasDiscount,
+                'discount_percentage' => $discountPercentage,
+                'subtotal' => $cart->kuantitas * $productPrice, // subtotal dengan diskon
+                'available_stock' => $cart->product->getStockForSize($cart->size)
+            ];
         }
 
         return $cartItems;

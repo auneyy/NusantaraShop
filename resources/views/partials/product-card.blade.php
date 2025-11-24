@@ -1,23 +1,10 @@
 @php
-// Cek apakah produk memiliki diskon aktif
-$hasActiveDiscount = false;
-$discountPercentage = 0;
-$discountedPrice = $product->harga;
-$discountEndDate = null;
-$discountId = null;
-
-if (isset($activeDiscounts)) {
-    foreach ($activeDiscounts as $discount) {
-        if ($discount->products->contains('id', $product->id) && $discount->is_valid) {
-            $hasActiveDiscount = true;
-            $discountPercentage = $discount->percentage;
-            $discountedPrice = $product->harga - ($product->harga * $discount->percentage / 100);
-            $discountEndDate = $discount->end_date_iso;
-            $discountId = $discount->id;
-            break;
-        }
-    }
-}
+// Gunakan accessor dari model - lebih sederhana dan reliable
+$hasActiveDiscount = $product->has_active_discount;
+$discountPercentage = $product->discount_percentage;
+$discountedPrice = $product->discounted_price;
+$discountEndDate = $product->discount_end_date_iso;
+$discountId = $hasActiveDiscount ? $product->active_discount->id : null;
 
 $primaryImage = $product->images->firstWhere('is_primary', true);
 $secondaryImage = $product->images->firstWhere('is_primary', false);
@@ -411,14 +398,16 @@ $displayImage = $primaryImage ?? $product->images->first();
 
             <div class="card-body-clean">
                 <h5 class="product-title">{{ $product->name }}</h5>
-                <div class="price-container">
-                    @if($hasActiveDiscount)
-                        <span class="original-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
-                        <span class="discount-price">Rp {{ number_format($discountedPrice, 0, ',', '.') }}</span>
-                    @else
-                        <span class="product-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
-                    @endif
-                </div>
+              <div class="price-container">
+    @if($hasActiveDiscount)
+        <div class="d-flex align-items-center gap-2">
+            <span class="discount-price">Rp {{ number_format($discountedPrice, 0, ',', '.') }}</span>
+            <span class="original-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
+        </div>
+    @else
+        <span class="product-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
+    @endif
+</div>
             </div>
         </div>
     </div>
@@ -444,6 +433,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const distance = endDate - now;
             
             if (distance < 0) {
+                // Refresh halaman ketika countdown selesai
                 location.reload();
                 return;
             }
