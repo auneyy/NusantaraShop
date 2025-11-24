@@ -34,4 +34,38 @@ class HelpController extends Controller
             return view('help', compact('featuredArticles', 'allArticles'));
         }
     }
+
+    /**
+     * Display articles by category
+     */
+    public function category($category)
+    {
+        try {
+            // Validate category
+            $validCategories = ['getting-started', 'account-billing', 'troubleshooting'];
+            
+            if (!in_array($category, $validCategories)) {
+                abort(404, 'Kategori tidak ditemukan');
+            }
+
+            // Get category name in Indonesian
+            $categoryNames = [
+                'getting-started' => 'Memulai',
+                'account-billing' => 'Akun dan Pembayaran',
+                'troubleshooting' => 'Pemecahan Masalah',
+            ];
+
+            $categoryName = $categoryNames[$category];
+
+            // Get articles by category
+            $articles = Article::published()
+                ->where('category', $category)
+                ->ordered()
+                ->get();
+
+            return view('help-category', compact('articles', 'category', 'categoryName'));
+        } catch (\Exception $e) {
+            abort(404, 'Kategori tidak ditemukan');
+        }
+    }
 }

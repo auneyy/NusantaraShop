@@ -35,14 +35,17 @@ class ArtikelController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'category' => 'nullable|string|in:getting-started,account-billing,troubleshooting',
-            'is_featured' => 'boolean',
-            'is_published' => 'boolean',
-            'order' => 'nullable|integer',
+            'order' => 'nullable|integer|min:0',
         ]);
 
+        // Generate slug dari title
         $validated['slug'] = Str::slug($validated['title']);
-        $validated['is_featured'] = $request->has('is_featured');
-        $validated['is_published'] = $request->has('is_published');
+        
+        // Handle checkboxes - checkbox yang dicentang akan mengirim value, yang tidak dicentang tidak mengirim apapun
+        $validated['is_featured'] = $request->has('is_featured') ? true : false;
+        $validated['is_published'] = $request->has('is_published') ? true : false;
+        
+        // Set default order jika tidak ada
         $validated['order'] = $validated['order'] ?? 0;
 
         Article::create($validated);
@@ -76,14 +79,17 @@ class ArtikelController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'category' => 'nullable|string|in:getting-started,account-billing,troubleshooting',
-            'is_featured' => 'boolean',
-            'is_published' => 'boolean',
-            'order' => 'nullable|integer',
+            'order' => 'nullable|integer|min:0',
         ]);
 
+        // Generate slug dari title
         $validated['slug'] = Str::slug($validated['title']);
-        $validated['is_featured'] = $request->has('is_featured');
-        $validated['is_published'] = $request->has('is_published');
+        
+        // Handle checkboxes
+        $validated['is_featured'] = $request->has('is_featured') ? true : false;
+        $validated['is_published'] = $request->has('is_published') ? true : false;
+        
+        // Set default order jika tidak ada
         $validated['order'] = $validated['order'] ?? 0;
 
         $artikel->update($validated);

@@ -2,7 +2,7 @@
 
 @section('content')
 <style>
-/* Tambahkan style yang sudah ada di sini */
+/* Style yang sudah ada */
 :root {
   --primary-color: #422D1C;
   --secondary-color: #8B4513;
@@ -135,11 +135,15 @@ html, body {
   transition: var(--transition);
   border: 1px solid rgba(0, 0, 0, 0.05);
   cursor: pointer;
+  text-decoration: none;
+  display: block;
+  color: inherit;
 }
 
 .topic-card:hover {
   transform: translateY(-8px);
   box-shadow: var(--shadow-lg);
+  text-decoration: none;
 }
 
 .topic-icon {
@@ -374,33 +378,33 @@ html, body {
     
     <div class="row">
       <div class="col-md-4 mb-4">
-        <div class="topic-card" data-category="getting-started">
+        <a href="{{ route('help.category', 'getting-started') }}" class="topic-card" style="text-decoration: none; color: inherit;">
           <div class="topic-icon">
             <i class="bi bi-play-circle"></i>
           </div>
           <h4 class="topic-title">Memulai</h4>
           <p class="topic-description">Dapatkan akun Anda dan mulai berbelanja hanya dalam beberapa langkah mudah</p>
-        </div>
+        </a>
       </div>
       
       <div class="col-md-4 mb-4">
-        <div class="topic-card" data-category="account-billing">
+        <a href="{{ route('help.category', 'account-billing') }}" class="topic-card" style="text-decoration: none; color: inherit;">
           <div class="topic-icon">
             <i class="bi bi-credit-card"></i>
           </div>
           <h4 class="topic-title">Akun dan Pembayaran</h4>
           <p class="topic-description">Kelola akun Anda, buat pesanan baru, data pengguna dan pembayaran</p>
-        </div>
+        </a>
       </div>
       
       <div class="col-md-4 mb-4">
-        <div class="topic-card" data-category="troubleshooting">
+        <a href="{{ route('help.category', 'troubleshooting') }}" class="topic-card" style="text-decoration: none; color: inherit;">
           <div class="topic-icon">
             <i class="bi bi-gear"></i>
           </div>
           <h4 class="topic-title">Pemecahan Masalah</h4>
           <p class="topic-description">Jawaban untuk masalah konfigurasi yang paling umum dan isu-isu lainnya</p>
-        </div>
+        </a>
       </div>
     </div>
   </div>
@@ -546,61 +550,6 @@ document.addEventListener('DOMContentLoaded', function() {
       document.body.style.overflow = 'auto';
     }
   });
-  
-  // Topic card filter
-  document.querySelectorAll('.topic-card').forEach(card => {
-    card.addEventListener('click', function() {
-      const category = this.getAttribute('data-category');
-      filterArticlesByCategory(category);
-    });
-  });
-  
-  function filterArticlesByCategory(category) {
-    const filteredArticles = articles.filter(a => a.category === category);
-    const container = document.getElementById('articlesContainer');
-    
-    if (filteredArticles.length > 0) {
-      container.innerHTML = '';
-      filteredArticles.forEach(article => {
-        const articleHtml = `
-          <div class="article-item" data-article-id="${article.id}">
-            <div>
-              <h5 class="article-title">${article.title}</h5>
-              ${article.category_name ? `<p class="article-category mb-0"><i class="bi bi-tag-fill me-1"></i>${article.category_name}</p>` : ''}
-            </div>
-            <i class="bi bi-arrow-right article-arrow"></i>
-          </div>
-        `;
-        container.innerHTML += articleHtml;
-      });
-      
-      // Re-attach click handlers
-      container.querySelectorAll('.article-item').forEach(item => {
-        item.addEventListener('click', function() {
-          const articleId = this.getAttribute('data-article-id');
-          const article = articles.find(a => a.id == articleId);
-          
-          if (article) {
-            let categoryBadge = '';
-            if (article.category_name) {
-              categoryBadge = `<span class="modal-article-category">${article.category_name}</span>`;
-            }
-            
-            modalBody.innerHTML = `
-              <h2 class="modal-article-title">${article.title}</h2>
-              ${categoryBadge}
-              <div class="modal-article-content">${article.content}</div>
-            `;
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-          }
-        });
-      });
-      
-      // Scroll to articles
-      container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
   
   // Search functionality
   const searchInput = document.getElementById('helpSearch');
