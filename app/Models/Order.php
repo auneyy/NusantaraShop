@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Order extends Model
 {
@@ -36,15 +37,18 @@ class Order extends Model
         'order_date',
         'shipped_date',
         'delivered_date',
+        'delivered_at', // Tambahkan ini
     ];
 
+    // Dan di casts
     protected $casts = [
         'order_date' => 'datetime',
         'shipped_date' => 'datetime',
         'delivered_date' => 'datetime',
+        'delivered_at' => 'datetime', // Tambahkan ini
         'payment_completed_at' => 'datetime',
         'tracking_history' => 'array',
-         'estimated_delivery' => 'datetime',
+        'estimated_delivery' => 'datetime',
     ];
 
     // Relationships
@@ -60,17 +64,19 @@ class Order extends Model
 
     // Accessors
     public function getStatusLabelAttribute()
-    {
-        $labels = [
-            'pending' => 'Menunggu Pembayaran',
-            'processing' => 'Diproses',
-            'shipped' => 'Dikirim',
-            'delivered' => 'Diterima',
-            'cancelled' => 'Dibatalkan',
-        ];
+{
+    $labels = [
+        'pending' => 'Menunggu Pembayaran',
+        'processing' => 'Diproses',
+        'shipped' => 'Dikirim',
+        'dikirim' => 'Dikirim',  // Tambahkan ini
+        'delivered' => 'Diterima',
+        'diterima' => 'Diterima', // Tambahkan ini
+        'cancelled' => 'Dibatalkan',
+    ];
 
-        return $labels[$this->status] ?? 'Unknown';
-    }
+    return $labels[$this->status] ?? 'Unknown';
+}
 
    public function getPaymentStatusLabelAttribute()
 {
@@ -90,7 +96,7 @@ class Order extends Model
 
     // Debug untuk cek apa yang terjadi
     if (!array_key_exists($this->payment_status, $labels)) {
-        \Log::warning('Unknown payment_status detected in accessor', [
+        Log::warning('Unknown payment_status detected in accessor', [
             'order_number' => $this->order_number ?? 'N/A',
             'payment_status' => $this->payment_status,
             'available_labels' => array_keys($labels)
@@ -153,4 +159,9 @@ class Order extends Model
     {
         return $query->where('payment_method', 'midtrans');
     }
+
+    public function reviews()
+{
+    return $this->hasMany(Review::class);
+}
 }

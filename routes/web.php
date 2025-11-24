@@ -26,12 +26,12 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\AdminController;
 
 Route::post('/webhook/midtrans', [CheckoutController::class, 'midtransNotification'])
-     ->name('webhook.midtrans')
-     ->withoutMiddleware(['web']); // Hapus semua web middleware
+    ->name('webhook.midtrans')
+    ->withoutMiddleware(['web']); // Hapus semua web middleware
 
 Route::post('/payment/notification', [CheckoutController::class, 'midtransNotification'])
-     ->name('payment.notification')
-     ->withoutMiddleware(['web']);
+    ->name('payment.notification')
+    ->withoutMiddleware(['web']);
 
 // Middleware untuk mencegah back history di seluruh aplikasi
 Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(function () {
@@ -43,20 +43,24 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     // Route utama (landing page)
-    Route::get('/', function () {return redirect('/home');});
+    Route::get('/', function () {
+        return redirect('/home');
+    });
 
     // Halaman umum (dapat diakses semua orang)
     Route::get('/promo', [PromoController::class, 'index'])->name('promo');
     Route::view('/contact', 'contact')->name('contact');
-    Route::get('/help', [HelpController::class, 'index'])->name('help');
 
-    Route::get('/search', [SearchController::class, 'search'])->name('search');
-    Route::get('/search-suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
-    Route::get('/advanced-search', [SearchController::class, 'advancedSearch'])->name('search.advanced');   
+    // Help & Article Routes
+    Route::get('/help', [HelpController::class, 'index'])->name('help');
+    Route::get('/help/article/{slug}', [HelpController::class, 'show'])->name('help.article');
+    Route::get('/help/category/{category}', [HelpController::class, 'category'])->name('help.category');
 
     // Products Resource (menggunakan controller publik yang benar)
     Route::get('/products', [PublicProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product:slug}', [PublicProductController::class, 'show'])->name('products.show');
+
+    // Reviews API
 
     // API Routes untuk AJAX (jika ada)
     Route::prefix('api')->group(function () {
@@ -86,7 +90,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
         // User Login
         Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
         Route::post('/login', [AuthController::class, 'login']);
-        
+
         // Admin Login
         Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
         Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
@@ -98,9 +102,42 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
 
     Route::middleware('auth')->group(function () {
 
-        // Tambahkan di dalam Route::middleware('auth')->group(function () {
+        Route::prefix('orders')->name('orders.')->group(function () {
+            Route::get('/', [OrderController::class, 'index'])->name('index');
+            Route::get('/{orderNumber}', [OrderController::class, 'show'])->name('show');
+            Route::match(['POST', 'DELETE'], '/{orderNumber}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+            Route::patch('/{order}/cancel', [ProfileController::class, 'cancelOrder'])->name('cancel.profile');
+            Route::get('/{orderNumber}/check-payment-status', [OrderController::class, 'checkPaymentStatus'])->name('check-payment-status');
+
+            // ✅ ROUTE YANG BENAR - menggunakan orderNumber sebagai parameter
+            Route::post('/{orderNumber}/mark-delivered', [OrderController::class, 'markAsDelivered'])
+                ->name('mark-delivered');
+
+            Route::get('/{orderId}/items', [OrderController::class, 'getOrderItems'])->name('items');
+        });
+
+        Route::prefix('reviews')->name('reviews.')->group(function () {
+            Route::post('/store', [App\Http\Controllers\ReviewController::class, 'store'])->name('store');
+            Route::get('/user', [App\Http\Controllers\ReviewController::class, 'getUserReviews'])->name('user');
+            Route::put('/{id}', [App\Http\Controllers\ReviewController::class, 'update'])->name('update');
+            Route::delete('/{id}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('destroy');
+            Route::post('/can-review', [App\Http\Controllers\ReviewController::class, 'canReview'])->name('can-review');
+        });
+
+        Route::prefix('api/products')->name('api.products.')->group(function () {
+            Route::post('/reviews', [App\Http\Controllers\ReviewController::class, 'store'])
+                ->name('reviews.store');
+            Route::get('/{product}/reviews', [App\Http\Controllers\ReviewController::class, 'getProductReviews'])
+                ->name('reviews');
+        });
+
+        // Order status update
+        Route::post('/orders/{order}/mark-delivered', [OrderController::class, 'markAsDelivered'])
+            ->name('orders.mark-delivered');
+
+        // Check discount status
         Route::get('/api/discounts/check-status', [DiscountController::class, 'checkStatus'])->name('api.discounts.check-status');
-        
+
         // Cart Routes
         Route::prefix('cart')->name('cart.')->group(function () {
             Route::get('/', [CartController::class, 'index'])->name('index');
@@ -111,23 +148,29 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::get('/count', [CartController::class, 'getCart'])->name('count');
         });
 
-Route::prefix('profile')->name('profile.')->middleware('auth')->group(function () {
-    Route::get('/', [ProfileController::class, 'index'])->name('index');
-    Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
-    Route::put('/update', [ProfileController::class, 'update'])->name('update');
-    Route::get('/orders', [ProfileController::class, 'orders'])->name('orders');
-    Route::get('/password', [ProfileController::class, 'showChangePassword'])->name('password');
-    Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('update-password');
-});
-        
+        // Profile Routes
+        Route::prefix('profile')->name('profile.')->group(function () {
+            Route::get('/', [ProfileController::class, 'index'])->name('index');
+            Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+            Route::put('/update', [ProfileController::class, 'update'])->name('update');
+            Route::get('/orders', [ProfileController::class, 'orders'])->name('orders');
+            Route::get('/password', [ProfileController::class, 'showChangePassword'])->name('password');
+            Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('update-password');
+            Route::get('/settings', [ProfileController::class, 'settings'])->name('settings');
+            Route::post('/settings/notifications', [ProfileController::class, 'updateNotifications'])->name('settings.notifications');
+            Route::post('/settings/preferences', [ProfileController::class, 'updatePreferences'])->name('settings.preferences');
+            Route::delete('/delete', [ProfileController::class, 'deleteAccount'])->name('delete');
+        });
+
         // Orders Routes
         Route::prefix('orders')->name('orders.')->group(function () {
             Route::get('/', [OrderController::class, 'index'])->name('index');
             Route::get('/{orderNumber}', [OrderController::class, 'show'])->name('show');
             Route::match(['POST', 'DELETE'], '/{orderNumber}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+            Route::patch('/{order}/cancel', [ProfileController::class, 'cancelOrder'])->name('cancel.profile');
             Route::get('/{orderNumber}/check-payment-status', [OrderController::class, 'checkPaymentStatus'])->name('check-payment-status');
         });
-        
+
         // Checkout Routes
         Route::prefix('checkout')->name('checkout.')->group(function () {
             Route::get('/', [CheckoutController::class, 'index'])->name('index');
@@ -136,76 +179,16 @@ Route::prefix('profile')->name('profile.')->middleware('auth')->group(function (
             Route::get('/check-payment-status/{orderNumber}', [CheckoutController::class, 'checkPaymentStatus'])->name('check-payment-status');
         });
 
-        // File: routes/web.php
-        // Tambahkan route ini untuk testing
-
-// TEMPORARY DEBUG ROUTE
-// Tambahkan ini di routes/web.php untuk testing
-// HAPUS setelah selesai debugging!
-
-Route::get('/test-rajaongkir', function() {
-    // Test dengan parameter yang sama seperti di checkout
-    $testDistrictId = request()->get('district_id', 3942); // Default ke Diwek
-    $testWeight = request()->get('weight', 1000); // Default 1kg
-    $testCourier = request()->get('courier', 'jne'); // Default JNE
-    
-    $response = Http::withOptions([
-        'verify' => false, // Sesuaikan dengan setting Anda
-    ])->asForm()->withHeaders([
-        'Accept' => 'application/json',
-        'key' => config('rajaongkir.api_key'),
-    ])->post('https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
-        'origin' => 3942, // Diwek
-        'destination' => $testDistrictId,
-        'weight' => $testWeight,
-        'courier' => $testCourier,
-    ]);
-
-    $data = $response->json();
-    
-    return response()->json([
-        'request_params' => [
-            'origin' => 3942,
-            'destination' => $testDistrictId,
-            'weight' => $testWeight,
-            'courier' => $testCourier,
-        ],
-        'api_status' => $response->status(),
-        'api_successful' => $response->successful(),
-        'full_response' => $data,
-        'rajaongkir_status' => $data['rajaongkir']['status'] ?? null,
-        'rajaongkir_results' => $data['rajaongkir']['results'] ?? null,
-    ], 200, [], JSON_PRETTY_PRINT);
-});
-
-// Usage:
-// http://localhost/test-rajaongkir
-// http://localhost/test-rajaongkir?courier=pos&weight=2000
-// http://localhost/test-rajaongkir?district_id=3942&courier=tiki&weight=500
-
-        // Profile Routes
-        Route::middleware('auth')->group(function () {
-            Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');   
-            Route::get('/profile/orders', [ProfileController::class, 'orders'])->name('profile.orders');
-            Route::get('/profile/settings', [ProfileController::class, 'settings'])->name('profile.settings');
-            Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');  
-            Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-            Route::get('/profile/change-password', [ProfileController::class, 'showChangePassword'])->name('password.change');
-            Route::put('/profile/change-password', [ProfileController::class, 'updatePassword'])->name('password.update');
-            Route::post('/profile/settings/notifications', [ProfileController::class, 'updateNotifications'])->name('profile.settings.notifications');
-            Route::post('/profile/settings/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.settings.preferences');
-            Route::delete('/profile/delete', [ProfileController::class, 'deleteAccount'])->name('profile.delete');
-            Route::patch('/orders/{order}/cancel', [ProfileController::class, 'cancelOrder'])->name('orders.cancel');
-
-            Route::prefix('api/ai-chat')->name('ai-chat.')->group(function () {
-                Route::post('/send', [App\Http\Controllers\AIChatController::class, 'chat'])->name('send');
-                Route::get('/suggestions', [App\Http\Controllers\AIChatController::class, 'getProductSuggestions'])->name('suggestions');
-                Route::get('/test', [App\Http\Controllers\AIChatController::class, 'testConnection'])->name('test');
-            });
+        // AI Chat Routes
+        Route::prefix('api/ai-chat')->name('ai-chat.')->group(function () {
+            Route::post('/send', [App\Http\Controllers\AIChatController::class, 'chat'])->name('send');
+            Route::get('/suggestions', [App\Http\Controllers\AIChatController::class, 'getProductSuggestions'])->name('suggestions');
+            Route::get('/test', [App\Http\Controllers\AIChatController::class, 'testConnection'])->name('test');
         });
 
+        // Contact Form
         Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
-        
+
         // User Logout
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     });
@@ -232,7 +215,7 @@ Route::get('/test-rajaongkir', function() {
                 ->name('products.deleteImage');
             Route::post('/products/quick-store-category', [AdminProductController::class, 'quickStoreCategory'])
                 ->name('products.quickStoreCategory');
-            
+
             // Discounts
             Route::resource('discounts', DiscountController::class);
             Route::patch('/discounts/{discount}/toggle-status', [DiscountController::class, 'toggleStatus'])
@@ -241,18 +224,21 @@ Route::get('/test-rajaongkir', function() {
             // Kategori
             Route::resource('categories', CategoryController::class)->except(['show']);
 
-            // Artikel - PERBAIKI INI
+            // Artikel Help
             Route::resource('artikel', ArtikelController::class);
-           
+
             // Pesanan
             Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
             Route::get('/orders/{orderNumber}', [AdminOrderController::class, 'show'])->name('orders.show');
             Route::patch('/orders/{orderNumber}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
 
+            // Messages/Pesan Masuk
+            Route::resource('messages', MessageController::class)->only(['index', 'show']);
+
             // Laporan Pendapatan
-         Route::get('/laporan/pendapatan', [LaporanController::class, 'pendapatan'])->name('laporan.pendapatan');
-    Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.export-excel');
-    Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.export-pdf');
+            Route::get('/laporan/pendapatan', [LaporanController::class, 'pendapatan'])->name('laporan.pendapatan');
+            Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.export-excel');
+            Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.export-pdf');
 
             // Pesan Masuk
             Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
@@ -260,8 +246,9 @@ Route::get('/test-rajaongkir', function() {
             Route::patch('/messages/{id}/mark-as-read', [MessageController::class, 'markAsRead'])->name('messages.markAsRead');
             Route::patch('/messages/{id}/mark-as-unread', [MessageController::class, 'markAsUnread'])->name('messages.markAsUnread');
             Route::delete('/messages/{id}', [MessageController::class, 'destroy'])->name('messages.destroy');
-                        
+
             // Admin Logout
             Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
         });
+
 });

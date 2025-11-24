@@ -872,8 +872,8 @@
                     console.log('Payment pending:', result);
                     
                     showModal('pending', 'Pembayaran Sedang Diproses', 'Pembayaran Anda sedang diproses. Mohon tunggu konfirmasi dari sistem pembayaran.', function() {
-                        // Check status after 5 seconds
-                        setTimeout(checkPaymentStatus, 5000);
+                        // Check status after 3 seconds
+                        setTimeout(checkPaymentStatus, 3000);
                     });
                     
                     // Re-enable button

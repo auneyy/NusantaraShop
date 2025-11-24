@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up()
     {
+        // Drop the table if it exists
+        Schema::dropIfExists('reviews');
+
+        // Create the new table
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');

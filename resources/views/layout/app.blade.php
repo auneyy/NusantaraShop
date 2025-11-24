@@ -16,54 +16,32 @@
   @stack('styles')
   
   <style>
-    body {
+     body {
       font-family: 'Manrope', sans-serif;
       background-color: #fff;
-      padding-top: 80px;
     }
 
-    /* Navbar Base Styles */
-    .navbar {
-      background-color: #fff !important;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-      padding: 1rem 0;
-      z-index: 1000;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      backdrop-filter: blur(10px);
-    }
+.navbar {
+  background-color: #fff !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  padding: 1rem 0;
+  z-index: 1000;
+  position: sticky;
+  top: 0;
+}
 
-    /* Navbar Scrolled State */
-    .navbar.scrolled {
-      padding: 0.5rem 0;
-      background-color: rgba(255, 255, 255, 0.95) !important;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      backdrop-filter: blur(20px);
-    }
-
-    /* Logo Animation */
     .logonusantara {
       height: 50px;
       width: auto;
       margin-right: 20px;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .navbar.scrolled .logonusantara {
-      height: 40px;
-    }
-
-    /* Nav Links */
     .navbar-nav .nav-link {
       color: #422D1C !important;
       font-weight: 500;
       margin: 0 10px;
       transition: all 0.3s ease;
       position: relative;
-      padding: 0.5rem 0 !important;
     }
 
     .navbar-nav .nav-link::after {
@@ -73,13 +51,11 @@
       bottom: 0;
       width: 0;
       height: 2px;
-      background: linear-gradient(90deg, #8B4513, #422D1C);
+      background-color: #8B4513;
       transition: width 0.3s ease-in-out;
-      border-radius: 2px;
     }
 
-    .navbar-nav .nav-link:hover::after,
-    .navbar-nav .nav-link.active::after {
+    .navbar-nav .nav-link:hover::after {
       width: 100%;
     }
 
@@ -89,72 +65,80 @@
       font-weight: 600;
     }
 
-    /* Navbar Icons */
     .navbar-icons {
       display: flex;
       align-items: center;
       gap: 15px;
     }
 
-    .navbar-icons a,
-    .navbar-icons .dropdown-toggle {
+    .navbar-icons a {
       color: #422D1C;
       font-size: 1.2rem;
       text-decoration: none;
-      transition: all 0.3s ease;
-      position: relative;
-      display: inline-block;
-      cursor: pointer;
+      transition: color 0.3s ease;
     }
 
-    .navbar-icons a::before,
-    .navbar-icons .dropdown-toggle::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      width: 40px;
-      height: 40px;
-      background-color: rgba(139, 69, 19, 0.1);
-      border-radius: 50%;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: -1;
-    }
-
-    .navbar-icons a:hover::before,
-    .navbar-icons .dropdown-toggle:hover::before {
-      transform: translate(-50%, -50%) scale(1);
-    }
-
-    .navbar-icons a:hover,
-    .navbar-icons .dropdown-toggle:hover {
+    .navbar-icons a:hover {
       color: #8B4513;
-      transform: translateY(-2px);
     }
 
-    /* Mega Menu */
+    .btn-auth {
+      background-color: #422D1C;
+      border-color: #422D1C;
+      color: white;
+      padding: 0.375rem 1rem;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-auth:hover {
+      background-color: #8B4513;
+      border-color: #8B4513;
+      color: white;
+    }
+
+    .btn-auth-outline {
+      background-color: transparent;
+      border: 2px solid #422D1C;
+      color: #422D1C;
+      padding: 0.375rem 1rem;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      margin-left: 10px;
+    }
+
+    .btn-auth-outline:hover {
+      background-color: #422D1C;
+      color: white;
+    }
+
+    .product-card img {
+      height: 300px;
+      object-fit: cover;
+    }
+
     .mega-menu {
       position: absolute;
       left: 50%;
-      transform: translateX(-50%) translateY(10px);
+      transform: translateX(-50%);
       top: 100%;
       z-index: 1000;
       width: 250px;
       background-color: #ffffff;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       padding: 1rem 0;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 12px;
-      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease-in-out;
     }
 
     .mega-menu-wrapper:hover .mega-menu {
       opacity: 1;
       visibility: visible;
-      transform: translateX(-50%) translateY(0);
     }
 
     .category-list-5 {
@@ -168,14 +152,13 @@
       padding: 0.75rem 1.5rem;
       color: #422D1C;
       text-decoration: none;
-      transition: all 0.2s ease-in-out;
+      transition: background-color 0.2s ease-in-out;
       position: relative;
       overflow: hidden;
     }
 
     .category-list-5 .category-item:hover {
-      background-color: #f8f9fa;
-      padding-left: 2rem;
+      background-color: #f5f5f5;
     }
 
     .category-list-5 .category-item::before {
@@ -185,7 +168,7 @@
       left: 0;
       width: 4px;
       height: 100%;
-      background: linear-gradient(180deg, #8B4513, #422D1C);
+      background-color: #8c7b6c;
       transform: translateX(-100%);
       transition: transform 0.3s ease-in-out;
     }
@@ -205,49 +188,8 @@
       align-items: center;
       justify-content: space-between;
       text-decoration: none;
-      color: #8B4513;
+      color: #8c7b6c;
       font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .view-more-link:hover {
-      color: #422D1C;
-      transform: translateX(5px);
-    }
-
-    /* Scroll to Top Button */
-    .scroll-to-top {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 50px;
-      height: 50px;
-      background: linear-gradient(135deg, #8B4513, #422D1C);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      cursor: pointer;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(20px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 20px rgba(66, 45, 28, 0.3);
-      z-index: 999;
-    }
-
-    .scroll-to-top.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-
-    .scroll-to-top:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 6px 25px rgba(66, 45, 28, 0.4);
     }
 
     /* Modern Footer Styles */
@@ -302,7 +244,6 @@
       transition: all 0.3s ease;
       text-decoration: none;
       position: relative;
-      display: inline-block;
     }
 
     .footer .text-muted a:hover {
@@ -366,6 +307,7 @@
       opacity: 1;
     }
 
+    /* Contact Info Styling */
     .contact-info {
       display: flex;
       align-items: flex-start;
@@ -386,50 +328,15 @@
     }
 
     .dropdown-item {
+      font-size: 18px;
+    }
+
+    .dropdown-item a{
       font-size: 15px;
-      transition: all 0.3s ease;
-      padding: 0.5rem 1rem;
-    }
-
-    .dropdown-item:hover {
-      background-color: #f8f9fa;
-      padding-left: 1.5rem;
-    }
-
-    .dropdown-menu {
-      border: none;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-      border-radius: 12px;
-      overflow: hidden;
-      margin-top: 0.5rem;
-    }
-
-    .btn-primary {
-      background-color: #422D1C;
-      border: none;
-      transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-      background-color: #8B4513;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(66, 45, 28, 0.3);
     }
 
     /* Responsive */
     @media (max-width: 991px) {
-      body {
-        padding-top: 70px;
-      }
-
-      .navbar {
-        padding: 0.75rem 0;
-      }
-
-      .navbar.scrolled {
-        padding: 0.5rem 0;
-      }
-
       .navbar-icons {
         margin-top: 1rem;
         justify-content: center;
@@ -448,14 +355,6 @@
         left: 50%;
         transform: translateX(-50%);
       }
-
-      .scroll-to-top {
-        bottom: 20px;
-        right: 20px;
-        width: 45px;
-        height: 45px;
-        font-size: 1.3rem;
-      }
     }
 
     @media (max-width: 576px) {
@@ -468,226 +367,21 @@
       }
     }
 
-/* Modal Overlay */
-.search-modal-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85); /* Background overlay hitam */
-  z-index: 99999;
-}
+    .btn-primary{
+      background-color: #422D1C;
+      border: none;
+    }
 
-.search-modal-overlay.active {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-/* Modal Content - Di atas, height 1/4 layar, width full */
-.search-modal-content {
-  background: #ffffff;
-  width: 100%;
-  height: 25vh;
-  min-height: 250px;
-  padding: 40px 50px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transform: translateY(-100%);
-  opacity: 0;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.search-modal-overlay.active .search-modal-content {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-/* Close Button */
-.search-modal-close {
-  position: absolute;
-  top: 30px;
-  right: 40px;
-  background: transparent;
-  border: none;
-  font-size: 2.2rem;
-  color: #1a1a1a;
-  cursor: pointer;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  line-height: 1;
-  z-index: 10;
-}
-
-.search-modal-close:hover {
-  color: #999999;
-  transform: rotate(90deg);
-}
-
-/* Modal Title */
-.search-modal-title {
-  font-size: 2.8rem;
-  font-weight: 300;
-  color: #1a1a1a;
-  text-align: center;
-  margin-bottom: 40px;
-  letter-spacing: 2px;
-}
-
-/* Modal Search Form */
-.modal-search-form {
-  width: 100%;
-  max-width: 800px;
-  padding: 0 40px;
-}
-
-.modal-search-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  background: #ffffff;
-  border: 1.5px solid #1a1a1a;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.modal-search-wrapper:focus-within {
-  border-color: #422D1C;
-  box-shadow: 0 0 0 3px rgba(66, 45, 28, 0.1);
-}
-
-.modal-search-input {
-  width: 100%;
-  border: none;
-  padding: 18px 65px 18px 28px;
-  font-size: 1rem;
-  color: #1a1a1a;
-  background: transparent;
-  outline: none;
-  font-weight: 300;
-  letter-spacing: 0.5px;
-}
-
-.modal-search-input::placeholder {
-  color: #999999;
-  font-weight: 300;
-}
-
-.modal-search-btn {
-  position: absolute;
-  right: 0;
-  background: #1a1a1a;
-  border: none;
-  padding: 18px 28px;
-  cursor: pointer;
-  color: #ffffff;
-  font-size: 1.2rem;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-search-btn:hover {
-  background: #422D1C;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .search-modal-content {
-    padding: 30px 40px;
-    height: 30vh;
-    min-height: 220px;
-  }
-
-  .search-modal-close {
-    top: 20px;
-    right: 25px;
-    font-size: 1.8rem;
-    width: 45px;
-    height: 45px;
-  }
-
-  .search-modal-title {
-    font-size: 2rem;
-    margin-bottom: 30px;
-    letter-spacing: 1px;
-  }
-
-  .modal-search-form {
-    padding: 0 30px;
-  }
-
-  .modal-search-input {
-    padding: 16px 55px 16px 22px;
-    font-size: 0.95rem;
-  }
-
-  .modal-search-btn {
-    padding: 16px 24px;
-    font-size: 1.1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .search-modal-content {
-    padding: 25px 30px;
-    height: 35vh;
-    min-height: 200px;
-  }
-
-  .search-modal-close {
-    top: 15px;
-    right: 20px;
-    font-size: 1.6rem;
-    width: 40px;
-    height: 40px;
-  }
-
-  .search-modal-title {
-    font-size: 1.6rem;
-    margin-bottom: 25px;
-  }
-
-  .modal-search-form {
-    padding: 0 20px;
-  }
-
-  .modal-search-input {
-    padding: 15px 50px 15px 20px;
-    font-size: 0.9rem;
-  }
-
-  .modal-search-btn {
-    padding: 15px 20px;
-    font-size: 1rem;
-  }
-}
-  </style>
+    .btn-primary:hover{
+      background-color: #8B4513;
+    }
+</style>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Back history prevention
-        if (window.history && window.history.pushState) {
-            window.addEventListener('load', function() {
-                window.history.pushState({}, '', window.location.href);
-            });
-
-            window.addEventListener('popstate', function() {
-                window.history.pushState({}, '', window.location.href);
-            });
-        }
-
-        // Auth check
+        // ✅ FIXED: Hanya auth check, hapus popstate prevention yang mengganggu
+        
+        // Auth check saat page load from cache
         window.addEventListener('pageshow', function(event) {
             if (event.persisted || 
                 (window.performance && window.performance.getEntriesByType("navigation")[0].type === "back_forward")) {
@@ -706,12 +400,12 @@
                     }
                 })
                 .catch(() => {
-                    window.location.replace('/login');
+                    // Ignore errors untuk public pages
                 });
             }
         });
         
-        // Cache clear
+        // Cache clear hanya untuk protected pages
         if (window.location.pathname.includes('/home') || 
             window.location.pathname.includes('/cart') ||
             window.location.pathname.includes('/profile')) {
@@ -731,12 +425,9 @@
 </head>
 
 <body>
-  <!-- Navbar dengan animasi scroll -->
   <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container">
-      <a href="{{ auth()->check() ? url('/home') : url('/') }}">
-        <img src="{{ asset('storage/product_images/logobrand.png') }}" alt="logo" class="logonusantara">
-      </a>
+      <a href="{{ auth()->check() ? url('/home') : url('/') }}"><img src="{{ asset('storage/product_images/logobrand.png') }}" alt="logo" class="logonusantara"></a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -774,7 +465,7 @@
                         <a href="{{ url('/products') }}" class="view-more-link">
                             Lihat Semua Kategori
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M9 18L15 12L9 6" stroke="#422D1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </a>
                     </div>
@@ -798,7 +489,7 @@
             <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="bi bi-person-circle"></i>
             </a>
-            <ul class="dropdown-menu dropdown-menu-end">
+            <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="{{ route('profile.index') }}">{{ Auth::user()->name }}</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="{{ route('orders.index') }}">Pesanan Saya</a></li>
@@ -818,47 +509,34 @@
           <a href="#" class="search-trigger">
             <i class="bi bi-search"></i>
           </a>
+          @else
           @endauth
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- Scroll to Top Button -->
-  <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">
-    <i class="bi bi-arrow-up"></i>
-  </button>
-
-  <!-- Clean Search Modal Structure -->
-  <div class="search-modal-overlay" id="searchModal">
-    <div class="search-modal-content">
-      <button class="search-modal-close">
-        <i class="bi bi-x"></i>
-      </button>
-      
-      <h2 class="search-modal-title">Search</h2>
-      
-      <form action="{{ route('search') }}" method="GET" class="modal-search-form">
-        <div class="modal-search-wrapper">
-          <input 
-            type="text" 
-            name="q" 
-            class="modal-search-input" 
-            placeholder="Search for products..."
-            autocomplete="off"
-            id="modalSearchInput"
-            required>
-          <button type="submit" class="modal-search-btn">
-            <i class="bi bi-search"></i>
-          </button>
+  <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="searchModalLabel">Cari Produk</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-      </form>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <input type="text" class="form-control" placeholder="Cari produk batik...">
+            </div>
+            <button type="submit" class="btn btn-primary">Cari</button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 
   <main>
     @yield('content')
-    @include('partials.ai-chat')
   </main>
 
   <footer class="footer">
@@ -924,106 +602,9 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const navbar = document.querySelector('.navbar');
-      const scrollToTopBtn = document.getElementById('scrollToTop');
-      let lastScrollTop = 0;
-
-      // Navbar scroll effect
-      window.addEventListener('scroll', function() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-        // Add/remove scrolled class
-        if (scrollTop > 50) {
-          navbar.classList.add('scrolled');
-        } else {
-          navbar.classList.remove('scrolled');
-        }
-
-        lastScrollTop = scrollTop;
-
-        // Show/hide scroll to top button
-        if (scrollTop > 300) {
-          scrollToTopBtn.classList.add('show');
-        } else {
-          scrollToTopBtn.classList.remove('show');
-        }
-      });
-
-      // Scroll to top functionality
-      scrollToTopBtn.addEventListener('click', function() {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      });
-
-      // SEARCH MODAL FUNCTIONALITY - FIXED
-      function openSearchModal() {
-        const modal = document.getElementById('searchModal');
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        
-        // Focus on input after animation
-        setTimeout(() => {
-          const input = document.getElementById('modalSearchInput');
-          if (input) input.focus();
-        }, 400);
-      }
-
-      function closeSearchModal() {
-        const modal = document.getElementById('searchModal');
-        modal.classList.remove('active');
-        document.body.style.overflow = 'auto';
-      }
-
-      // Event listeners untuk search modal
-      const modal = document.getElementById('searchModal');
-      const closeBtn = document.querySelector('.search-modal-close');
-      
-      // Close ketika klik overlay
-      modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-          closeSearchModal();
-        }
-      });
-      
-      // Close ketika klik tombol close
-      closeBtn.addEventListener('click', closeSearchModal);
-      
-      // Close ketika tekan Escape
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modal.classList.contains('active')) {
-          closeSearchModal();
-        }
-      });
-      
-      // Trigger modal ketika klik search icon di navbar
-      const searchIcons = document.querySelectorAll('.search-trigger');
-      searchIcons.forEach(icon => {
-        icon.addEventListener('click', function(e) {
-          e.preventDefault();
-          openSearchModal();
-        });
-      });
-
-      // Smooth scroll untuk anchor links
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-          e.preventDefault();
-          const target = document.querySelector(this.getAttribute('href'));
-          if (target) {
-            target.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start'
-            });
-          }
-        });
-      });
-    });
-  </script>
-
   @stack('scripts')
+
+  @include('partials.ai-chat')
+
 </body>
 </html>

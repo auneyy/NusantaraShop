@@ -1,5 +1,5 @@
 @php
-// Gunakan accessor dari model - lebih sederhana dan reliable
+// Gunakan accessor dari model
 $hasActiveDiscount = $product->has_active_discount;
 $discountPercentage = $product->discount_percentage;
 $discountedPrice = $product->discounted_price;
@@ -139,7 +139,7 @@ $displayImage = $primaryImage ?? $product->images->first();
     padding: 5px 10px;
     border-radius: 15px;
     z-index: 10;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
     box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
 }
@@ -282,176 +282,184 @@ $displayImage = $primaryImage ?? $product->images->first();
         font-size: 9px;
         padding: 4px 8px;
         border-radius: 12px;
-    }
-    
-    .countdown-timer {
-        padding: 5px 8px;
-        font-size: 9px;
-        bottom: 8px;
-        gap: 4px;
-        width: calc(100% - 16px);
-        border-radius: 8px;
-    }
-    
-    .countdown-timer .time-unit {
-        min-width: 24px;
-    }
-    
-    .countdown-timer .time-value {
-        font-size: 11px;
-    }
-    
-    .countdown-timer .time-label {
-        font-size: 7px;
-    }
-    
-    .countdown-timer .separator {
-        font-size: 10px;
-    }
-    
-    .d-flex.align-items-center.justify-content-center.bg-light .fa-image {
-        font-size: 32px !important;
-    }
-    
-    /* Disable hover effect on mobile */
-    .minimalist-product-card:hover {
-        transform: none;
-        box-shadow: 
-            0 4px 20px rgba(0, 0, 0, 0.05),
-            0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    
-    .minimalist-product-card:active {
-        transform: scale(0.98);
-    }
+}
+.countdown-timer {
+    padding: 5px 8px;
+    font-size: 9px;
+    bottom: 8px;
+    gap: 4px;
+    width: calc(100% - 16px);
+    border-radius: 8px;
 }
 
+.countdown-timer .time-unit {
+    min-width: 24px;
+}
+
+.countdown-timer .time-value {
+    font-size: 11px;
+}
+
+.countdown-timer .time-label {
+    font-size: 7px;
+}
+
+.countdown-timer .separator {
+    font-size: 10px;
+}
+
+.d-flex.align-items-center.justify-content-center.bg-light .fa-image {
+    font-size: 32px !important;
+}
+
+.minimalist-product-card:hover {
+    transform: none;
+    box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.05),
+        0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.minimalist-product-card:active {
+    transform: scale(0.98);
+}
+}
 @media (max-width: 480px) {
-    .product-title {
-        font-size: 12px;
-        min-height: 32px;
-    }
-    
-    .product-price,
-    .discount-price {
-        font-size: 12px;
-    }
-    
-    .original-price {
-        font-size: 10px;
-    }
-    
-    .card-body-clean {
-        padding: 12px 8px;
-    }
+.product-title {
+font-size: 12px;
+min-height: 32px;
+}
+.product-price,
+.discount-price {
+    font-size: 12px;
+}
+
+.original-price {
+    font-size: 10px;
+}
+
+.card-body-clean {
+    padding: 12px 8px;
+}
 }
 </style>
-
 <a href="{{ route('products.show', $product->slug) }}" class="product-card-link">
     <div class="product-card-wrapper">
         <div class="minimalist-product-card">
             <div class="product-image-container">
                 @if($hasActiveDiscount)
                     <div class="discount-badge">-{{ $discountPercentage }}%</div>
-                    
-                    <div class="countdown-timer" 
-                         data-end-date="{{ $discountEndDate }}"
-                         data-product-id="{{ $product->id }}"
-                         data-discount-id="{{ $discountId }}">
-                        <div class="time-unit">
-                            <span class="time-value days">00</span>
-                            <span class="time-label">Hari</span>
-                        </div>
-                        <span class="separator">:</span>
-                        <div class="time-unit">
-                            <span class="time-value hours">00</span>
-                            <span class="time-label">Jam</span>
-                        </div>
-                        <span class="separator">:</span>
-                        <div class="time-unit">
-                            <span class="time-value minutes">00</span>
-                            <span class="time-label">Menit</span>
-                        </div>
-                        <span class="separator">:</span>
-                        <div class="time-unit">
-                            <span class="time-value seconds">00</span>
-                            <span class="time-label">Detik</span>
-                        </div>
+                <div class="countdown-timer countdown-timer-card" 
+                     data-end-date="{{ $discountEndDate }}"
+                     data-product-id="{{ $product->id }}">
+                    <div class="time-unit">
+                        <span class="time-value days">00</span>
+                        <span class="time-label">Hari</span>
                     </div>
-                @endif
-                
-                @if($displayImage)
-                    <img src="{{ $displayImage->image_path }}" 
+                    <span class="separator">:</span>
+                    <div class="time-unit">
+                        <span class="time-value hours">00</span>
+                        <span class="time-label">Jam</span>
+                    </div>
+                    <span class="separator">:</span>
+                    <div class="time-unit">
+                        <span class="time-value minutes">00</span>
+                        <span class="time-label">Menit</span>
+                    </div>
+                    <span class="separator">:</span>
+                    <div class="time-unit">
+                        <span class="time-value seconds">00</span>
+                        <span class="time-label">Detik</span>
+                    </div>
+                </div>
+            @endif
+            
+            @if($displayImage)
+                <img src="{{ $displayImage->image_path }}" 
+                     alt="{{ $product->name }}"
+                     class="product-image-primary">
+                @if($secondaryImage)
+                    <img src="{{ $secondaryImage->image_path }}" 
                          alt="{{ $product->name }}"
-                         class="product-image-primary">
-                    @if($secondaryImage)
-                        <img src="{{ $secondaryImage->image_path }}" 
-                             alt="{{ $product->name }}"
-                             class="product-image-secondary">
-                    @endif
-                @else
-                    <div class="d-flex align-items-center justify-content-center bg-light" style="width: 100%; height: 100%;">
-                        <i class="fas fa-image fa-3x text-muted"></i>
-                    </div>
+                         class="product-image-secondary">
                 @endif
-            </div>
-
-            <div class="card-body-clean">
-                <h5 class="product-title">{{ $product->name }}</h5>
-              <div class="price-container">
-    @if($hasActiveDiscount)
-        <div class="d-flex align-items-center gap-2">
-            <span class="discount-price">Rp {{ number_format($discountedPrice, 0, ',', '.') }}</span>
-            <span class="original-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
+            @else
+                <div class="d-flex align-items-center justify-content-center bg-light" style="width: 100%; height: 100%;">
+                    <i class="fas fa-image fa-3x text-muted"></i>
+                </div>
+            @endif
         </div>
-    @else
-        <span class="product-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
-    @endif
-</div>
+
+        <div class="card-body-clean">
+            <h5 class="product-title">{{ $product->name }}</h5>
+            <div class="price-container">
+                @if($hasActiveDiscount)
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="discount-price">Rp {{ number_format($discountedPrice, 0, ',', '.') }}</span>
+                        <span class="original-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
+                    </div>
+                @else
+                    <span class="product-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
+                @endif
             </div>
         </div>
     </div>
+</div>
 </a>
-
+@once
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const timers = document.querySelectorAll('.countdown-timer');
+// ✅ FIXED: Countdown untuk PRODUCT CARD saja
+(function() {
+    'use strict';
     
-    timers.forEach(timer => {
-        const endDate = new Date(timer.dataset.endDate).getTime();
-        const productId = timer.dataset.productId;
-        const discountId = timer.dataset.discountId;
+    function initProductCardCountdowns() {
+        const timers = document.querySelectorAll('.countdown-timer-card');
         
-        const daysEl = timer.querySelector('.days');
-        const hoursEl = timer.querySelector('.hours');
-        const minutesEl = timer.querySelector('.minutes');
-        const secondsEl = timer.querySelector('.seconds');
+        if (timers.length === 0) return;
         
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = endDate - now;
+        timers.forEach(timer => {
+            const endDate = new Date(timer.dataset.endDate).getTime();
+            const productId = timer.dataset.productId;
             
-            if (distance < 0) {
-                // Refresh halaman ketika countdown selesai
-                location.reload();
-                return;
+            const daysEl = timer.querySelector('.days');
+            const hoursEl = timer.querySelector('.hours');
+            const minutesEl = timer.querySelector('.minutes');
+            const secondsEl = timer.querySelector('.seconds');
+            
+            if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return;
+            
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const distance = endDate - now;
+                
+                if (distance < 0) {
+                    location.reload();
+                    return;
+                }
+                
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                daysEl.textContent = String(days).padStart(2, '0');
+                hoursEl.textContent = String(hours).padStart(2, '0');
+                minutesEl.textContent = String(minutes).padStart(2, '0');
+                secondsEl.textContent = String(seconds).padStart(2, '0');
             }
             
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            
-            daysEl.textContent = String(days).padStart(2, '0');
-            hoursEl.textContent = String(hours).padStart(2, '0');
-            minutesEl.textContent = String(minutes).padStart(2, '0');
-            secondsEl.textContent = String(seconds).padStart(2, '0');
-        }
-        
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
-    });
-});
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        });
+    }
+    
+    // Init saat DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initProductCardCountdowns);
+    } else {
+        initProductCardCountdowns();
+    }
+})();
 </script>
 @endpush
+@endonce

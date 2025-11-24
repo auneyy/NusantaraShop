@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Discount;
+use App\Models\Review;
 
 class ProductController extends Controller
 {
@@ -18,7 +19,7 @@ class ProductController extends Controller
 
         // Filter by category
         if (request()->has('category')) {
-            $query->whereHas('category', function($q) {
+            $query->whereHas('category', function ($q) {
                 $q->where('slug', request('category'));
             });
         }
@@ -26,73 +27,73 @@ class ProductController extends Controller
         // Filter by search
         if (request()->has('search') && request('search') != '') {
             $searchTerm = request('search');
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('deskripsi', 'like', '%' . $searchTerm . '%');
+                    ->orWhere('deskripsi', 'like', '%' . $searchTerm . '%');
             });
         }
 
-        // Sort options - BERUBAH: sorting berdasarkan harga setelah diskon
+        // Sort options - sorting berdasarkan harga setelah diskon
         if (request()->has('sort')) {
             switch (request('sort')) {
                 case 'price_asc':
                     // Sort by discounted price (low to high)
                     $query->orderByRaw('
-                        CASE 
+                        CASE
                             WHEN EXISTS (
-                                SELECT 1 FROM product_discount 
-                                JOIN discounts ON product_discount.discount_id = discounts.id 
-                                WHERE product_discount.product_id = products.id 
-                                AND discounts.start_date <= NOW() 
+                                SELECT 1 FROM product_discount
+                                JOIN discounts ON product_discount.discount_id = discounts.id
+                                WHERE product_discount.product_id = products.id
+                                AND discounts.start_date <= NOW()
                                 AND discounts.end_date >= NOW()
-                            ) 
+                            )
                             THEN (products.harga - (products.harga * (
-                                SELECT discounts.percentage 
-                                FROM product_discount 
-                                JOIN discounts ON product_discount.discount_id = discounts.id 
-                                WHERE product_discount.product_id = products.id 
-                                AND discounts.start_date <= NOW() 
-                                AND discounts.end_date >= NOW() 
+                                SELECT discounts.percentage
+                                FROM product_discount
+                                JOIN discounts ON product_discount.discount_id = discounts.id
+                                WHERE product_discount.product_id = products.id
+                                AND discounts.start_date <= NOW()
+                                AND discounts.end_date >= NOW()
                                 LIMIT 1
                             ) / 100))
-                            ELSE products.harga 
+                            ELSE products.harga
                         END ASC
                     ');
                     break;
-                    
+
                 case 'price_desc':
                     // Sort by discounted price (high to low)
                     $query->orderByRaw('
-                        CASE 
+                        CASE
                             WHEN EXISTS (
-                                SELECT 1 FROM product_discount 
-                                JOIN discounts ON product_discount.discount_id = discounts.id 
-                                WHERE product_discount.product_id = products.id 
-                                AND discounts.start_date <= NOW() 
+                                SELECT 1 FROM product_discount
+                                JOIN discounts ON product_discount.discount_id = discounts.id
+                                WHERE product_discount.product_id = products.id
+                                AND discounts.start_date <= NOW()
                                 AND discounts.end_date >= NOW()
-                            ) 
+                            )
                             THEN (products.harga - (products.harga * (
-                                SELECT discounts.percentage 
-                                FROM product_discount 
-                                JOIN discounts ON product_discount.discount_id = discounts.id 
-                                WHERE product_discount.product_id = products.id 
-                                AND discounts.start_date <= NOW() 
-                                AND discounts.end_date >= NOW() 
+                                SELECT discounts.percentage
+                                FROM product_discount
+                                JOIN discounts ON product_discount.discount_id = discounts.id
+                                WHERE product_discount.product_id = products.id
+                                AND discounts.start_date <= NOW()
+                                AND discounts.end_date >= NOW()
                                 LIMIT 1
                             ) / 100))
-                            ELSE products.harga 
+                            ELSE products.harga
                         END DESC
                     ');
                     break;
-                    
+
                 case 'name_asc':
                     $query->orderBy('name', 'asc');
                     break;
-                    
+
                 case 'name_desc':
                     $query->orderBy('name', 'desc');
                     break;
-                    
+
                 default:
                     $query->latest();
             }
@@ -111,9 +112,39 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        // Load relationships dengan discounts
+        // Load relationships including reviews with pagination
         $product->load(['images', 'category', 'sizes', 'discounts']);
-        
+
+        // ✅ Load reviews with pagination (10 per page)
+        $reviews = Review::where('product_id', $product->id)
+            ->with('user:id,name')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        // ✅ Calculate review statistics
+        $totalReviews = $product->total_reviews ?? 0;
+        $averageRating = $product->rating_rata ?? 0;
+
+        // ✅ Get rating distribution (1-5 stars) - PERBAIKAN
+        $ratingDistribution = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $ratingDistribution[$i] = Review::where('product_id', $product->id)
+                ->where('rating', $i)
+                ->count();
+        }
+
+        // ✅ Calculate rating percentages - PERBAIKAN
+        $ratingPercentages = [];
+        if ($totalReviews > 0) {
+            for ($i = 1; $i <= 5; $i++) {
+                $ratingPercentages[$i] = round(($ratingDistribution[$i] / $totalReviews) * 100, 1);
+            }
+        } else {
+            for ($i = 1; $i <= 5; $i++) {
+                $ratingPercentages[$i] = 0;
+            }
+        }
+
         // Produk rekomendasi - load discounts juga
         $recommendedProducts = Product::where('is_featured', 1)
             ->where('id', '!=', $product->id)
@@ -123,8 +154,13 @@ class ProductController extends Controller
             ->get();
 
         return view('products.show', compact(
-            'product', 
-            'recommendedProducts'
+            'product',
+            'recommendedProducts',
+            'reviews',
+            'totalReviews',
+            'averageRating',
+            'ratingDistribution',
+            'ratingPercentages'
         ));
     }
 
@@ -137,10 +173,10 @@ class ProductController extends Controller
 
         if (request()->has('q') && request('q') != '') {
             $searchTerm = request('q');
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('deskripsi', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('sku', 'like', '%' . $searchTerm . '%');
+                    ->orWhere('deskripsi', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('sku', 'like', '%' . $searchTerm . '%');
             });
         }
 
@@ -149,60 +185,60 @@ class ProductController extends Controller
             switch (request('sort')) {
                 case 'price_asc':
                     $query->orderByRaw('
-                        CASE 
+                        CASE
                             WHEN EXISTS (
-                                SELECT 1 FROM product_discount 
-                                JOIN discounts ON product_discount.discount_id = discounts.id 
-                                WHERE product_discount.product_id = products.id 
-                                AND discounts.start_date <= NOW() 
+                                SELECT 1 FROM product_discount
+                                JOIN discounts ON product_discount.discount_id = discounts.id
+                                WHERE product_discount.product_id = products.id
+                                AND discounts.start_date <= NOW()
                                 AND discounts.end_date >= NOW()
-                            ) 
+                            )
                             THEN (products.harga - (products.harga * (
-                                SELECT discounts.percentage 
-                                FROM product_discount 
-                                JOIN discounts ON product_discount.discount_id = discounts.id 
-                                WHERE product_discount.product_id = products.id 
-                                AND discounts.start_date <= NOW() 
-                                AND discounts.end_date >= NOW() 
+                                SELECT discounts.percentage
+                                FROM product_discount
+                                JOIN discounts ON product_discount.discount_id = discounts.id
+                                WHERE product_discount.product_id = products.id
+                                AND discounts.start_date <= NOW()
+                                AND discounts.end_date >= NOW()
                                 LIMIT 1
                             ) / 100))
-                            ELSE products.harga 
+                            ELSE products.harga
                         END ASC
                     ');
                     break;
-                    
+
                 case 'price_desc':
                     $query->orderByRaw('
-                        CASE 
+                        CASE
                             WHEN EXISTS (
-                                SELECT 1 FROM product_discount 
-                                JOIN discounts ON product_discount.discount_id = discounts.id 
-                                WHERE product_discount.product_id = products.id 
-                                AND discounts.start_date <= NOW() 
+                                SELECT 1 FROM product_discount
+                                JOIN discounts ON product_discount.discount_id = discounts.id
+                                WHERE product_discount.product_id = products.id
+                                AND discounts.start_date <= NOW()
                                 AND discounts.end_date >= NOW()
-                            ) 
+                            )
                             THEN (products.harga - (products.harga * (
-                                SELECT discounts.percentage 
-                                FROM product_discount 
-                                JOIN discounts ON product_discount.discount_id = discounts.id 
-                                WHERE product_discount.product_id = products.id 
-                                AND discounts.start_date <= NOW() 
-                                AND discounts.end_date >= NOW() 
+                                SELECT discounts.percentage
+                                FROM product_discount
+                                JOIN discounts ON product_discount.discount_id = discounts.id
+                                WHERE product_discount.product_id = products.id
+                                AND discounts.start_date <= NOW()
+                                AND discounts.end_date >= NOW()
                                 LIMIT 1
                             ) / 100))
-                            ELSE products.harga 
+                            ELSE products.harga
                         END DESC
                     ');
                     break;
-                    
+
                 case 'name_asc':
                     $query->orderBy('name', 'asc');
                     break;
-                    
+
                 case 'name_desc':
                     $query->orderBy('name', 'desc');
                     break;
-                    
+
                 default:
                     $query->latest();
             }
