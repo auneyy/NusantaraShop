@@ -164,4 +164,9 @@ class Order extends Model
 {
     return $this->hasMany(Review::class);
 }
+
+public function hasReviewForProduct($productId)
+{
+    return $this->reviews()->where('product_id', $productId)->exists();
+}
 }
