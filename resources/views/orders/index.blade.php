@@ -525,12 +525,12 @@
     }
 
     .modal-btn-confirm {
-        background: #dc3545;
+        background:rgb(36, 194, 11);
         color: white;
     }
 
     .modal-btn-confirm:hover {
-        background: #c82333;
+        background:rgb(43, 200, 35);
     }
 
     /* Toast */
@@ -1019,6 +1019,23 @@
             </button>
             <button type="button" class="modal-btn modal-btn-confirm" onclick="confirmCancel()">
                 Ya, Batalkan
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delivery Confirmation Modal -->
+<div id="deliveryConfirmationModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-icon">📦</div>
+        <h4 class="modal-title">Konfirmasi Penerimaan</h4>
+        <p class="modal-text">Apakah Anda yakin pesanan sudah diterima dengan baik?</p>
+        <div class="modal-buttons">
+            <button type="button" class="modal-btn modal-btn-cancel" id="cancelDeliveryBtn">
+                Batal
+            </button>
+            <button type="button" class="modal-btn modal-btn-confirm" id="confirmDeliveryBtn">
+                Ya, Konfirmasi
             </button>
         </div>
     </div>
@@ -1640,21 +1657,70 @@
             });
     }
 
-    function confirmDelivery(orderNumber) {
-        if (!confirm('Apakah Anda yakin pesanan sudah diterima dengan baik?')) {
-            return;
+    let currentOrderNumber = null;
+
+    function showDeliveryConfirmation(orderNumber) {
+        currentOrderNumber = orderNumber;
+        const modal = document.getElementById('deliveryConfirmationModal');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function hideDeliveryConfirmation() {
+        const modal = document.getElementById('deliveryConfirmationModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+        currentOrderNumber = null;
+    }
+
+    // Initialize delivery confirmation handlers
+    document.addEventListener('DOMContentLoaded', function() {
+        const confirmBtn = document.getElementById('confirmDeliveryBtn');
+        const cancelBtn = document.getElementById('cancelDeliveryBtn');
+        const modal = document.getElementById('deliveryConfirmationModal');
+
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', function() {
+                if (currentOrderNumber) {
+                    processDeliveryConfirmation(currentOrderNumber);
+                }
+            });
         }
 
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', hideDeliveryConfirmation);
+        }
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                hideDeliveryConfirmation();
+            }
+        });
+    });
+
+    function confirmDelivery(orderNumber) {
+        showDeliveryConfirmation(orderNumber);
+    }
+
+    function processDeliveryConfirmation(orderNumber) {
         const button = document.getElementById('confirm-btn-' + orderNumber);
         if (!button) {
             console.error('Button not found for order:', orderNumber);
+            hideDeliveryConfirmation();
             return;
         }
 
         const originalText = button.innerHTML;
         button.disabled = true;
         button.classList.add('btn-loading');
-        button.innerHTML = 'Memproses...';
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...';
+
+        // Show loading state in modal button
+        const confirmBtn = document.getElementById('confirmDeliveryBtn');
+        const confirmBtnText = confirmBtn.innerHTML;
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...';
 
         // Dapatkan CSRF token
         const csrfToken = document.querySelector('meta[name="csrf-token"]');
@@ -1717,12 +1783,13 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                showToast('error', 'Gagal!', error.message || 'Terjadi kesalahan saat memproses konfirmasi');
-
-                // Restore button
-                button.disabled = false;
-                button.classList.remove('btn-loading');
-                button.innerHTML = originalText;
+                hideDeliveryConfirmation();
+                showToast('error', 'Gagal', error.message || 'Terjadi kesalahan saat memproses konfirmasi');
+                if (button) {
+                    button.disabled = false;
+                    button.classList.remove('btn-loading');
+                    button.innerHTML = originalText;
+                }
             });
     }
 
