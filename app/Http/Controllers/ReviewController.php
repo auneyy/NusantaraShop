@@ -23,23 +23,56 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
 {
-    $validated = $request->validate([
-        'order_id' => 'required|exists:orders,id',
-        'product_id' => 'required|exists:products,id',
-        'rating' => 'required|integer|min:1|max:5',
-        'komentar' => 'nullable|string|max:1000',
-        'images' => 'nullable|array|max:5',
-        'images.*' => 'image|mimes:jpeg,png,jpg|max:2048'
-    ]);
-
     try {
+        // Log incoming request for debugging
+        Log::info('Review submission received', [
+            'user_id' => Auth::id(),
+            'data' => $request->all()
+        ]);
+
+        $validated = $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'product_id' => 'required|exists:products,id',
+            'rating' => 'required|integer|min:1|max:5',
+            'komentar' => 'nullable|string|max:1000',
+            'images' => 'nullable|array|max:3',
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048'
+        ]);
+
+        // Log validated data
+        Log::info('Validated data', $validated);
+
         DB::beginTransaction();
 
         // Verify order belongs to user and is delivered/diterima
         $order = Order::where('id', $validated['order_id'])
                      ->where('user_id', Auth::id())
-                     ->whereIn('status', ['delivered', 'diterima'])
-                     ->firstOrFail();
+                     ->first();
+
+        if (!$order) {
+            Log::warning('Order not found or unauthorized', [
+                'order_id' => $validated['order_id'],
+                'user_id' => Auth::id()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan tidak ditemukan.'
+            ], 404);
+        }
+
+        // Check if order is delivered
+        if (!in_array($order->status, ['delivered', 'diterima'])) {
+            Log::warning('Order not yet delivered', [
+                'order_id' => $order->id,
+                'status' => $order->status
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan belum dapat direview. Status: ' . ucfirst($order->status)
+            ], 400);
+        }
 
         // Check if product is in the order
         $orderItem = $order->orderItems()
@@ -47,7 +80,15 @@ class ReviewController extends Controller
                           ->first();
 
         if (!$orderItem) {
-            return back()->with('error', 'Produk tidak ditemukan dalam pesanan ini.');
+            Log::warning('Product not in order', [
+                'order_id' => $order->id,
+                'product_id' => $validated['product_id']
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Produk tidak ditemukan dalam pesanan ini.'
+            ], 400);
         }
 
         // Check if already reviewed
@@ -57,16 +98,37 @@ class ReviewController extends Controller
                                ->first();
 
         if ($existingReview) {
-            return back()->with('error', 'Anda sudah memberikan review untuk produk ini.');
+            Log::warning('Product already reviewed', [
+                'order_id' => $order->id,
+                'product_id' => $validated['product_id'],
+                'user_id' => Auth::id()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda sudah memberikan review untuk produk ini.'
+            ], 400);
         }
 
         // Handle image uploads
         $imagePaths = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                $path = $image->store('reviews', 'public');
-                $imagePaths[] = $path;
+                try {
+                    $path = $image->store('reviews', 'public');
+                    $imagePaths[] = $path;
+                } catch (\Exception $e) {
+                    Log::error('Error uploading review image', [
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
+        }
+
+        // Pastikan komentar tidak null jika ada input
+        $komentarValue = $request->input('komentar');
+        if (empty($komentarValue) || trim($komentarValue) === '') {
+            $komentarValue = null;
         }
 
         // Create review
@@ -75,9 +137,14 @@ class ReviewController extends Controller
             'product_id' => $validated['product_id'],
             'order_id' => $validated['order_id'],
             'rating' => $validated['rating'],
-            'komentar' => $validated['komentar'] ?? null,
+            'komentar' => $komentarValue,
             'images' => !empty($imagePaths) ? json_encode($imagePaths) : null,
             'is_verified' => true,
+        ]);
+
+        // Log created review
+        Log::info('Review created', [
+            'review' => $review->toArray()
         ]);
 
         // Update product rating statistics
@@ -88,32 +155,56 @@ class ReviewController extends Controller
 
         DB::commit();
 
-        Log::info('Review created', [
+        Log::info('Review created successfully', [
             'review_id' => $review->id,
             'user_id' => Auth::id(),
             'product_id' => $validated['product_id'],
             'order_id' => $validated['order_id'],
-            'rating' => $validated['rating']
+            'rating' => $validated['rating'],
+            'komentar' => $review->komentar
         ]);
 
-        // Redirect back to product page with success message
-        return redirect()
-            ->route('products.show', $product->slug)
-            ->with('success', 'Review berhasil ditambahkan! Terima kasih atas feedback Anda.');
+        // Return JSON response
+        return response()->json([
+            'success' => true,
+            'message' => 'Review berhasil ditambahkan! Terima kasih atas feedback Anda.',
+            'review' => [
+                'id' => $review->id,
+                'rating' => $review->rating,
+                'komentar' => $review->komentar,
+                'created_at' => $review->created_at->format('d M Y')
+            ]
+        ], 200);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        DB::rollBack();
+
+        Log::error('Validation error in review submission', [
+            'errors' => $e->errors(),
+            'user_id' => Auth::id()
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Data tidak valid.',
+            'errors' => $e->errors()
+        ], 422);
 
     } catch (\Exception $e) {
         DB::rollBack();
-        
+
         Log::error('Error creating review', [
             'error' => $e->getMessage(),
             'trace' => $e->getTraceAsString(),
             'user_id' => Auth::id(),
-            'product_id' => $validated['product_id'] ?? null
+            'product_id' => $request->product_id ?? null
         ]);
 
-        return back()
-            ->with('error', 'Gagal menambahkan review. Silakan coba lagi.')
-            ->withInput();
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal menambahkan review. Silakan coba lagi.',
+            'error' => config('app.debug') ? $e->getMessage() : null
+        ], 500);
     }
 }
 
@@ -124,12 +215,12 @@ class ReviewController extends Controller
     {
         try {
             $product = Product::findOrFail($productId);
-            
+
             // Get reviews with pagination
             $reviews = Review::where('product_id', $productId)
-                            ->with('user:id,name') // Only load necessary user fields
-                            ->orderBy('created_at', 'desc')
-                            ->paginate(10);
+                ->with('user:id,name') // Only load necessary user fields
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
 
             // Calculate statistics
             $totalReviews = $product->total_reviews;
@@ -140,7 +231,7 @@ class ReviewController extends Controller
             // Return HTML view for AJAX requests
             if (request()->ajax() || request()->expectsJson()) {
                 $html = view('partials.reviews_list', compact('reviews'))->render();
-                
+
                 return response()->json([
                     'success' => true,
                     'html' => $html,
@@ -163,7 +254,6 @@ class ReviewController extends Controller
                     'rating_percentages' => $ratingPercentages
                 ]
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching reviews', [
                 'product_id' => $productId,
@@ -196,8 +286,8 @@ class ReviewController extends Controller
             DB::beginTransaction();
 
             $review = Review::where('id', $id)
-                           ->where('user_id', Auth::id())
-                           ->firstOrFail();
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
 
             // Handle existing images
             $existingImages = $review->images ? json_decode($review->images, true) : [];
@@ -244,7 +334,6 @@ class ReviewController extends Controller
                 'message' => 'Review berhasil diperbarui!',
                 'review' => $review->load('user')
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -269,8 +358,8 @@ class ReviewController extends Controller
             DB::beginTransaction();
 
             $review = Review::where('id', $id)
-                           ->where('user_id', Auth::id())
-                           ->firstOrFail();
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
 
             $productId = $review->product_id;
 
@@ -301,7 +390,6 @@ class ReviewController extends Controller
                 'success' => true,
                 'message' => 'Review berhasil dihapus!'
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -324,15 +412,14 @@ class ReviewController extends Controller
     {
         try {
             $reviews = Review::where('user_id', Auth::id())
-                            ->with(['product', 'order'])
-                            ->orderBy('created_at', 'desc')
-                            ->paginate(10);
+                ->with(['product', 'order'])
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
 
             return response()->json([
                 'success' => true,
                 'reviews' => $reviews
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching user reviews', [
                 'user_id' => Auth::id(),
@@ -358,8 +445,8 @@ class ReviewController extends Controller
 
         try {
             $order = Order::where('id', $request->order_id)
-                         ->where('user_id', Auth::id())
-                         ->first();
+                ->where('user_id', Auth::id())
+                ->first();
 
             if (!$order) {
                 return response()->json([
@@ -376,9 +463,9 @@ class ReviewController extends Controller
             }
 
             $hasReview = Review::where('user_id', Auth::id())
-                              ->where('product_id', $request->product_id)
-                              ->where('order_id', $request->order_id)
-                              ->exists();
+                ->where('product_id', $request->product_id)
+                ->where('order_id', $request->order_id)
+                ->exists();
 
             if ($hasReview) {
                 return response()->json([
@@ -391,7 +478,6 @@ class ReviewController extends Controller
                 'can_review' => true,
                 'reason' => null
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error checking review eligibility', [
                 'error' => $e->getMessage()

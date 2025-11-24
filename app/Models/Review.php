@@ -21,8 +21,14 @@ class Review extends Model
 
     protected $casts = [
         'is_verified' => 'boolean',
-        'images' => 'array', // Automatically cast JSON to array
+        'images' => 'array',
     ];
+
+    // ✅ Tambahkan mutator untuk memastikan komentar tidak hanya whitespace
+    public function setKomentarAttribute($value)
+    {
+        $this->attributes['komentar'] = (empty($value) || trim($value) === '') ? null : trim($value);
+    }
 
     // Relationships
     public function user()
@@ -57,6 +63,12 @@ class Review extends Model
         return number_format($this->rating, 1);
     }
 
+    // ✅ Tambahkan accessor untuk check apakah ada komentar
+    public function getHasKomentarAttribute()
+    {
+        return !empty($this->komentar) && trim($this->komentar) !== '';
+    }
+
     // Scopes
     public function scopeVerified($query)
     {
@@ -76,5 +88,11 @@ class Review extends Model
     public function scopeWithImages($query)
     {
         return $query->whereNotNull('images');
+    }
+
+    // ✅ Scope untuk review dengan komentar
+    public function scopeWithKomentar($query)
+    {
+        return $query->whereNotNull('komentar')->where('komentar', '!=', '');
     }
 }

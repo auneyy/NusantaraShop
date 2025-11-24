@@ -29,23 +29,24 @@
                         @endif
                     </div>
                 </div>
-                
-                @if($review->komentar)
+
+                {{-- ✅ PERBAIKAN: Check komentar dengan lebih robust --}}
+                @if(!empty($review->komentar) && trim($review->komentar) !== '')
                     <div class="review-comment mt-3">
-                        <p class="mb-0" style="line-height: 1.6; color: #333;">{{ $review->komentar }}</p>
+                        <p class="mb-0" style="line-height: 1.6; color: #333; white-space: pre-wrap;">{{ $review->komentar }}</p>
                     </div>
                 @endif
-                
+
                 @if($review->images)
                     <div class="review-images mt-3">
                         @php
                             $images = is_array($review->images) ? $review->images : json_decode($review->images, true);
                         @endphp
-                        @if($images)
+                        @if($images && is_array($images))
                             @foreach($images as $image)
-                                <img src="{{ asset('storage/' . $image) }}" 
-                                     alt="Review Image" 
-                                     class="review-image" 
+                                <img src="{{ asset('storage/' . $image) }}"
+                                     alt="Review Image"
+                                     class="review-image"
                                      style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-right: 10px; cursor: pointer; border: 1px solid #e0e0e0;"
                                      onclick="showImageModal('{{ asset('storage/' . $image) }}')">
                             @endforeach
@@ -253,17 +254,17 @@
     .review-card {
         padding: 1rem;
     }
-    
+
     .review-avatar {
         width: 40px;
         height: 40px;
         font-size: 1rem;
     }
-    
+
     .review-images {
         flex-wrap: wrap;
     }
-    
+
     .review-image {
         width: 80px !important;
         height: 80px !important;
@@ -276,7 +277,7 @@
 function showImageModal(imageSrc) {
     const modal = document.getElementById('reviewImageModal');
     const modalImg = document.getElementById('modalImage');
-    
+
     if (modal && modalImg) {
         modal.style.display = 'block';
         modalImg.src = imageSrc;

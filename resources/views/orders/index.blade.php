@@ -257,24 +257,24 @@
         cursor: pointer;
         transition: all 0.2s ease;
     }
-    
+
     .btn-pay {
         background: #4f46e5;
     }
-    
+
     .btn-received {
         background: #10b981;
     }
-    
+
     .btn-received:hover {
         background: #0d9f6e;
     }
-    
+
     .btn-received:disabled {
         background: #d1fae5;
         cursor: not-allowed;
     }
-    
+
     /* Review Form Styles */
     .review-form {
         margin-top: 1.5rem;
@@ -283,24 +283,24 @@
         border-radius: 8px;
         border: 1px solid #e9ecef;
     }
-    
+
     .review-form h5 {
         margin-bottom: 1rem;
         color: #212529;
         font-weight: 600;
     }
-    
+
     .rating-stars {
         margin-bottom: 1rem;
     }
-    
+
     .rating-stars i {
         font-size: 1.5rem;
         color: #ffc107;
         cursor: pointer;
         margin-right: 0.25rem;
     }
-    
+
     .review-textarea {
         width: 100%;
         min-height: 100px;
@@ -310,14 +310,14 @@
         margin-bottom: 1rem;
         resize: vertical;
     }
-    
+
     .review-images-preview {
         display: flex;
         gap: 0.5rem;
         margin-bottom: 1rem;
         flex-wrap: wrap;
     }
-    
+
     .review-image-preview {
         width: 80px;
         height: 80px;
@@ -814,8 +814,8 @@
                                 @php
                                     $firstItem = $order->orderItems->first();
                                 @endphp
-                                <img src="{{ $firstItem->product->images->first()->image_path ?? 'https://via.placeholder.com/70x70?text=No+Image' }}" 
-                                     alt="{{ $firstItem->product_name }}" 
+                                <img src="{{ $firstItem->product->images->first()->image_path ?? 'https://via.placeholder.com/70x70?text=No+Image' }}"
+                                     alt="{{ $firstItem->product_name }}"
                                      class="item-image">
                                 <div class="item-info">
                                     <div class="item-name">{{ $firstItem->product_name }}</div>
@@ -861,17 +861,17 @@
         <a href="{{ route('orders.show', $order->order_number) }}" class="btn-details">
             Order Details
         </a>
-        
+
         {{-- Tombol Bayar untuk Midtrans --}}
         @if($order->payment_method === 'midtrans' && ($order->payment_status === 'pending' || !isset($order->payment_status)) && $order->status !== 'cancelled')
             <a href="{{ route('orders.show', $order->order_number) }}" class="btn-pay">
                 Bayar
             </a>
         @endif
-        
+
         {{-- Tombol Konfirmasi Penerimaan - BAGIAN BARU --}}
         @if(in_array($order->status, ['dikirim', 'shipped']))
-            <button onclick="confirmDelivery('{{ $order->order_number }}')" 
+            <button onclick="confirmDelivery('{{ $order->order_number }}')"
                     class="btn-confirm-delivery"
                     id="confirm-btn-{{ $order->order_number }}">
                 Konfirmasi Diterima
@@ -890,9 +890,9 @@
                         }
                     }
                 @endphp
-                
+
                 @if($hasUnreviewedItems)
-                    <button onclick="showReviewModal('{{ $order->id }}')" 
+                    <button onclick="showReviewModal('{{ $order->id }}')"
                             class="btn-add-review">
                         📝 Beri Ulasan
                     </button>
@@ -902,10 +902,10 @@
             </div>
         {{-- Tombol Batalkan untuk pending --}}
         @elseif(($order->payment_status === 'pending' || !isset($order->payment_status)) && $order->status !== 'cancelled')
-            <form action="{{ route('orders.cancel', $order->order_number) }}" 
-                  method="POST" 
-                  style="display: inline;" 
-                  class="cancel-form" 
+            <form action="{{ route('orders.cancel', $order->order_number) }}"
+                  method="POST"
+                  style="display: inline;"
+                  class="cancel-form"
                   data-order-number="{{ $order->order_number }}">
                 @csrf
                 @method('DELETE')
@@ -983,7 +983,7 @@
                 </ul>
             </nav>
         @endif
-        
+
         @else
         <!-- Empty State -->
         <div class="empty-state">
@@ -1018,37 +1018,39 @@
 <!-- Review Modal -->
 <div id="reviewModal" class="modal-overlay">
     <div class="modal-content" style="max-width: 600px;">
-        <span class="close-modal">&times;</span>
+        <span class="close-modal" style="cursor: pointer; float: right; font-size: 28px; font-weight: bold;">&times;</span>
         <h4 class="modal-title">Beri Ulasan</h4>
         <div class="modal-body">
             <form id="reviewForm" class="review-form" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="order_id" id="reviewOrderId">
                 <input type="hidden" name="product_id" id="reviewProductId">
-                
+
                 <div class="mb-3">
                     <label class="form-label">Rating</label>
                     <div class="rating-stars">
-                        @for($i = 1; $i <= 5; $i++)
-                            <i class="fas fa-star" data-rating="{{ $i }}"></i>
-                        @endfor
+                        <i class="fas fa-star" data-rating="1"></i>
+                        <i class="fas fa-star" data-rating="2"></i>
+                        <i class="fas fa-star" data-rating="3"></i>
+                        <i class="fas fa-star" data-rating="4"></i>
+                        <i class="fas fa-star" data-rating="5"></i>
                         <input type="hidden" name="rating" id="ratingInput" value="5" required>
                     </div>
                 </div>
-                
+
                 <div class="mb-3">
-                    <label for="comment" class="form-label">Ulasan Anda</label>
-                    <textarea name="comment" id="comment" class="review-textarea" placeholder="Bagaimana pengalaman Anda dengan produk ini?" required></textarea>
+                    <label for="komentar" class="form-label">Ulasan Anda</label>
+                    <textarea name="komentar" id="komentar" class="review-textarea" placeholder="Bagaimana pengalaman Anda dengan produk ini?" required></textarea>
                 </div>
-                
+
                 <div class="mb-3">
                     <label for="reviewImages" class="form-label">Unggah Foto (Maks. 3)</label>
                     <input type="file" name="images[]" id="reviewImages" class="form-control" multiple accept="image/*">
                     <small class="text-muted">Format: JPG, PNG, maksimal 2MB per gambar</small>
-                    
+
                     <div class="review-images-preview mt-2" id="imagePreview"></div>
                 </div>
-                
+
                 <div class="d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-outline-secondary" id="cancelReview">Batal</button>
                     <button type="submit" class="btn btn-primary">Kirim Ulasan</button>
@@ -1062,10 +1064,13 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-let currentCancelForm = null;
 let currentRating = 5;
+let selectedOrderId = null;
+let selectedProductId = null;
 
-// Initialize rating stars
+/**
+ * Initialize rating stars
+ */
 function initRatingStars() {
     const stars = document.querySelectorAll('.rating-stars i');
     stars.forEach(star => {
@@ -1073,7 +1078,7 @@ function initRatingStars() {
             const rating = parseInt(this.getAttribute('data-rating'));
             currentRating = rating;
             document.getElementById('ratingInput').value = rating;
-            
+
             // Update stars display
             stars.forEach((s, index) => {
                 if (index < rating) {
@@ -1085,33 +1090,62 @@ function initRatingStars() {
                 }
             });
         });
+
+        // Hover effect
+        star.addEventListener('mouseenter', function() {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            stars.forEach((s, index) => {
+                if (index < rating) {
+                    s.style.color = '#ffc107';
+                } else {
+                    s.style.color = '#ddd';
+                }
+            });
+        });
     });
+
+    // Reset on mouse leave
+    const starsContainer = document.querySelector('.rating-stars');
+    if (starsContainer) {
+        starsContainer.addEventListener('mouseleave', function() {
+            const currentValue = parseInt(document.getElementById('ratingInput').value);
+            stars.forEach((s, index) => {
+                if (index < currentValue) {
+                    s.style.color = '#ffc107';
+                } else {
+                    s.style.color = '#ddd';
+                }
+            });
+        });
+    }
 }
 
-// Handle image preview
+/**
+ * Handle image preview
+ */
 function handleImagePreview(input) {
     const preview = document.getElementById('imagePreview');
     preview.innerHTML = '';
-    
+
     if (input.files.length > 3) {
-        alert('Maksimal 3 gambar yang dapat diunggah');
+        showToast('error', 'Error', 'Maksimal 3 gambar yang dapat diunggah');
         input.value = '';
         return;
     }
-    
+
     Array.from(input.files).forEach(file => {
         if (!file.type.match('image.*')) {
-            alert('Hanya file gambar yang diizinkan');
+            showToast('error', 'Error', 'Hanya file gambar yang diizinkan');
             input.value = '';
             return;
         }
-        
+
         if (file.size > 2 * 1024 * 1024) {
-            alert('Ukuran file maksimal 2MB');
+            showToast('error', 'Error', 'Ukuran file maksimal 2MB');
             input.value = '';
             return;
         }
-        
+
         const reader = new FileReader();
         reader.onload = function(e) {
             const img = document.createElement('img');
@@ -1123,24 +1157,86 @@ function handleImagePreview(input) {
     });
 }
 
-// Show review modal
-function showReviewModal(orderId, productId) {
-    document.getElementById('reviewOrderId').value = orderId;
-    document.getElementById('reviewProductId').value = productId;
-    document.getElementById('reviewModal').style.display = 'flex';
+/**
+ * Show review modal
+ */
+function showReviewModal(orderId) {
+    console.log('Opening review modal for order:', orderId);
+
+    selectedOrderId = orderId;
+
+    // Fetch order items
+    fetch(`/orders/${orderId}/items`, {
+        method: 'GET',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Order items:', data);
+
+        if (data.success && data.items && data.items.length > 0) {
+            // Find first unreviewable item
+            const unreviewed = data.items.find(item => !item.has_review);
+
+            if (unreviewed) {
+                selectedProductId = unreviewed.product_id;
+                document.getElementById('reviewOrderId').value = orderId;
+                document.getElementById('reviewProductId').value = unreviewed.product_id;
+
+                // Update modal title with product name
+                const modalTitle = document.querySelector('#reviewModal .modal-title');
+                if (modalTitle) {
+                    modalTitle.textContent = `Beri Ulasan - ${unreviewed.product_name}`;
+                }
+
+                // Show modal
+                document.getElementById('reviewModal').classList.add('show');
+                document.getElementById('reviewModal').style.display = 'flex';
+            } else {
+                showToast('info', 'Info', 'Semua produk sudah direview');
+            }
+        } else {
+            showToast('error', 'Error', 'Tidak ada produk yang dapat direview');
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching order items:', error);
+        showToast('error', 'Error', 'Gagal memuat data produk: ' + error.message);
+    });
 }
 
-// Close review modal
+/**
+ * Close review modal
+ */
 function closeReviewModal() {
-    document.getElementById('reviewModal').style.display = 'none';
+    const modal = document.getElementById('reviewModal');
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+
+    // Reset form
     document.getElementById('reviewForm').reset();
     document.getElementById('imagePreview').innerHTML = '';
     currentRating = 5;
-    
+    selectedOrderId = null;
+    selectedProductId = null;
+
     // Reset stars
     const stars = document.querySelectorAll('.rating-stars i');
     stars.forEach((star, index) => {
-        star.className = index < 5 ? 'fas fa-star' : 'far fa-star';
+        if (index < 5) {
+            star.classList.add('fas');
+            star.classList.remove('far');
+        }
+        star.style.color = '#ffc107';
     });
 }
 
@@ -1149,11 +1245,11 @@ function markAsDelivered(button, orderId) {
     if (!confirm('Apakah Anda yakin pesanan sudah diterima?')) {
         return;
     }
-    
+
     const buttonText = button.innerHTML;
     button.disabled = true;
     button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...';
-    
+
     fetch(`/orders/${orderId}/mark-delivered`, {
         method: 'POST',
         headers: {
@@ -1173,19 +1269,19 @@ function markAsDelivered(button, orderId) {
                     <small class="text-muted d-block">${data.delivered_at}</small>
                 `;
             }
-            
+
             // Hide the received button
             button.style.display = 'none';
-            
+
             // Show success message
             alert('Pesanan berhasil ditandai sebagai Diterima');
-            
+
             // Show review button or form
             const reviewButton = document.createElement('button');
             reviewButton.className = 'btn btn-primary btn-sm';
             reviewButton.innerHTML = 'Beri Ulasan';
             reviewButton.onclick = () => showReviewModal(orderId, button.dataset.productId);
-            
+
             const actionsCell = button.closest('td');
             if (actionsCell) {
                 actionsCell.innerHTML = '';
@@ -1210,14 +1306,14 @@ function markAsDelivered(button, orderId) {
 // Handle review form submission
 document.getElementById('reviewForm')?.addEventListener('submit', function(e) {
     e.preventDefault();
-    
+
     const formData = new FormData(this);
     const submitButton = this.querySelector('button[type="submit"]');
     const buttonText = submitButton.innerHTML;
-    
+
     submitButton.disabled = true;
     submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Mengirim...';
-    
+
     // ✅ GANTI ROUTE INI
     fetch('{{ route("reviews.store") }}', {
         method: 'POST',
@@ -1232,7 +1328,7 @@ document.getElementById('reviewForm')?.addEventListener('submit', function(e) {
         if (data.success) {
             showToast('Ulasan berhasil dikirim. Terima kasih!', 'success');
             closeReviewModal();
-            
+
             // Reload after 2 seconds
             setTimeout(() => {
                 window.location.reload();
@@ -1250,27 +1346,116 @@ document.getElementById('reviewForm')?.addEventListener('submit', function(e) {
 });
 
 // Initialize when document is ready
+function handleReviewSubmit(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const submitButton = form.querySelector('button[type="submit"]');
+    const buttonText = submitButton.innerHTML;
+
+    // Disable submit button
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Mengirim...';
+
+    // Create FormData
+    const formData = new FormData(form);
+
+    // Log form data for debugging
+    console.log('Submitting review:', {
+        order_id: formData.get('order_id'),
+        product_id: formData.get('product_id'),
+        rating: formData.get('rating'),
+        komentar: formData.get('komentar')
+    });
+
+    // Submit form
+    fetch('/reviews/store', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+
+        // Check content type
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return response.json();
+        } else {
+            // If not JSON, get text for debugging
+            return response.text().then(text => {
+                console.error('Non-JSON response:', text);
+                throw new Error('Server returned non-JSON response');
+            });
+        }
+    })
+    .then(data => {
+        console.log('Review response:', data);
+
+        if (data.success) {
+            showToast('success', 'Berhasil!', 'Ulasan berhasil dikirim. Terima kasih!');
+            closeReviewModal();
+
+            // Reload page after 2 seconds
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            throw new Error(data.message || 'Gagal mengirim ulasan');
+        }
+    })
+    .catch(error => {
+        console.error('Error submitting review:', error);
+        showToast('error', 'Error', error.message || 'Terjadi kesalahan. Silakan coba lagi.');
+
+        // Re-enable button
+        submitButton.disabled = false;
+        submitButton.innerHTML = buttonText;
+    });
+}
+
+// ===================================
+// INITIALIZE ON PAGE LOAD
+// ===================================
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Initializing review modal...');
+
+    // Initialize rating stars
     initRatingStars();
-    
-    // Close modals when clicking outside
-    const modals = document.querySelectorAll('.modal-overlay');
-    modals.forEach(modal => {
-        modal.addEventListener('click', function(e) {
+
+    // Review form submission
+    const reviewForm = document.getElementById('reviewForm');
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', handleReviewSubmit);
+    }
+
+    // Cancel review button
+    const cancelReviewBtn = document.getElementById('cancelReview');
+    if (cancelReviewBtn) {
+        cancelReviewBtn.addEventListener('click', closeReviewModal);
+    }
+
+    // Close modal when clicking X
+    const closeModalBtn = document.querySelector('#reviewModal .close-modal');
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeReviewModal);
+    }
+
+    // Close modal when clicking outside
+    const reviewModal = document.getElementById('reviewModal');
+    if (reviewModal) {
+        reviewModal.addEventListener('click', function(e) {
             if (e.target === this) {
-                if (this.id === 'cancelModal') {
-                    closeCancelModal();
-                } else if (this.id === 'reviewModal') {
-                    closeReviewModal();
-                }
+                closeReviewModal();
             }
         });
-    });
-    
-    // Close buttons
-    document.querySelector('.close-modal')?.addEventListener('click', closeReviewModal);
-    document.getElementById('cancelReview')?.addEventListener('click', closeReviewModal);
-    
+    }
+
     // Image preview
     const imageInput = document.getElementById('reviewImages');
     if (imageInput) {
@@ -1278,6 +1463,8 @@ document.addEventListener('DOMContentLoaded', function() {
             handleImagePreview(this);
         });
     }
+
+    console.log('Review modal initialized successfully');
 });
 
 function showCancelModal(form) {
@@ -1292,14 +1479,14 @@ function closeCancelModal() {
 
 function confirmCancel() {
     if (!currentCancelForm) return;
-    
+
     const formData = new FormData(currentCancelForm);
     const action = currentCancelForm.getAttribute('action');
     const orderNumber = currentCancelForm.getAttribute('data-order-number');
-    
+
     hideCancelModal();
     showToast('Sedang memproses pembatalan...', 'info');
-    
+
     fetch(action, {
         method: 'POST',
         body: formData,
@@ -1316,7 +1503,7 @@ function confirmCancel() {
                 row.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
                 row.style.opacity = '0';
                 row.style.transform = 'translateX(-20px)';
-                
+
                 setTimeout(() => {
                     row.remove();
                     updateTabCounts();
@@ -1324,7 +1511,7 @@ function confirmCancel() {
                     checkEmptyState();
                 }, 300);
             }
-            
+
             showToast(data.message || 'Pesanan berhasil dibatalkan', 'success');
         } else {
             showToast(data.message || 'Gagal membatalkan pesanan', 'error');
@@ -1339,7 +1526,7 @@ function confirmCancel() {
 function updateTabCounts() {
     const tabs = document.querySelectorAll('.tab-button');
     const rows = document.querySelectorAll('.order-row');
-    
+
     const counts = {
         all: rows.length,
         pending: 0,
@@ -1348,19 +1535,19 @@ function updateTabCounts() {
         delivered: 0,
         cancelled: 0
     };
-    
+
     rows.forEach(row => {
         const status = row.getAttribute('data-status');
         if (counts.hasOwnProperty(status)) {
             counts[status]++;
         }
     });
-    
+
     tabs.forEach(tab => {
         const filter = tab.getAttribute('data-filter');
         const count = counts[filter] || 0;
         const countSpan = tab.querySelector('.tab-count');
-        
+
         if (countSpan) {
             countSpan.textContent = count;
         }
@@ -1369,7 +1556,7 @@ function updateTabCounts() {
 
 function checkEmptyState() {
     const rows = document.querySelectorAll('.order-row');
-    
+
     if (rows.length === 0) {
         const container = document.querySelector('.orders-container .container');
         container.innerHTML = `
@@ -1418,30 +1605,30 @@ function confirmDelivery(orderId, orderNumber) {
     }
 }
 
-function showToast(message, type = 'success') {
+function showToast(type, title, message) {
     const container = document.getElementById('toastContainer');
-    
+    if (!container) {
+        console.error('Toast container not found');
+        alert(`${title}: ${message}`);
+        return;
+    }
+
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    
+
     let icon = '';
-    let title = '';
-    
     switch(type) {
         case 'success':
             icon = '✅';
-            title = 'Berhasil';
             break;
         case 'error':
             icon = '❌';
-            title = 'Error';
             break;
         case 'info':
             icon = 'ℹ️';
-            title = 'Info';
             break;
     }
-    
+
     toast.innerHTML = `
         <div class="toast-icon">${icon}</div>
         <div class="toast-content">
@@ -1450,13 +1637,16 @@ function showToast(message, type = 'success') {
         </div>
         <button class="toast-close" onclick="closeToast(this)">×</button>
     `;
-    
+
     container.appendChild(toast);
-    
+
     setTimeout(() => toast.classList.add('show'), 100);
     setTimeout(() => closeToast(toast.querySelector('.toast-close')), 5000);
 }
 
+/**
+ * Close toast notification
+ */
 function closeToast(button) {
     const toast = button.closest('.toast');
     if (toast) {
@@ -1483,46 +1673,73 @@ function confirmDelivery(orderNumber) {
     if (!confirm('Apakah Anda yakin pesanan sudah diterima dengan baik?')) {
         return;
     }
-    
+
     const button = document.getElementById('confirm-btn-' + orderNumber);
-    if (!button) return;
-    
+    if (!button) {
+        console.error('Button not found for order:', orderNumber);
+        return;
+    }
+
     const originalText = button.innerHTML;
     button.disabled = true;
     button.classList.add('btn-loading');
     button.innerHTML = 'Memproses...';
-    
+
+    // Dapatkan CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) {
+        console.error('CSRF token not found');
+        showToast('error', 'Error', 'CSRF token tidak ditemukan');
+        button.disabled = false;
+        button.classList.remove('btn-loading');
+        button.innerHTML = originalText;
+        return;
+    }
+
     fetch(`/orders/${orderNumber}/mark-delivered`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
-        }
+        },
+        body: JSON.stringify({})
     })
     .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
+        console.log('Response status:', response.status);
+
+        // Clone response untuk bisa dibaca dua kali
+        return response.clone().text().then(text => {
+            console.log('Response text:', text);
+
+            // Coba parse sebagai JSON
+            try {
+                const data = JSON.parse(text);
+                return { ok: response.ok, status: response.status, data: data };
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                return { ok: response.ok, status: response.status, error: 'Invalid JSON response' };
+            }
+        });
     })
-    .then(data => {
-        if (data.success) {
-            showToast('success', 'Berhasil!', data.message);
-            
-            // Update UI: Reload page setelah 1.5 detik
+    .then(result => {
+        if (result.ok && result.data && result.data.success) {
+            showToast('success', 'Berhasil!', result.data.message);
+
+            // Reload page setelah 1.5 detik
             setTimeout(() => {
                 window.location.reload();
             }, 1500);
         } else {
-            throw new Error(data.message || 'Gagal memproses konfirmasi');
+            const errorMessage = result.data?.message || result.error || 'Gagal memproses konfirmasi';
+            throw new Error(errorMessage);
         }
     })
     .catch(error => {
         console.error('Error:', error);
         showToast('error', 'Gagal!', error.message || 'Terjadi kesalahan saat memproses konfirmasi');
-        
+
         // Restore button
         button.disabled = false;
         button.classList.remove('btn-loading');
@@ -1535,7 +1752,7 @@ function confirmDelivery(orderNumber) {
  */
 function showReviewModal(orderId) {
     document.getElementById('reviewOrderId').value = orderId;
-    
+
     // Fetch order items
     fetch(`/orders/${orderId}/items`, {
         headers: {
@@ -1573,13 +1790,19 @@ function closeReviewModal() {
     document.getElementById('reviewForm').reset();
     document.getElementById('imagePreview').innerHTML = '';
     currentRating = 5;
-    
+
     // Reset stars
     const stars = document.querySelectorAll('.rating-stars i');
     stars.forEach((star, index) => {
         star.className = index < 5 ? 'fas fa-star' : 'far fa-star';
     });
 }
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeReviewModal();
+    }
+});
 </script>
 
 @endsection

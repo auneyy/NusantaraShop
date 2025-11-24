@@ -26,12 +26,12 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\AdminController;
 
 Route::post('/webhook/midtrans', [CheckoutController::class, 'midtransNotification'])
-     ->name('webhook.midtrans')
-     ->withoutMiddleware(['web']); // Hapus semua web middleware
+    ->name('webhook.midtrans')
+    ->withoutMiddleware(['web']); // Hapus semua web middleware
 
 Route::post('/payment/notification', [CheckoutController::class, 'midtransNotification'])
-     ->name('payment.notification')
-     ->withoutMiddleware(['web']);
+    ->name('payment.notification')
+    ->withoutMiddleware(['web']);
 
 // Middleware untuk mencegah back history di seluruh aplikasi
 Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(function () {
@@ -43,12 +43,14 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     // Route utama (landing page)
-    Route::get('/', function () {return redirect('/home');});
+    Route::get('/', function () {
+        return redirect('/home');
+    });
 
     // Halaman umum (dapat diakses semua orang)
     Route::get('/promo', [PromoController::class, 'index'])->name('promo');
     Route::view('/contact', 'contact')->name('contact');
-    
+
     // Help & Article Routes
     Route::get('/help', [HelpController::class, 'index'])->name('help');
     Route::get('/help/article/{slug}', [HelpController::class, 'show'])->name('help.article');
@@ -57,7 +59,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
     // Products Resource (menggunakan controller publik yang benar)
     Route::get('/products', [PublicProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product:slug}', [PublicProductController::class, 'show'])->name('products.show');
-    
+
     // Reviews API
 
     // API Routes untuk AJAX (jika ada)
@@ -88,7 +90,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
         // User Login
         Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
         Route::post('/login', [AuthController::class, 'login']);
-        
+
         // Admin Login
         Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
         Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
@@ -106,8 +108,11 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::match(['POST', 'DELETE'], '/{orderNumber}/cancel', [OrderController::class, 'cancel'])->name('cancel');
             Route::patch('/{order}/cancel', [ProfileController::class, 'cancelOrder'])->name('cancel.profile');
             Route::get('/{orderNumber}/check-payment-status', [OrderController::class, 'checkPaymentStatus'])->name('check-payment-status');
-            
-            // ✅ TAMBAHKAN INI
+
+            // ✅ ROUTE YANG BENAR - menggunakan orderNumber sebagai parameter
+            Route::post('/{orderNumber}/mark-delivered', [OrderController::class, 'markAsDelivered'])
+                ->name('mark-delivered');
+
             Route::get('/{orderId}/items', [OrderController::class, 'getOrderItems'])->name('items');
         });
 
@@ -129,10 +134,10 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
         // Order status update
         Route::post('/orders/{order}/mark-delivered', [OrderController::class, 'markAsDelivered'])
             ->name('orders.mark-delivered');
-            
+
         // Check discount status
         Route::get('/api/discounts/check-status', [DiscountController::class, 'checkStatus'])->name('api.discounts.check-status');
-        
+
         // Cart Routes
         Route::prefix('cart')->name('cart.')->group(function () {
             Route::get('/', [CartController::class, 'index'])->name('index');
@@ -156,7 +161,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::post('/settings/preferences', [ProfileController::class, 'updatePreferences'])->name('settings.preferences');
             Route::delete('/delete', [ProfileController::class, 'deleteAccount'])->name('delete');
         });
-        
+
         // Orders Routes
         Route::prefix('orders')->name('orders.')->group(function () {
             Route::get('/', [OrderController::class, 'index'])->name('index');
@@ -165,7 +170,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::patch('/{order}/cancel', [ProfileController::class, 'cancelOrder'])->name('cancel.profile');
             Route::get('/{orderNumber}/check-payment-status', [OrderController::class, 'checkPaymentStatus'])->name('check-payment-status');
         });
-        
+
         // Checkout Routes
         Route::prefix('checkout')->name('checkout.')->group(function () {
             Route::get('/', [CheckoutController::class, 'index'])->name('index');
@@ -183,7 +188,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
 
         // Contact Form
         Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
-        
+
         // User Logout
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     });
@@ -210,7 +215,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
                 ->name('products.deleteImage');
             Route::post('/products/quick-store-category', [AdminProductController::class, 'quickStoreCategory'])
                 ->name('products.quickStoreCategory');
-            
+
             // Discounts
             Route::resource('discounts', DiscountController::class);
             Route::patch('/discounts/{discount}/toggle-status', [DiscountController::class, 'toggleStatus'])
@@ -221,19 +226,19 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
 
             // Artikel Help
             Route::resource('artikel', ArtikelController::class);
-           
+
             // Pesanan
             Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
             Route::get('/orders/{orderNumber}', [AdminOrderController::class, 'show'])->name('orders.show');
             Route::patch('/orders/{orderNumber}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
 
             // Messages/Pesan Masuk
-            Route::resource('messages', MessageController::class)->only(['index','show']);
+            Route::resource('messages', MessageController::class)->only(['index', 'show']);
 
             // Laporan Pendapatan
-         Route::get('/laporan/pendapatan', [LaporanController::class, 'pendapatan'])->name('laporan.pendapatan');
-    Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.export-excel');
-    Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.export-pdf');
+            Route::get('/laporan/pendapatan', [LaporanController::class, 'pendapatan'])->name('laporan.pendapatan');
+            Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.export-excel');
+            Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.export-pdf');
 
             // Pesan Masuk
             Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
@@ -241,7 +246,7 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             Route::patch('/messages/{id}/mark-as-read', [MessageController::class, 'markAsRead'])->name('messages.markAsRead');
             Route::patch('/messages/{id}/mark-as-unread', [MessageController::class, 'markAsUnread'])->name('messages.markAsUnread');
             Route::delete('/messages/{id}', [MessageController::class, 'destroy'])->name('messages.destroy');
-                        
+
             // Admin Logout
             Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
         });
