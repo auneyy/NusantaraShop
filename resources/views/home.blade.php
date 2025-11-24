@@ -35,7 +35,6 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
     z-index: 1;
     transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -375,17 +374,15 @@
   <div class="carousel-inner">
     <!-- Slide 1 -->
     <div class="carousel-item active">
-      <img src="{{ asset('storage/product_images/macambatik.jpg') }}" class="d-block w-100" alt="Elegant Batik Collection">
+      <img src="{{ asset('storage/product_images/hero-image1.png') }}" class="d-block w-100" alt="Elegant Batik Collection">
       <div class="carousel-caption">
-        <h1 class="animate__animated animate__fadeInDown">Temukan pakaian batik yang cocok dengan dirimu di NusantaraShop</h1>
-        <p class="animate__animated animate__fadeInUp">Membuatmu terhubung dengan budaya lewat kenyamanan</p>
         <div class="animate__animated animate__fadeInUp">
           @guest
             <a href="{{ route('register') }}" class="btn btn-primary-custom">Daftar Sekarang</a>
             <a href="{{ route('login') }}" class="btn btn-outline-custom">Masuk</a>
           @endguest
           @auth
-            <a href="{{ url('/products') }}" class="btn btn-primary-custom">Beli Sekarang</a>
+            <!-- <a href="{{ url('/products') }}" class="btn btn-primary-custom">Beli Sekarang</a> -->
           @endauth
         </div>
       </div>
@@ -393,7 +390,7 @@
 
     <!-- Slide 2 -->
     <div class="carousel-item">
-      <img src="{{ asset('storage/product_images/batik2.jpg') }}" class="d-block w-100" alt="Comfort and Style">
+      <img src="{{ asset('storage/product_images/hero-image.jpg') }}" class="d-block w-100" alt="Comfort and Style">
       <div class="carousel-caption">
         <h1 class="animate__animated animate__fadeInDown">Siap Menemani Momenmu</h1>
         <p class="animate__animated animate__fadeInUp">Dibuat dari bahan pilihan yang lembut dan tahan lama, batik kami siap nemenin setiap momenmu.</p>
