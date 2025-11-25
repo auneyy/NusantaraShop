@@ -61,10 +61,9 @@ class Product extends Model
         return $this->belongsToMany(Discount::class, 'product_discount')->withTimestamps();
     }
 
-    // Method untuk mendapatkan discount aktif - PERBAIKAN: hapus kondisi is_valid
-    public function getActiveDiscountAttribute()
+ public function getActiveDiscountAttribute()
     {
-        $currentDate = now()->format('Y-m-d H:i:s');
+        $currentDate = Carbon::now('Asia/Jakarta');
         
         return $this->discounts()
             ->where('start_date', '<=', $currentDate)
@@ -72,6 +71,19 @@ class Product extends Model
             ->orderBy('percentage', 'desc')
             ->first();
     }
+
+    /**
+     * End date dalam format ISO untuk countdown - PERBAIKAN: gunakan timezone
+     */
+    public function getDiscountEndDateIsoAttribute()
+{
+    if ($this->has_active_discount && $this->active_discount->end_date) {
+        return Carbon::parse($this->active_discount->end_date)
+            ->timezone('Asia/Jakarta')
+            ->toISOString(true); // true untuk include milliseconds
+    }
+    return null;
+}
 
     // Cek apakah punya discount aktif
     public function getHasActiveDiscountAttribute()
@@ -107,15 +119,6 @@ class Product extends Model
     public function getDiscountEndDateAttribute()
     {
         return $this->has_active_discount ? $this->active_discount->end_date : null;
-    }
-
-    // End date dalam format ISO untuk countdown
-    public function getDiscountEndDateIsoAttribute()
-    {
-        if ($this->has_active_discount && $this->active_discount->end_date) {
-            return Carbon::parse($this->active_discount->end_date)->toISOString();
-        }
-        return null;
     }
 
     public function getFormattedHargaFinalAttribute()

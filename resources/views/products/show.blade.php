@@ -1291,272 +1291,318 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // ========================================
-        // COUNTDOWN TIMER
-        // ========================================
-        const productCountdown = document.querySelector('.product-countdown-timer');
+// ✅ COMPLETE FIXED VERSION - PRODUCT DETAIL PAGE
+(function() {
+    'use strict';
+    
+    console.log('🚀 PRODUCT DETAIL - COMPLETE FIXED VERSION LOADED');
 
-        if (productCountdown) {
-            const endDate = new Date(productCountdown.dataset.endDate).getTime();
+    // ========================================
+    // UTILITY FUNCTIONS
+    // ========================================
+    function waitForElement(selector, timeout = 5000) {
+        return new Promise((resolve, reject) => {
+            const element = document.querySelector(selector);
+            if (element) {
+                resolve(element);
+                return;
+            }
+            
+            const observer = new MutationObserver((mutations, obs) => {
+                const element = document.querySelector(selector);
+                if (element) {
+                    obs.disconnect();
+                    resolve(element);
+                }
+            });
+            
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+            
+            setTimeout(() => {
+                observer.disconnect();
+                reject(new Error(`Element ${selector} not found within ${timeout}ms`));
+            }, timeout);
+        });
+    }
+
+    // ========================================
+    // 1. COUNTDOWN TIMER (Detail Page Only)
+    // ========================================
+    function initDetailPageCountdown() {
+        const productCountdown = document.querySelector('.product-countdown-timer:not(.countdown-timer-card)');
+        
+        if (!productCountdown || !productCountdown.dataset.endDate) {
+            console.log('ℹ️ No active discount countdown on detail page');
+            return;
+        }
+
+        console.log('⏰ Initializing detail page countdown...');
+
+        function updateCountdown() {
+            const endDate = new Date(productCountdown.dataset.endDate);
+            const now = new Date();
+            const distance = endDate - now;
+
+            if (distance < 0) {
+                console.log('⏰ Countdown expired, reloading...');
+                location.reload();
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
             const daysEl = productCountdown.querySelector('.days');
             const hoursEl = productCountdown.querySelector('.hours');
             const minutesEl = productCountdown.querySelector('.minutes');
             const secondsEl = productCountdown.querySelector('.seconds');
 
-            function updateProductCountdown() {
-                const now = new Date().getTime();
-                const distance = endDate - now;
+            if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+            if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+            if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+            if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+        }
 
-                if (distance < 0) {
-                    location.reload();
+        updateCountdown();
+        const intervalId = setInterval(updateCountdown, 1000);
+        console.log('✅ Detail page countdown initialized');
+        
+        return intervalId;
+    }
+
+    // ========================================
+    // 2. SIZE & QUANTITY CONTROLS
+    // ========================================
+    function initSizeAndQuantity() {
+        console.log('🔄 Initializing size and quantity controls...');
+        
+        return waitForElement('.size-option')
+            .then(() => {
+                const sizeOptions = document.querySelectorAll('.size-option');
+                const quantityInput = document.getElementById('product-qty');
+                const stockValueEl = document.getElementById('stock-value');
+                const addToCartBtn = document.getElementById('add-to-cart');
+                const buyNowBtn = document.getElementById('buy-now');
+                const selectedSizeInput = document.getElementById('selected-size');
+                const decreaseBtn = document.getElementById('decrease-qty');
+                const increaseBtn = document.getElementById('increase-qty');
+
+                console.log('📦 Elements found:', {
+                    sizes: sizeOptions.length,
+                    quantityInput: !!quantityInput,
+                    addToCartBtn: !!addToCartBtn,
+                    buyNowBtn: !!buyNowBtn
+                });
+
+                if (sizeOptions.length === 0) {
+                    console.error('❌ No size options found!');
                     return;
                 }
 
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                let currentStock = 0;
 
-                daysEl.textContent = String(days).padStart(2, '0');
-                hoursEl.textContent = String(hours).padStart(2, '0');
-                minutesEl.textContent = String(minutes).padStart(2, '0');
-                secondsEl.textContent = String(seconds).padStart(2, '0');
-            }
-
-            updateProductCountdown();
-            setInterval(updateProductCountdown, 1000);
-        }
-
-        // ========================================
-        // SIZE & QUANTITY SELECTION
-        // ========================================
-        const sizeOptions = document.querySelectorAll('.size-option:not(.out-of-stock)');
-        const decreaseBtn = document.getElementById('decrease-qty');
-        const increaseBtn = document.getElementById('increase-qty');
-        const quantityInput = document.getElementById('product-qty');
-        const stockValueEl = document.getElementById('stock-value');
-        const addToCartBtn = document.getElementById('add-to-cart');
-        const buyNowBtn = document.getElementById('buy-now');
-        const selectedSizeInput = document.getElementById('selected-size');
-
-        let currentStock = 0;
-
-        // Custom Alert Functions
-        function showCustomAlert(type, title, message, callback = null) {
-            const overlay = document.getElementById('customAlertOverlay');
-            const alert = document.getElementById('customAlert');
-            const icon = document.getElementById('alertIcon');
-            const titleEl = document.getElementById('alertTitle');
-            const messageEl = document.getElementById('alertMessage');
-            const button = document.getElementById('alertButton');
-            const closeBtn = document.getElementById('alertClose');
-
-            alert.className = 'custom-alert ' + type;
-            titleEl.textContent = title;
-            messageEl.textContent = message;
-
-            if (type === 'success') {
-                icon.innerHTML = '<i class="bi bi-check-lg"></i>';
-            } else if (type === 'error') {
-                icon.innerHTML = '<i class="bi bi-x-lg"></i>';
-            } else if (type === 'warning') {
-                icon.innerHTML = '<i class="bi bi-exclamation-lg"></i>';
-            }
-
-            overlay.style.display = 'flex';
-            setTimeout(() => alert.classList.add('show'), 10);
-
-            const closeAlert = () => {
-                alert.classList.remove('show');
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                    if (callback) callback();
-                }, 300);
-            };
-
-            button.onclick = closeAlert;
-            closeBtn.onclick = closeAlert;
-            overlay.onclick = (e) => {
-                if (e.target === overlay) closeAlert();
-            };
-        }
-
-        function showToast(type, title, message, duration = 4000) {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `custom-toast ${type}`;
-
-            const iconClass = type === 'success' ? 'bi-check-lg' :
-                type === 'error' ? 'bi-x-lg' : 'bi-exclamation-lg';
-
-            toast.innerHTML = `
-            <div class="toast-icon ${type}">
-                <i class="bi ${iconClass}"></i>
-            </div>
-            <div class="toast-content">
-                <div class="toast-title">${title}</div>
-                <div class="toast-message">${message}</div>
-            </div>
-            <button class="toast-close">&times;</button>
-        `;
-
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 10);
-
-            const closeToast = () => {
-                toast.classList.remove('show');
-                setTimeout(() => {
-                    if (container.contains(toast)) container.removeChild(toast);
-                }, 300);
-            };
-
-            toast.querySelector('.toast-close').onclick = closeToast;
-            setTimeout(closeToast, duration);
-        }
-
-        // Size Selection
-        sizeOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                if (this.classList.contains('out-of-stock')) return;
-
-                sizeOptions.forEach(o => o.classList.remove('active'));
-                this.classList.add('active');
-                selectedSizeInput.value = this.dataset.size;
-
-                currentStock = parseInt(this.dataset.stock);
-                stockValueEl.textContent = currentStock;
-                quantityInput.max = currentStock;
-                quantityInput.value = Math.min(1, currentStock);
-
-                addToCartBtn.disabled = false;
-                buyNowBtn.style.pointerEvents = 'auto';
-                buyNowBtn.style.opacity = '1';
-            });
-        });
-
-        if (sizeOptions.length > 0) {
-            sizeOptions[0].click();
-        }
-
-        // Quantity Control
-        decreaseBtn.addEventListener('click', function() {
-            let currentQty = parseInt(quantityInput.value);
-            if (currentQty > 1) quantityInput.value = currentQty - 1;
-        });
-
-        increaseBtn.addEventListener('click', function() {
-            let currentQty = parseInt(quantityInput.value);
-            if (currentQty < currentStock) quantityInput.value = currentQty + 1;
-        });
-
-        // Validation
-        function validateForm() {
-            if (!selectedSizeInput.value) {
-                showCustomAlert('warning', 'Pilih Ukuran', 'Silakan pilih ukuran produk terlebih dahulu!');
-                return false;
-            }
-            if (parseInt(quantityInput.value) < 1) {
-                showCustomAlert('warning', 'Jumlah Tidak Valid', 'Jumlah produk minimal 1!');
-                return false;
-            }
-            if (parseInt(quantityInput.value) > currentStock) {
-                showCustomAlert('error', 'Stok Tidak Mencukupi', 'Jumlah produk melebihi stok yang tersedia!');
-                return false;
-            }
-            return true;
-        }
-
-        // Add to Cart
-        addToCartBtn.addEventListener('click', function() {
-            if (!validateForm()) return;
-
-            this.classList.add('btn-loading');
-            this.disabled = true;
-            const originalText = this.innerHTML;
-            this.innerHTML = '<span>Menambahkan...</span>';
-
-            const formData = {
-                product_id: document.querySelector('input[name="product_id"]').value,
-                quantity: quantityInput.value,
-                size: selectedSizeInput.value,
-                _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            };
-
-            fetch('/cart/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': formData._token,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify(formData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast('success', 'Berhasil!', 'Produk berhasil ditambahkan ke keranjang');
-                        updateCartCount(data.cart_count);
-                    } else {
-                        showCustomAlert('error', 'Gagal!', data.message || 'Gagal menambahkan produk ke keranjang!');
+                // Handle size selection
+                function handleSizeSelection(selectedOption) {
+                    console.log('👉 Size selected:', selectedOption.dataset.size);
+                    
+                    // Remove active from all
+                    sizeOptions.forEach(option => {
+                        option.classList.remove('active');
+                    });
+                    
+                    // Add active to selected
+                    selectedOption.classList.add('active');
+                    
+                    // Update hidden input
+                    if (selectedSizeInput) {
+                        selectedSizeInput.value = selectedOption.dataset.size;
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showCustomAlert('error', 'Terjadi Kesalahan', 'Silakan coba lagi dalam beberapa saat!');
-                })
-                .finally(() => {
-                    this.classList.remove('btn-loading');
-                    this.disabled = false;
-                    this.innerHTML = originalText;
-                });
-        });
-
-        // Buy Now
-        buyNowBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (!validateForm()) return;
-
-            const productId = document.querySelector('input[name="product_id"]').value;
-            const quantity = quantityInput.value;
-            const size = selectedSizeInput.value;
-
-            window.location.href = `/checkout?product_id=${productId}&quantity=${quantity}&size=${size}`;
-        });
-
-        // Update Cart Count
-        function updateCartCount(count) {
-            const cartCountElements = document.querySelectorAll('.cart-count, .cart-badge');
-            cartCountElements.forEach(element => {
-                if (element) {
-                    element.textContent = count || 0;
-                    if (count > 0) {
-                        element.style.display = 'inline';
-                    } else {
-                        element.style.display = 'none';
+                    
+                    // Update stock
+                    currentStock = parseInt(selectedOption.dataset.stock) || 0;
+                    if (stockValueEl) stockValueEl.textContent = currentStock;
+                    if (quantityInput) {
+                        quantityInput.max = currentStock;
+                        quantityInput.value = 1; // Reset to 1
+                    }
+                    
+                    // Enable buttons
+                    if (addToCartBtn) {
+                        addToCartBtn.disabled = false;
+                        console.log('✅ Add to cart enabled');
+                    }
+                    
+                    if (buyNowBtn) {
+                        buyNowBtn.style.pointerEvents = 'auto';
+                        buyNowBtn.style.opacity = '1';
+                        console.log('✅ Buy now enabled');
                     }
                 }
+
+                // Add click listeners
+                sizeOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        if (!this.classList.contains('out-of-stock')) {
+                            handleSizeSelection(this);
+                        }
+                    });
+                });
+
+                // Auto-select first available size
+                const firstAvailableSize = document.querySelector('.size-option:not(.out-of-stock)');
+                if (firstAvailableSize) {
+                    console.log('🔄 Auto-selecting first available size');
+                    handleSizeSelection(firstAvailableSize);
+                } else {
+                    console.warn('⚠️ No available sizes found');
+                }
+
+                // Quantity controls
+                if (decreaseBtn && increaseBtn && quantityInput) {
+                    decreaseBtn.addEventListener('click', function() {
+                        let currentQty = parseInt(quantityInput.value) || 1;
+                        if (currentQty > 1) {
+                            quantityInput.value = currentQty - 1;
+                        }
+                    });
+
+                    increaseBtn.addEventListener('click', function() {
+                        let currentQty = parseInt(quantityInput.value) || 1;
+                        if (currentQty < currentStock) {
+                            quantityInput.value = currentQty + 1;
+                        }
+                    });
+                }
+
+                console.log('✅ Size & quantity initialization completed');
+            })
+            .catch(error => {
+                console.error('❌ Failed to initialize size/quantity:', error);
             });
+    }
+
+    // ========================================
+    // 3. ADD TO CART
+    // ========================================
+    function initAddToCart() {
+        const addToCartBtn = document.getElementById('add-to-cart');
+        const selectedSizeInput = document.getElementById('selected-size');
+        const quantityInput = document.getElementById('product-qty');
+
+        if (!addToCartBtn) {
+            console.log('ℹ️ Add to cart button not found');
+            return;
         }
 
-        // Keyboard Support
-        document.addEventListener('keydown', function(e) {
-            const overlay = document.getElementById('customAlertOverlay');
-            if (overlay.style.display === 'flex' && e.key === 'Escape') {
-                const alert = document.getElementById('customAlert');
-                alert.classList.remove('show');
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                }, 300);
+        addToCartBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🛒 Add to cart clicked');
+            
+            // Validation
+            if (!selectedSizeInput || !selectedSizeInput.value) {
+                showAlert('warning', 'Perhatian', 'Silakan pilih ukuran terlebih dahulu!');
+                return;
             }
+
+            const quantity = parseInt(quantityInput?.value) || 1;
+            const size = selectedSizeInput.value;
+
+            // Show loading
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="bi bi-hourglass-split"></i> Menambahkan...';
+            this.disabled = true;
+
+            // Get form data
+            const form = document.getElementById('product-form');
+            const formData = new FormData(form);
+
+            // Send to server
+            fetch('{{ route("cart.add") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('success', 'Berhasil!', data.message || 'Produk berhasil ditambahkan ke keranjang');
+                    
+                    // Update cart count if exists
+                    const cartCount = document.querySelector('.cart-count');
+                    if (cartCount && data.cart_count) {
+                        cartCount.textContent = data.cart_count;
+                    }
+                } else {
+                    showAlert('error', 'Gagal', data.message || 'Gagal menambahkan ke keranjang');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('error', 'Error', 'Terjadi kesalahan. Silakan coba lagi.');
+            })
+            .finally(() => {
+                this.innerHTML = originalText;
+                this.disabled = false;
+            });
         });
 
-        // ========================================
-        // THUMBNAIL & IMAGE GALLERY
-        // ========================================
+        console.log('✅ Add to cart initialized');
+    }
+
+    // ========================================
+    // 4. BUY NOW
+    // ========================================
+    function initBuyNow() {
+        const buyNowBtn = document.getElementById('buy-now');
+        const selectedSizeInput = document.getElementById('selected-size');
+        const quantityInput = document.getElementById('product-qty');
+
+        if (!buyNowBtn) {
+            console.log('ℹ️ Buy now button not found');
+            return;
+        }
+
+        buyNowBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('⚡ Buy now clicked');
+
+            if (!selectedSizeInput || !selectedSizeInput.value) {
+                showAlert('warning', 'Perhatian', 'Silakan pilih ukuran terlebih dahulu!');
+                return;
+            }
+
+            const quantity = parseInt(quantityInput?.value) || 1;
+            const size = selectedSizeInput.value;
+            const productId = document.querySelector('input[name="product_id"]')?.value;
+
+            // Redirect to checkout
+            const checkoutUrl = `{{ route('checkout.index') }}?product_id=${productId}&quantity=${quantity}&size=${encodeURIComponent(size)}`;
+            console.log('🔀 Redirecting to:', checkoutUrl);
+            window.location.href = checkoutUrl;
+        });
+
+        console.log('✅ Buy now initialized');
+    }
+
+    // ========================================
+    // 5. IMAGE GALLERY
+    // ========================================
+    function initImageGallery() {
         const mainImages = document.querySelectorAll('.main-image');
         const thumbnails = document.querySelectorAll('.thumbnail-gallery img');
+
+        if (thumbnails.length === 0 || mainImages.length === 0) {
+            console.log('ℹ️ No image gallery found');
+            return;
+        }
 
         thumbnails.forEach((thumbnail, index) => {
             thumbnail.addEventListener('click', function() {
@@ -1572,151 +1618,126 @@
             });
         });
 
-        const observerOptions = {
-            root: null,
-            rootMargin: '-50% 0px -50% 0px',
-            threshold: 0
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const index = Array.from(mainImages).indexOf(entry.target);
-                    thumbnails.forEach(t => t.classList.remove('active'));
-                    if (thumbnails[index]) {
-                        thumbnails[index].classList.add('active');
-                    }
-                }
-            });
-        }, observerOptions);
-
-        mainImages.forEach(img => observer.observe(img));
-
-        if (thumbnails.length > 0) {
+        // Auto-select first thumbnail
+        if (thumbnails[0]) {
             thumbnails[0].classList.add('active');
         }
 
-        // ========================================
-        // REVIEW IMAGE MODAL - ✅ TARUH DI SINI
-        // ========================================
-        const reviewImageModal = document.getElementById('reviewImageModal');
-        const modalImg = document.getElementById('modalImage');
-        const closeModal = document.querySelector('.close-modal');
+        console.log('✅ Image gallery initialized');
+    }
 
-        // Function to show image in modal
+    // ========================================
+    // 6. CUSTOM ALERT SYSTEM
+    // ========================================
+    function showAlert(type, title, message) {
+        const overlay = document.getElementById('customAlertOverlay');
+        const alert = document.getElementById('customAlert');
+        const icon = document.getElementById('alertIcon');
+        const titleEl = document.getElementById('alertTitle');
+        const messageEl = document.getElementById('alertMessage');
+        const button = document.getElementById('alertButton');
+        const closeBtn = document.getElementById('alertClose');
+
+        if (!overlay || !alert) {
+            console.log('Using fallback alert');
+            window.alert(`${title}\n\n${message}`);
+            return;
+        }
+
+        // Set content
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+
+        // Set icon
+        alert.className = 'custom-alert ' + type;
+        const iconMap = {
+            success: 'bi-check-lg',
+            error: 'bi-x-lg',
+            warning: 'bi-exclamation-lg'
+        };
+        icon.innerHTML = `<i class="bi ${iconMap[type] || iconMap.success}"></i>`;
+
+        // Show
+        overlay.style.display = 'flex';
+        setTimeout(() => alert.classList.add('show'), 10);
+
+        // Close handlers
+        const closeAlert = () => {
+            alert.classList.remove('show');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 300);
+        };
+
+        button.onclick = closeAlert;
+        closeBtn.onclick = closeAlert;
+        overlay.onclick = (e) => {
+            if (e.target === overlay) closeAlert();
+        };
+    }
+
+    // ========================================
+    // 7. REVIEW IMAGE MODAL
+    // ========================================
+    function initReviewImageModal() {
+        const modal = document.getElementById('reviewImageModal');
+        if (!modal) return;
+
+        const modalImg = document.getElementById('modalImage');
+        const closeBtn = modal.querySelector('.close-modal');
+
         window.showImageModal = function(imageSrc) {
-            if (reviewImageModal && modalImg) {
-                reviewImageModal.style.display = 'block';
-                modalImg.src = imageSrc;
-                document.body.style.overflow = 'hidden';
+            modal.style.display = 'block';
+            modalImg.src = imageSrc;
+        };
+
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        };
+
+        modal.onclick = function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
             }
         };
 
-        // Close modal when clicking the close button
-        if (closeModal) {
-            closeModal.addEventListener('click', function() {
-                reviewImageModal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            });
-        }
+        console.log('✅ Review image modal initialized');
+    }
 
-        // Close modal when clicking outside the image
-        window.addEventListener('click', function(e) {
-            if (e.target === reviewImageModal) {
-                reviewImageModal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }
-        });
+    // ========================================
+    // MAIN INITIALIZATION
+    // ========================================
+    function init() {
+        console.log('🔧 Starting main initialization...');
+        
+        // 1. Countdown (immediate)
+        initDetailPageCountdown();
+        
+        // 2. Size & Quantity (wait for DOM)
+        initSizeAndQuantity();
+        
+        // 3. Add to Cart
+        initAddToCart();
+        
+        // 4. Buy Now
+        initBuyNow();
+        
+        // 5. Image Gallery
+        initImageGallery();
+        
+        // 6. Review Image Modal
+        initReviewImageModal();
+        
+        console.log('✅ All initializations completed');
+    }
 
-        // ========================================
-        // REVIEW FORM VALIDATION - ✅ TARUH DI SINI
-        // ========================================
-        // ========================================
-        // REVIEW FORM SUBMISSION - ✅ UPDATE
-        // ========================================
-        const reviewForm = document.getElementById('review-form');
-        if (reviewForm) {
-            reviewForm.addEventListener('submit', function(e) {
-                const fileInput = document.getElementById('images');
-                const komentarInput = document.getElementById('komentar');
-                const submitBtn = document.getElementById('submit-review-btn');
+    // Run when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 
-                // Validate file count
-                if (fileInput && fileInput.files.length > 3) {
-                    e.preventDefault();
-                    showCustomAlert('warning', 'Terlalu Banyak File', 'Maksimal 3 foto yang dapat diunggah!');
-                    return false;
-                }
-
-                // Validate file size (max 2MB per file)
-                if (fileInput) {
-                    for (let i = 0; i < fileInput.files.length; i++) {
-                        if (fileInput.files[i].size > 2 * 1024 * 1024) {
-                            e.preventDefault();
-                            showCustomAlert('warning', 'File Terlalu Besar', 'Setiap foto maksimal 2MB!');
-                            return false;
-                        }
-                    }
-                }
-
-                // ✅ PENTING: Pastikan komentar tidak hanya whitespace
-                if (komentarInput && komentarInput.value.trim() === '') {
-                    komentarInput.value = ''; // Set ke empty string jika hanya whitespace
-                }
-
-                // Log data yang akan dikirim (untuk debugging)
-                console.log('Form data:', {
-                    rating: reviewForm.querySelector('input[name="rating"]:checked')?.value,
-                    komentar: komentarInput?.value,
-                    product_id: reviewForm.querySelector('input[name="product_id"]').value,
-                    order_id: reviewForm.querySelector('input[name="order_id"]').value
-                });
-
-                // Show loading state
-                if (submitBtn) {
-                    const originalBtnText = submitBtn.innerHTML;
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Mengirim...';
-
-                    // Store original text for potential error handling
-                    submitBtn.dataset.originalText = originalBtnText;
-                }
-
-                // Allow form to submit normally
-                return true;
-            });
-        }
-
-        // ========================================
-        // SCROLL TO REVIEWS ON SUCCESS/ERROR - ✅ TARUH DI SINI
-        // ========================================
-        const urlParams = new URLSearchParams(window.location.search);
-
-        // Check if we should scroll to reviews
-        if (urlParams.has('review_success') || urlParams.has('review_error')) {
-            setTimeout(() => {
-                const reviewsSection = document.querySelector('.reviews-section');
-                if (reviewsSection) {
-                    reviewsSection.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            }, 300);
-        }
-
-        // Auto-hide alerts after 5 seconds
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            setTimeout(() => {
-                if (typeof bootstrap !== 'undefined' && bootstrap.Alert) {
-                    const bsAlert = bootstrap.Alert.getInstance(alert) || new bootstrap.Alert(alert);
-                    bsAlert.close();
-                } else {
-                    alert.style.display = 'none';
-                }
-            }, 5000);
-        });
-    });
+})();
 </script>
 @endpush

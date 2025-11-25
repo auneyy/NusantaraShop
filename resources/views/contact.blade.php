@@ -763,13 +763,6 @@
         <p>Ya, kami menerima return/tukar dalam 7 hari dengan kondisi produk masih dalam keadaan baik, belum dicuci, dan dengan kemasan asli.</p>
       </div>
       
-      <div class="faq-card">
-        <h5>
-          <i class="bi bi-shield-check"></i>
-          Apakah produk asli?
-        </h5>
-        <p>Semua produk batik kami adalah produk asli dari pengrajin terpercaya dengan sertifikat keaslian dan jaminan kualitas terbaik.</p>
-      </div>
     </div>
   </div>
 </div>

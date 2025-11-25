@@ -379,18 +379,9 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Back history prevention
-        if (window.history && window.history.pushState) {
-            window.addEventListener('load', function() {
-                window.history.pushState({}, '', window.location.href);
-            });
-
-            window.addEventListener('popstate', function() {
-                window.history.pushState({}, '', window.location.href);
-            });
-        }
-
-        // Auth check
+        // ✅ FIXED: Hanya auth check, hapus popstate prevention yang mengganggu
+        
+        // Auth check saat page load from cache
         window.addEventListener('pageshow', function(event) {
             if (event.persisted || 
                 (window.performance && window.performance.getEntriesByType("navigation")[0].type === "back_forward")) {
@@ -409,12 +400,12 @@
                     }
                 })
                 .catch(() => {
-                    window.location.replace('/login');
+                    // Ignore errors untuk public pages
                 });
             }
         });
         
-        // Cache clear
+        // Cache clear hanya untuk protected pages
         if (window.location.pathname.includes('/home') || 
             window.location.pathname.includes('/cart') ||
             window.location.pathname.includes('/profile')) {
@@ -609,8 +600,11 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- SweetAlert2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  @stack('scripts')
+
+  @include('partials.ai-chat')
 
 </body>
 </html>

@@ -250,4 +250,5 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
             // Admin Logout
             Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
         });
+
 });

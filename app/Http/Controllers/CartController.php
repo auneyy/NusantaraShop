@@ -19,9 +19,10 @@ class CartController extends Controller
     {
         $cartItems = $this->getCartItems();
         $total = $this->getCartTotal();
-        $originalTotal = $this->getCartOriginalTotal(); // ✅ Tambah total harga asli
+        $originalTotal = $this->getCartOriginalTotal();
+        $totalSavings = $this->getTotalSavings();
         
-        return view('cart.index', compact('cartItems', 'total', 'originalTotal'));
+        return view('cart.index', compact('cartItems', 'total', 'originalTotal', 'totalSavings'));
     }
 
     public function add(Request $request)
