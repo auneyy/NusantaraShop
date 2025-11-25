@@ -390,20 +390,12 @@
 
     <!-- Slide 2 -->
     <div class="carousel-item">
-      <img src="{{ asset('storage/product_images/hero-image.jpg') }}" class="d-block w-100" alt="Comfort and Style">
-      <div class="carousel-caption">
-        <h1 class="animate__animated animate__fadeInDown">Siap Menemani Momenmu</h1>
-        <p class="animate__animated animate__fadeInUp">Dibuat dari bahan pilihan yang lembut dan tahan lama, batik kami siap nemenin setiap momenmu.</p>
-      </div>
+      <img src="{{ asset('storage/product_images/hero-image2.png') }}" class="d-block w-100" alt="Comfort and Style">
     </div>
 
     <!-- Slide 3 -->
     <div class="carousel-item">
-      <img src="{{ asset('storage/product_images/macambatik1.jpg') }}" class="d-block w-100" alt="Traditional Heritage">
-      <div class="carousel-caption">
-        <h1 class="animate__animated animate__fadeInDown">Saatnya Temukan Favoritmu</h1>
-        <p class="animate__animated animate__fadeInUp">Setiap orang punya gaya unik. Yuk, cari yang paling cocok buat kamu di sini.</p>
-      </div>
+      <img src="{{ asset('storage/product_images/hero-image3.png') }}" class="d-block w-100" alt="Traditional Heritage">
     </div>
   </div>
 

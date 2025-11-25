@@ -7,7 +7,6 @@
     <style>
         /* Reset dan Base Styles */
         .profile-container {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
             background-color: white !important;
             min-height: 100vh;
             padding: 0 !important;
@@ -37,7 +36,6 @@
         }
 
         .profile-page-title h1 {
-            font-size: 32px !important;
             color: #333 !important;
             font-weight: 600 !important;
             margin: 0 !important;
@@ -60,7 +58,6 @@
         }
 
         .profile-card-header h2 {
-            font-size: 24px !important;
             color: #333 !important;
             margin-bottom: 20px !important;
             font-weight: 600 !important;
@@ -77,8 +74,6 @@
             align-items: center !important;
             justify-content: center !important;
             color: white !important;
-            font-size: 48px !important;
-            font-weight: bold !important;
             overflow: hidden !important;
             position: relative !important;
         }
@@ -96,7 +91,6 @@
         }
 
         .profile-main-info h3 {
-            font-size: 24px !important;
             color: #333 !important;
             margin-bottom: 15px !important;
             font-weight: 600 !important;
@@ -105,7 +99,6 @@
         .profile-main-info p {
             color: #666 !important;
             margin-bottom: 12px !important;
-            font-size: 14px !important;
             display: flex !important;
             align-items: center !important;
             gap: 10px !important;
@@ -132,7 +125,6 @@
             cursor: pointer !important;
             border: none !important;
             transition: all 0.3s !important;
-            font-size: 14px !important;
             flex: 1 !important;
         }
 
@@ -185,7 +177,6 @@
             text-decoration: none !important;
             color: #666 !important;
             font-weight: 500 !important;
-            font-size: 14px !important;
             border-bottom: 2px solid transparent !important;
             transition: all 0.3s !important;
             display: flex !important;
@@ -235,7 +226,6 @@
             font-weight: 600 !important;
             color: #333 !important;
             margin: 0 !important;
-            font-size: 16px !important;
         }
 
         .orders-table-head {
@@ -245,7 +235,6 @@
             display: grid !important;
             grid-template-columns: 60px 1fr 120px 80px 150px 120px 100px !important;
             gap: 16px !important;
-            font-size: 14px !important;
             font-weight: 600 !important;
             color: #555 !important;
         }
@@ -287,14 +276,12 @@
             font-weight: 600 !important;
             color: #333 !important;
             border-bottom: 2px solid #e0e0e0 !important;
-            font-size: 14px !important;
         }
 
         .profile-purchase-table td {
             padding: 15px !important;
             border-bottom: 1px solid #e0e0e0 !important;
             vertical-align: middle !important;
-            font-size: 14px !important;
             background: white !important;
         }
 
@@ -310,7 +297,6 @@
         .profile-status-badge {
             padding: 6px 12px !important;
             border-radius: 20px !important;
-            font-size: 12px !important;
             font-weight: 500 !important;
             text-transform: capitalize !important;
             display: inline-block !important;
@@ -336,7 +322,6 @@
             text-align: center !important;
             color: #999 !important;
             padding: 60px 20px !important;
-            font-size: 16px !important;
         }
 
         /* Mobile Responsive */
@@ -400,14 +385,12 @@
         }
 
         .profile-mobile-order-date {
-            font-size: 12px !important;
             color: #666 !important;
         }
 
         .profile-mobile-order-details {
             display: flex !important;
             justify-content: space-between !important;
-            font-size: 14px !important;
         }
 
         .profile-mobile-order-quantity {
@@ -437,16 +420,12 @@
 @section('content')
     <div class="profile-container">
         <div class="container">
-            <!-- Page Title -->
-            <div class="profile-page-title">
-                <h1>Profil Saya</h1>
-            </div>
 
             <div class="profile-main-grid">
                 <!-- Profile Card - Left Side -->
                 <div class="profile-main-card">
                     <div class="profile-card-header">
-                        <h2>Profil Saya</h2>
+                        <h3>Profil Saya</h3>
                     </div>
 
                     <div class="profile-main-avatar">
@@ -487,10 +466,10 @@
 
                     <div class="orders-table-card">
                         <div class="orders-table-header">
-                            <h3>
+                            <h4>
                                 <i class="fas fa-list" style="margin-right: 8px; color: #8B4513;"></i>
                                 Riwayat Pembelian
-                            </h3>
+                            </h4>
                         </div>
 
                         <!-- Desktop Table -->

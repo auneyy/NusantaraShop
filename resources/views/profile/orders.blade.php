@@ -28,7 +28,6 @@
     }
 
     .orders-header h1 {
-        font-size: 28px !important;
         color: #333 !important;
         font-weight: 600 !important;
         margin: 0 !important;
@@ -52,7 +51,6 @@
         text-decoration: none !important;
         color: #666 !important;
         font-weight: 500 !important;
-        font-size: 14px !important;
         border-bottom: 2px solid transparent !important;
         transition: all 0.3s !important;
         display: flex !important;
@@ -97,7 +95,6 @@
 
     .orders-filter-label {
         display: block !important;
-        font-size: 14px !important;
         font-weight: 600 !important;
         color: #333 !important;
         margin-bottom: 6px !important;
@@ -109,7 +106,6 @@
         padding: 10px 12px !important;
         border: 1px solid #ddd !important;
         border-radius: 6px !important;
-        font-size: 14px !important;
         background: white !important;
         transition: all 0.3s !important;
         color: #333 !important;
@@ -132,7 +128,6 @@
     cursor: pointer;
     border: none;
     transition: all 0.3s ease;
-    font-size: 14px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -142,7 +137,6 @@
 
 .orders-btn i, 
 .orders-btn svg {
-    font-size: 16px;                 /* kecilin icon agar proporsional */
     width: 16px;
     height: 16px;
 }
@@ -210,7 +204,6 @@
         font-weight: 600 !important;
         color: #333 !important;
         margin: 0 !important;
-        font-size: 16px !important;
     }
 
     .orders-table-head {
@@ -220,7 +213,6 @@
         display: grid !important;
         grid-template-columns: 60px 1fr 120px 80px 150px 120px 100px !important;
         gap: 16px !important;
-        font-size: 14px !important;
         font-weight: 600 !important;
         color: #555 !important;
     }
@@ -258,11 +250,9 @@
         font-weight: 600 !important;
         color: #333 !important;
         margin-bottom: 4px !important;
-        font-size: 16px !important;
     }
 
     .orders-mobile-left p {
-        font-size: 13px !important;
         color: #666 !important;
         margin-bottom: 2px !important;
     }
@@ -275,7 +265,6 @@
         font-weight: 600 !important;
         color: #333 !important;
         margin-bottom: 4px !important;
-        font-size: 16px !important;
     }
 
     .orders-mobile-actions {
@@ -287,7 +276,6 @@
         flex: 1 !important;
         padding: 8px 16px !important;
         border-radius: 6px !important;
-        font-size: 13px !important;
         font-weight: 500 !important;
         border: none !important;
         cursor: pointer !important;
@@ -322,7 +310,6 @@
         grid-template-columns: 60px 1fr 120px 80px 150px 120px 100px !important;
         gap: 16px !important;
         align-items: center !important;
-        font-size: 14px !important;
     }
 
     .orders-desktop-cell {
@@ -347,7 +334,6 @@
     .orders-badge {
         display: inline-block !important;
         padding: 4px 8px !important;
-        font-size: 12px !important;
         font-weight: 500 !important;
         border-radius: 4px !important;
     }
@@ -381,7 +367,6 @@
         padding: 4px 8px !important;
         border-radius: 4px !important;
         transition: all 0.3s !important;
-        font-size: 14px !important;
     }
 
     .orders-action-btn:hover {
@@ -414,14 +399,12 @@
     }
 
     .orders-empty i {
-        font-size: 48px !important;
         color: #ddd !important;
         margin-bottom: 16px !important;
         display: block !important;
     }
 
     .orders-empty h4 {
-        font-size: 18px !important;
         color: #555 !important;
         margin-bottom: 8px !important;
         font-weight: 600 !important;
@@ -472,10 +455,6 @@
         background-color: #f3e5f5 !important;
     }
 
-    .orders-summary-icon {
-        font-size: 24px !important;
-    }
-
     .orders-summary-icon-blue {
         color: #1976d2 !important;
     }
@@ -493,12 +472,10 @@
     }
 
     .orders-summary-content p:first-child {
-        font-size: 12px !important;
         margin-bottom: 4px !important;
     }
 
     .orders-summary-content p:last-child {
-        font-size: 20px !important;
         font-weight: 700 !important;
         margin: 0 !important;
     }
@@ -569,7 +546,6 @@
     }
 
     .orders-modal-icon {
-        font-size: 48px !important;
         margin-bottom: 16px !important;
         display: block !important;
     }
@@ -579,7 +555,6 @@
     }
 
     .orders-modal-title {
-        font-size: 18px !important;
         font-weight: 600 !important;
         color: #333 !important;
         margin-bottom: 8px !important;
@@ -637,7 +612,7 @@
         }
 
         .orders-header h1 {
-            font-size: 24px !important;
+    
         }
     }
 
@@ -667,12 +642,6 @@
 @section('content')
 <div class="orders-container">
     <div class="container">
-        <!-- Page Header -->
-        <div class="orders-header">
-            <h1>
-                Riwayat Pembelian
-            </h1>
-        </div>
 
         <!-- Navigation Tabs -->
         <div class="orders-nav">
