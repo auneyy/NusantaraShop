@@ -1116,11 +1116,6 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-(function() {
-    'use strict';
-    
-    console.log('🚀 Orders Page - Initializing...');
-
     let currentRating = 5;
     let selectedOrderId = null;
     let selectedProductId = null;
@@ -1229,20 +1224,11 @@
 
     function initRatingStars() {
         const stars = document.querySelectorAll('.rating-stars i');
-        
-        if (stars.length === 0) {
-            console.log('ℹ️ No rating stars found');
-            return;
-        }
-
         stars.forEach(star => {
             star.addEventListener('click', function() {
                 const rating = parseInt(this.getAttribute('data-rating'));
                 currentRating = rating;
-                const ratingInput = document.getElementById('ratingInput');
-                if (ratingInput) {
-                    ratingInput.value = rating;
-                }
+                document.getElementById('ratingInput').value = rating;
 
                 stars.forEach((s, index) => {
                     if (index < rating) {
@@ -1266,15 +1252,12 @@
         const starsContainer = document.querySelector('.rating-stars');
         if (starsContainer) {
             starsContainer.addEventListener('mouseleave', function() {
-                const ratingInput = document.getElementById('ratingInput');
-                const currentValue = ratingInput ? parseInt(ratingInput.value) : 5;
+                const currentValue = parseInt(document.getElementById('ratingInput').value);
                 stars.forEach((s, index) => {
                     s.style.color = index < currentValue ? '#ffc107' : '#ddd';
                 });
             });
         }
-
-        console.log('✅ Rating stars initialized');
     }
 
     // ===================================
@@ -1283,8 +1266,6 @@
 
     function handleImagePreview(input) {
         const preview = document.getElementById('imagePreview');
-        if (!preview) return;
-
         preview.innerHTML = '';
 
         if (input.files.length > 3) {
@@ -1332,31 +1313,12 @@
         .then(data => {
             if (data.success && data.items && data.items.length > 0) {
                 const unreviewed = data.items.find(item => !item.has_review);
-            method: 'GET',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success && data.items && data.items.length > 0) {
-                const unreviewed = data.items.find(item => !item.has_review);
 
                 if (unreviewed) {
                     selectedProductId = unreviewed.product_id;
                     document.getElementById('reviewOrderId').value = orderId;
                     document.getElementById('reviewProductId').value = unreviewed.product_id;
-                if (unreviewed) {
-                    selectedProductId = unreviewed.product_id;
-                    document.getElementById('reviewOrderId').value = orderId;
-                    document.getElementById('reviewProductId').value = unreviewed.product_id;
 
-                    const modalTitle = document.querySelector('#reviewModal .modal-title');
-                    if (modalTitle) {
-                        modalTitle.textContent = `Beri Ulasan - ${unreviewed.product_name}`;
-                    }
                     const modalTitle = document.querySelector('#reviewModal .modal-title');
                     if (modalTitle) {
                         modalTitle.textContent = `Beri Ulasan - ${unreviewed.product_name}`;
@@ -1403,13 +1365,9 @@
         const submitButton = form.querySelector('button[type="submit"]');
         
         if (submitButton.disabled) return;
-        
-        if (submitButton.disabled) return;
 
         const buttonText = submitButton.innerHTML;
-        const buttonText = submitButton.innerHTML;
         submitButton.disabled = true;
-        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Mengirim...';
         submitButton.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Mengirim...';
 
         const formData = new FormData(form);
@@ -1445,7 +1403,7 @@
     // ORDER FUNCTIONS
     // ===================================
 
-    window.confirmCancel = function() {
+    function confirmCancel() {
         if (!currentCancelForm) return;
 
         const formData = new FormData(currentCancelForm);
@@ -1632,7 +1590,7 @@
         container.appendChild(toast);
         setTimeout(() => toast.classList.add('show'), 100);
         setTimeout(() => closeToast(toast.querySelector('.toast-close')), 5000);
-    };
+    }
 
     function closeToast(button) {
         const toast = button.closest('.toast');

@@ -1,6 +1,7 @@
 <!-- AI Chat Button (Floating) -->
 <button id="aiChatButton" class="ai-chat-button" aria-label="Chat dengan AI">
   <i class="bi bi-robot"></i>
+  <span class="chat-badge" id="chatBadge" style="display: none;">1</span>
 </button>
 
 <!-- AI Chat Modal -->
@@ -14,15 +15,18 @@
             <i class="bi bi-robot"></i>
           </div>
           <div class="ms-3">
-            <h5 class="modal-title mb-0" id="aiChatModalLabel">Asisten Virtual NusantaraShop</h5>
-            <small class="text-white-50">Powered by Gemini 2.5 Flash</small>
+            <h5 class="modal-title mb-0" id="aiChatModalLabel">Asisten Virtual</h5>
+            <small class="text-white-50 d-flex align-items-center">
+              <span class="status-dot"></span> Online
+            </small>
           </div>
         </div>
-        <div class="d-flex gap-2">
-          <button type="button" class="btn btn-sm btn-light" id="clearChatBtn" title="Hapus Percakapan">
-            <i class="bi bi-trash"></i>
-          </button>
+        <div class="d-flex gap-1 close-btn">
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="d-flex gap-5 clear-btn">
+        <button type="button" class="btn btn-sm" id="clearChatBtn" title="Hapus Percakapan">
+            <i class="bi bi-trash"></i></button>
         </div>
       </div>
 
@@ -35,15 +39,20 @@
           </div>
           <div class="message-content">
             <div class="message-bubble">
-              <p class="mb-1">Halo! 👋 Selamat datang di NusantaraShop!</p>
-              <p class="mb-0">Saya adalah asisten virtual yang siap membantu Anda. Anda bisa menanyakan:</p>
-              <ul class="mb-0 mt-2">
-                <li>Informasi produk batik kami</li>
-                <li>Harga dan ketersediaan stok</li>
-                <li>Cara pemesanan dan pengiriman</li>
-                <li>Rekomendasi produk</li>
-              </ul>
-              <p class="mt-2 mb-0">Silakan tanyakan apa saja! 😊</p>
+              <p class="mb-2">👋 Halo! Selamat datang di <strong>NusantaraShop</strong>!</p>
+              <p class="mb-2">Saya siap membantu Anda menemukan batik yang tepat. Anda bisa bertanya:</p>
+              <div class="quick-questions">
+                <button class="quick-question-btn" data-question="Ada kemeja batik pria formal?">
+                  <i class="bi bi-search"></i> Kemeja batik pria
+                </button>
+                <button class="quick-question-btn" data-question="Rekomendasi batik wanita untuk kondangan">
+                  <i class="bi bi-stars"></i> Batik wanita
+                </button>
+                <button class="quick-question-btn" data-question="Produk apa yang lagi diskon?">
+                  <i class="bi bi-tag"></i> Produk diskon
+                </button>
+              </div>
+              <p class="mt-2 mb-0 small text-muted">Atau tanyakan apa saja sesuai kebutuhan Anda 😊</p>
             </div>
             <small class="message-time">Baru saja</small>
           </div>
@@ -66,7 +75,9 @@
               <i class="bi bi-send-fill"></i>
             </button>
           </div>
-          <small class="text-muted d-block mt-1">Tekan Enter untuk mengirim</small>
+          <small class="text-muted d-block mt-1">
+            <i class="bi bi-lightbulb"></i> Tekan Enter untuk mengirim
+          </small>
         </form>
       </div>
     </div>
@@ -114,9 +125,48 @@
   animation: pulse 2s infinite;
 }
 
+.clear-btn {
+  margin-bottom: 18px;
+  margin-right: 30px;
+}
+
+.clear-btn i {
+  font-size: 20px;
+  color: white;
+}
+
+.close-btn {
+  margin-bottom: 18px;
+}
+
+.modal-content {
+  max-width: 800px;
+}
+
+.modal-title {
+  color: white;
+}
+
 .ai-chat-button:hover {
   transform: scale(1.1);
   box-shadow: 0 6px 30px rgba(66, 45, 28, 0.6);
+}
+
+.chat-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border: 2px solid white;
 }
 
 @keyframes pulse {
@@ -133,6 +183,7 @@
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 10px 50px rgba(0, 0, 0, 0.2);
+  max-height: 90vh;
 }
 
 .ai-chat-header {
@@ -152,6 +203,21 @@
   justify-content: center;
   font-size: 1.5rem;
   backdrop-filter: blur(10px);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: #28a745;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 .ai-chat-body {
@@ -237,6 +303,7 @@
   border-radius: 18px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   word-wrap: break-word;
+  line-height: 1.6;
 }
 
 .user-message .message-bubble {
@@ -248,17 +315,44 @@
   margin-bottom: 0;
 }
 
-.message-bubble ul {
-  padding-left: 1.5rem;
-  margin: 0.5rem 0;
-}
-
 .message-time {
   display: block;
   color: #6c757d;
   font-size: 0.75rem;
   margin-top: 0.25rem;
   padding: 0 0.5rem;
+}
+
+/* Quick Questions */
+.quick-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.quick-question-btn {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.quick-question-btn:hover {
+  background: #e9ecef;
+  border-color: #8B4513;
+  color: #8B4513;
+  transform: translateX(5px);
+}
+
+.quick-question-btn i {
+  margin-right: 0.5rem;
+  color: #8B4513;
 }
 
 /* Product Cards in Chat */
@@ -269,18 +363,20 @@
   margin-top: 0.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
 }
 
 .product-card-chat:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  border-color: #8B4513;
 }
 
 .product-card-chat img {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 /* Typing Indicator */
@@ -349,7 +445,7 @@
   transition: all 0.3s ease;
 }
 
-.chat-send-btn:hover {
+.chat-send-btn:hover:not(:disabled) {
   transform: scale(1.05);
   box-shadow: 0 4px 15px rgba(66, 45, 28, 0.3);
 }
@@ -357,7 +453,16 @@
 .chat-send-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
+}
+
+/* Error Message */
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #f5c6cb;
+  margin-top: 0.5rem;
 }
 
 /* Responsive */
@@ -375,11 +480,22 @@
   }
 
   .ai-chat-body {
-    max-height: 350px;
+    max-height: 400px;
+    min-height: 300px;
   }
 
   .message-content {
     max-width: 85%;
+  }
+
+  .product-card-chat {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .product-card-chat img {
+    width: 100%;
+    height: 150px;
   }
 }
 </style>
@@ -395,7 +511,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const clearChatBtn = document.getElementById('clearChatBtn');
     const typingIndicator = document.getElementById('typingIndicator');
     
-    // CSRF Token
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     // Open chat modal
@@ -404,15 +519,22 @@ document.addEventListener('DOMContentLoaded', function() {
         chatInput.focus();
     });
 
+    // Quick question buttons
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.quick-question-btn')) {
+            const question = e.target.closest('.quick-question-btn').dataset.question;
+            chatInput.value = question;
+            chatForm.dispatchEvent(new Event('submit'));
+        }
+    });
+
     // Clear chat
     clearChatBtn.addEventListener('click', function() {
-        if (confirm('Apakah Anda yakin ingin menghapus semua percakapan?')) {
-            // Clear visual
+        if (confirm('Hapus semua percakapan?')) {
             const welcomeMessage = chatMessages.querySelector('.chat-message.ai-message');
             chatMessages.innerHTML = '';
-            chatMessages.appendChild(welcomeMessage);
+            chatMessages.appendChild(welcomeMessage.cloneNode(true));
             
-            // Clear session
             fetch('/api/ai-chat/clear', {
                 method: 'POST',
                 headers: {
@@ -424,66 +546,70 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Send message
-    // Send message
-chatForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const message = chatInput.value.trim();
-    if (!message) return;
-
-    // Add user message
-    addMessage(message, 'user');
-    chatInput.value = '';
-    sendBtn.disabled = true;
-
-    // Show typing indicator
-    showTypingIndicator();
-
-    try {
-        const response = await fetch('/api/ai-chat/send', {
-            method: 'POST',  // ← Pastikan POST
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'  // ← Tambahkan ini
-            },
-            body: JSON.stringify({ message: message })
-        });
-
-        // Hide typing indicator
-        hideTypingIndicator();
-
-        // Check if response is JSON
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            console.error('Response bukan JSON:', await response.text());
-            addMessage('Maaf, terjadi kesalahan format response. Silakan coba lagi.', 'ai');
-            return;
-        }
-
-        const data = await response.json();
+    chatForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
         
-        if (response.ok && data.success) {
-            // Add AI response
-            addMessage(data.message, 'ai');
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        addMessage(message, 'user');
+        chatInput.value = '';
+        sendBtn.disabled = true;
+        showTypingIndicator();
+
+        // Debug: Log request
+        console.log('📤 Sending message:', message);
+
+        try {
+            const startTime = Date.now();
             
-            // Add product cards if any
-            if (data.products && data.products.length > 0) {
-                addProductCards(data.products);
+            const response = await fetch('/api/ai-chat/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            const responseTime = Date.now() - startTime;
+            console.log(`⏱️ Response time: ${responseTime}ms`);
+
+            hideTypingIndicator();
+
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                console.error('❌ Invalid content type:', contentType);
+                throw new Error('Invalid response format');
             }
-        } else {
-            addMessage(data.message || 'Maaf, terjadi kesalahan. Silakan coba lagi.', 'ai');
+
+            const data = await response.json();
+            console.log('📥 Response data:', data);
+            
+            if (response.ok && data.success) {
+                addMessage(data.message, 'ai');
+                
+                if (data.products && data.products.length > 0) {
+                    console.log('🛍️ Products found:', data.products.length);
+                    addProductCards(data.products);
+                } else {
+                    console.log('ℹ️ No products in response');
+                }
+            } else {
+                console.error('❌ Request failed:', data);
+                addMessage(data.message || 'Terjadi kesalahan. Silakan coba lagi.', 'ai');
+            }
+            
+        } catch (error) {
+            hideTypingIndicator();
+            console.error('💥 Chat error:', error);
+            addMessage('Maaf, koneksi bermasalah. Pastikan Anda terhubung dengan internet.', 'ai');
+        } finally {
+            sendBtn.disabled = false;
+            chatInput.focus();
         }
-        
-    } catch (error) {
-        hideTypingIndicator();
-        console.error('Chat error:', error);
-        addMessage('Maaf, koneksi bermasalah. Silakan coba lagi.', 'ai');
-    } finally {
-        sendBtn.disabled = false;
-        chatInput.focus();
-    }
-});
+    });
 
     // Add message to chat
     function addMessage(text, sender) {
@@ -501,10 +627,7 @@ chatForm.addEventListener('submit', async function(e) {
         
         const bubbleDiv = document.createElement('div');
         bubbleDiv.className = 'message-bubble';
-        
-        // Format text dengan line breaks dan links
-        const formattedText = formatMessage(text);
-        bubbleDiv.innerHTML = formattedText;
+        bubbleDiv.innerHTML = formatMessage(text);
         
         const timeSpan = document.createElement('small');
         timeSpan.className = 'message-time';
@@ -524,17 +647,12 @@ chatForm.addEventListener('submit', async function(e) {
 
     // Format message text
     function formatMessage(text) {
-        // Convert line breaks
         text = text.replace(/\n/g, '<br>');
         
-        // Convert URLs to links
         const urlRegex = /(https?:\/\/[^\s]+)/g;
-        text = text.replace(urlRegex, '<a href="$1" target="_blank">$1</a>');
+        text = text.replace(urlRegex, '<a href="$1" target="_blank" class="text-primary">$1</a>');
         
-        // Convert bold markdown **text**
         text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        
-        // Convert italic markdown *text*
         text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
         
         return text;
@@ -551,19 +669,20 @@ chatForm.addEventListener('submit', async function(e) {
         
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
+        contentDiv.style.maxWidth = '85%';
         
         products.forEach(product => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card-chat d-flex align-items-center gap-3';
             productCard.innerHTML = `
-                <img src="/storage/${product.image}" alt="${product.name}" onerror="this.src='/storage/product_images/default.jpg'">
+                <img src="${product.image}" alt="${product.name}" onerror="this.src='/storage/product_images/default.jpg'">
                 <div class="flex-grow-1">
                     <h6 class="mb-1">${product.name}</h6>
                     <p class="mb-1 text-muted small">${product.category}</p>
                     <strong class="text-primary">${product.harga}</strong>
                 </div>
                 <a href="/products/${product.slug}" class="btn btn-sm btn-outline-primary">
-                    Lihat
+                    <i class="bi bi-eye"></i> Lihat
                 </a>
             `;
             contentDiv.appendChild(productCard);
@@ -594,7 +713,9 @@ chatForm.addEventListener('submit', async function(e) {
 
     // Scroll to bottom
     function scrollToBottom() {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        setTimeout(() => {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 100);
     }
 
     // Enter key to send

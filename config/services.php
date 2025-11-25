@@ -14,12 +14,15 @@ return [
     |
     */
 
-    'postmark' => [
-        'token' => env('POSTMARK_TOKEN'),
+    'mailgun' => [
+        'domain' => env('MAILGUN_DOMAIN'),
+        'secret' => env('MAILGUN_SECRET'),
+        'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
+        'scheme' => 'https',
     ],
 
-    'resend' => [
-        'key' => env('RESEND_KEY'),
+    'postmark' => [
+        'token' => env('POSTMARK_TOKEN'),
     ],
 
     'ses' => [
@@ -28,16 +31,24 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-    'slack' => [
-        'notifications' => [
-            'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
-            'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
-        ],
-    ],
-
+    // โœ… Tambahkan konfigurasi Google AI (Gemini)
     'google_ai' => [
         'api_key' => env('GOOGLE_AI_API_KEY'),
-        'model' => env('GOOGLE_AI_MODEL', 'gemini-2.5-flash'),
+        'model' => env('GOOGLE_AI_MODEL', 'gemini-1.5-flash'), // Default model yang stabil
+    ],
+
+    'midtrans' => [
+        'merchant_id' => env('MIDTRANS_MERCHANT_ID'),
+        'client_key' => env('MIDTRANS_CLIENT_KEY'),
+        'server_key' => env('MIDTRANS_SERVER_KEY'),
+        'is_production' => env('MIDTRANS_IS_PRODUCTION', false),
+        'is_sanitized' => env('MIDTRANS_IS_SANITIZED', true),
+        'is_3ds' => env('MIDTRANS_IS_3DS', true),
+    ],
+
+    'rajaongkir' => [
+        'api_key' => env('RAJAONGKIR_API_KEY'),
+        'base_url' => env('RAJAONGKIR_BASE_URL', 'https://pro.rajaongkir.com/api'),
     ],
 
 ];

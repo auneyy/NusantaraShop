@@ -14,72 +14,147 @@ class GoogleAIService
     public function __construct()
     {
         $this->apiKey = config('services.google_ai.api_key');
-        $this->model = config('services.google_ai.model', 'gemini-2.0-flash-exp');
-
-        // Endpoint standar Gemini generateContent v1beta
+        $this->model = config('services.google_ai.model', 'gemini-1.5-flash');
         $this->apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent";
+        
+        // Validasi API key
+        if (empty($this->apiKey)) {
+            Log::error('Google AI API Key tidak ditemukan di .env');
+        }
     }
 
     /**
-     * Fungsi utama memanggil Gemini API
+     * Generate AI response with conversation history
      */
-    public function generateContent($systemInstruction, $prompt)
+    public function generateContent($systemInstruction, $prompt, $conversationHistory = [])
     {
         try {
+            // Validasi input
+            if (empty($prompt)) {
+                throw new \Exception('Prompt tidak boleh kosong');
+            }
+
+            // Build conversation contents
+            $contents = [];
+            
+            // Add conversation history (max 10 messages untuk menghindari token limit)
+            $history = array_slice($conversationHistory, -10);
+            foreach ($history as $msg) {
+                if (isset($msg['role']) && isset($msg['text'])) {
+                    $contents[] = [
+                        "role" => $msg['role'],
+                        "parts" => [["text" => $msg['text']]]
+                    ];
+                }
+            }
+            
+            // Add current user message
+            $contents[] = [
+                "role" => "user",
+                "parts" => [["text" => $prompt]]
+            ];
+
+            // Build payload
             $payload = [
-                "contents" => [
-                    [
-                        "role" => "user",
-                        "parts" => [
-                            [
-                                "text" =>
-                                    $systemInstruction . // Rules + product data
-                                    "\n\n" .
-                                    "User: " . $prompt
-                            ]
-                        ]
-                    ]
+                "system_instruction" => [
+                    "parts" => [["text" => $systemInstruction]]
                 ],
+                "contents" => $contents,
                 "generationConfig" => [
-                    "temperature" => 0.9,
-                    "maxOutputTokens" => 8192,
+                    "temperature" => 0.7,
+                    "maxOutputTokens" => 2048,
+                    "topP" => 0.95,
+                    "topK" => 40,
+                ],
+                "safetySettings" => [
+                    [
+                        "category" => "HARM_CATEGORY_HARASSMENT",
+                        "threshold" => "BLOCK_MEDIUM_AND_ABOVE"
+                    ],
+                    [
+                        "category" => "HARM_CATEGORY_HATE_SPEECH",
+                        "threshold" => "BLOCK_MEDIUM_AND_ABOVE"
+                    ],
+                    [
+                        "category" => "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                        "threshold" => "BLOCK_MEDIUM_AND_ABOVE"
+                    ],
+                    [
+                        "category" => "HARM_CATEGORY_DANGEROUS_CONTENT",
+                        "threshold" => "BLOCK_MEDIUM_AND_ABOVE"
+                    ]
                 ]
             ];
 
-            $response = Http::withOptions([
-                    'verify' => false, // Disable SSL verification untuk development
-                ])
+            Log::info('Gemini API Request', [
+                'model' => $this->model,
+                'prompt_length' => strlen($prompt),
+                'history_count' => count($history)
+            ]);
+
+            // Send request to Gemini
+            $response = Http::withOptions(['verify' => false])
                 ->timeout(30)
-                ->withHeaders([
-                    "Content-Type" => "application/json",
-                ])
+                ->withHeaders(["Content-Type" => "application/json"])
                 ->post($this->apiUrl . "?key={$this->apiKey}", $payload);
 
+            // Handle response errors
             if (!$response->successful()) {
+                $errorBody = $response->json();
                 Log::error("Gemini API Error", [
                     "status" => $response->status(),
-                    "body" => $response->body(),
+                    "error" => $errorBody,
                     "url" => $this->apiUrl,
                 ]);
 
-                return "Maaf, koneksi ke AI bermasalah. Silakan coba lagi.";
+                // Check specific error types
+                if ($response->status() == 429) {
+                    return "Maaf, terlalu banyak permintaan. Silakan tunggu sebentar.";
+                } elseif ($response->status() == 403) {
+                    return "Maaf, API key tidak valid. Silakan hubungi admin.";
+                }
+
+                return "Maaf, terjadi kesalahan koneksi ke AI. Silakan coba lagi.";
             }
 
             $data = $response->json();
 
-            if (empty($data['candidates'][0]['content']['parts'])) {
-                Log::warning("Gemini: No response parts", ['data' => $data]);
-                return "Maaf, AI tidak memberikan respons. Coba lagi ya.";
-            }
-
-            foreach ($data['candidates'][0]['content']['parts'] as $part) {
-                if (isset($part['text'])) {
-                    return $part['text'];
+            // Validate response structure
+            if (empty($data['candidates'])) {
+                Log::warning("Gemini: No candidates in response", ['data' => $data]);
+                
+                // Check if blocked by safety filters
+                if (isset($data['promptFeedback']['blockReason'])) {
+                    return "Maaf, pertanyaan Anda tidak dapat diproses karena alasan keamanan.";
                 }
+                
+                return "Maaf, AI tidak dapat memberikan respons. Coba pertanyaan lain.";
             }
 
-            return "Maaf, respons AI tidak dapat dibaca.";
+            if (empty($data['candidates'][0]['content']['parts'])) {
+                Log::warning("Gemini: No parts in response", ['data' => $data]);
+                return "Maaf, respons AI tidak lengkap. Coba lagi.";
+            }
 
+            // Extract text from response
+            $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
+            
+            if (empty($text)) {
+                return "Maaf, AI tidak memberikan respons teks.";
+            }
+
+            Log::info('Gemini API Success', [
+                'response_length' => strlen($text)
+            ]);
+
+            return trim($text);
+
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error("Gemini Connection Error", [
+                "error" => $e->getMessage()
+            ]);
+            return "Maaf, tidak dapat terhubung ke server AI. Periksa koneksi internet Anda.";
+            
         } catch (\Exception $e) {
             Log::error("Gemini Request Failed", [
                 "error" => $e->getMessage(),
@@ -90,124 +165,118 @@ class GoogleAIService
     }
 
     /**
-     * Membangun system instruction lengkap dengan konteks produk
+     * Build system instruction with product context
      */
     public function buildSystemInstruction(array $context): string
     {
-        $instruction = "Kamu adalah customer service virtual bernama 'Asisten NusantaraShop' untuk NusantaraShop, sebuah toko online batik premium.\n\n";
+        $instruction = "Kamu adalah asisten virtual NusantaraShop yang ramah dan profesional.\n\n";
 
         $instruction .= "INFORMASI TOKO:\n";
-        $instruction .= "- Nama toko: NusantaraShop\n";
-        $instruction .= "- Produk utama: Batik berkualitas tinggi (kemeja, blouse, kain, dress, dll)\n";
-        $instruction .= "- Alamat: Jl. Kalimasada Nomor 30, Polehan, Kec. Blimbing, Kota Malang, Jawa Timur 65121\n";
-        $instruction .= "- Email: nusantarashop@gmail.com\n";
-        $instruction .= "- Telepon: +62 895 4036 50987\n";
-        $instruction .= "- Metode Pembayaran: Transfer Bank, E-wallet, COD\n";
-        $instruction .= "- Pengiriman: Seluruh Indonesia via JNE, POS, TIKI\n\n";
+        $instruction .= "Nama: NusantaraShop\n";
+        $instruction .= "Produk: Batik premium Indonesia (kemeja, blouse, kain, dress)\n";
+        $instruction .= "Alamat: Jl. Kalimasada No. 30, Polehan, Blimbing, Malang, Jawa Timur 65121\n";
+        $instruction .= "Kontak: nusantarashop@gmail.com | +62 895 4036 50987\n";
+        $instruction .= "Pembayaran: Transfer Bank, E-wallet, COD\n";
+        $instruction .= "Pengiriman: JNE, POS, TIKI (seluruh Indonesia)\n\n";
 
-        $instruction .= "GAYA KOMUNIKASI:\n";
-        $instruction .= "- Gunakan bahasa Indonesia yang ramah, sopan, dan hangat\n";
-        $instruction .= "- Tone: Friendly, helpful, dan professional\n";
-        $instruction .= "- Gunakan emoji secukupnya untuk kehangatan (😊, 👍, 🎉, ✨)\n";
-        $instruction .= "- Jangan terlalu formal, tapi tetap sopan\n\n";
-
-        // =======================
-        // PRODUK dari database
-        // =======================
-        if (!empty($context['products'])) {
-            $instruction .= "PRODUK YANG TERSEDIA (dari database kami):\n\n";
-
+        if (!empty($context['products']) && count($context['products']) > 0) {
+            $instruction .= "PRODUK YANG RELEVAN:\n\n";
+            
             foreach ($context['products'] as $i => $product) {
-                $instruction .= "Produk #" . ($i + 1) . ":\n";
-                $instruction .= "├─ Nama: {$product['name']}\n";
-                $instruction .= "├─ Kategori: {$product['category']}\n";
-                $instruction .= "├─ Harga: IDR " . number_format($product['price'], 0, ',', '.') . "\n";
-
+                $no = $i + 1;
+                $instruction .= "{$no}. {$product['name']}\n";
+                $instruction .= "   Kategori: {$product['category']}\n";
+                
                 if (!empty($product['discount']) && $product['discount'] > 0) {
+                    $instruction .= "   💰 Harga: Rp " . number_format($product['price'], 0, ',', '.') . "\n";
+                    $instruction .= "   🎉 DISKON {$product['discount']}% dari Rp " . number_format($product['original_price'], 0, ',', '.') . "\n";
                     $saving = $product['original_price'] - $product['price'];
-                    $instruction .= "├─ 🎉 DISKON: {$product['discount']}%\n";
-                    $instruction .= "│  Hemat: IDR " . number_format($saving, 0, ',', '.') . "\n";
-                    $instruction .= "│  Harga Normal: IDR " . number_format($product['original_price'], 0, ',', '.') . "\n";
+                    $instruction .= "   💵 Hemat: Rp " . number_format($saving, 0, ',', '.') . "\n";
+                } else {
+                    $instruction .= "   Harga: Rp " . number_format($product['price'], 0, ',', '.') . "\n";
                 }
-
+                
+                $instruction .= "   Stok: " . ($product['stock'] > 0 ? "{$product['stock']} unit tersedia ✓" : "Habis ✗") . "\n";
+                
                 if (!empty($product['description'])) {
-                    $instruction .= "├─ Deskripsi: {$product['description']}\n";
+                    $desc = substr($product['description'], 0, 80);
+                    $instruction .= "   Info: {$desc}...\n";
                 }
-
-                $instruction .= "├─ Stok: " . ($product['stock'] > 0 ? "{$product['stock']} unit tersedia ✓" : "Stok habis ✗") . "\n";
-                $instruction .= "└─ Link Produk: {$product['url']}\n\n";
+                
+                $instruction .= "   🔗 Link: {$product['url']}\n\n";
             }
         } else {
-            $instruction .= "INFO: Tidak ada produk spesifik yang relevan dengan pertanyaan user.\n";
-            $instruction .= "Kamu bisa menawarkan untuk melihat katalog lengkap di /products atau tanyakan kategori yang diinginkan.\n\n";
+            $instruction .= "CATATAN: Tidak ada produk spesifik yang cocok dengan pertanyaan user.\n";
+            $instruction .= "Sarankan user untuk melihat katalog lengkap di /products atau tanyakan kebutuhan lebih detail.\n\n";
         }
 
-        // =======================
-        // TUGAS & ATURAN
-        // =======================
-        $instruction .= "TUGAS UTAMA KAMU:\n";
-        $instruction .= "1. Membantu customer menemukan produk batik yang sesuai kebutuhan\n";
-        $instruction .= "2. Memberikan rekomendasi berdasarkan preferensi customer\n";
-        $instruction .= "3. Menjelaskan detail produk (harga, stok, bahan, ukuran, dll)\n";
-        $instruction .= "4. Membantu proses pemesanan dan menjawab pertanyaan umum\n";
-        $instruction .= "5. Memberikan informasi tentang promo, diskon, dan pengiriman\n\n";
+        $instruction .= "ATURAN MENJAWAB:\n";
+        $instruction .= "1. Jawab pertanyaan langsung dan spesifik berdasarkan data produk di atas\n";
+        $instruction .= "2. Jika user tanya produk, HANYA sebutkan produk yang ADA di list di atas\n";
+        $instruction .= "3. JANGAN membuat nama produk atau harga fiktif\n";
+        $instruction .= "4. Sertakan harga lengkap dengan format Rp dan info diskon jika ada\n";
+        $instruction .= "5. Berikan link produk untuk memudahkan user\n";
+        $instruction .= "6. Gunakan bahasa Indonesia yang ramah dan natural\n";
+        $instruction .= "7. Maksimal 5-6 kalimat per respons, jangan terlalu panjang\n";
+        $instruction .= "8. Jika produk stok habis, tawarkan alternatif lain\n";
+        $instruction .= "9. Untuk pertanyaan di luar produk (cara pesan, pembayaran), jawab sesuai info toko\n\n";
 
-        $instruction .= "ATURAN PENTING:\n";
-        $instruction .= "❌ JANGAN membuat informasi produk palsu atau harga yang tidak ada\n";
-        $instruction .= "❌ JANGAN memberikan rekomendasi produk yang tidak ada di database\n";
-        $instruction .= "❌ JANGAN terlalu teknis atau formal dalam bahasa\n";
-        $instruction .= "❌ JANGAN abaikan pertanyaan customer\n\n";
+        $instruction .= "CONTOH RESPONS YANG BAIK:\n";
+        $instruction .= "User: 'Ada kemeja batik pria formal?'\n";
+        $instruction .= "Bot: 'Ada kak! Kami punya [nama produk dari list] dengan harga Rp [harga sesuai list]. ";
+        $instruction .= "[Deskripsi singkat]. Kakak bisa lihat detailnya di [link]. ";
+        $instruction .= "Stoknya masih [jumlah] unit. Ada yang ingin ditanyakan lagi? 😊'\n\n";
 
-        $instruction .= "✅ LAKUKAN:\n";
-        $instruction .= "✓ Rekomendasikan produk yang BENAR-BENAR ADA di database\n";
-        $instruction .= "✓ Berikan link produk untuk memudahkan customer\n";
-        $instruction .= "✓ Sebutkan harga dengan format IDR yang jelas\n";
-        $instruction .= "✓ Informasikan jika ada diskon atau promo\n";
-        $instruction .= "✓ Tanyakan detail lebih lanjut jika pertanyaan kurang spesifik\n";
-        $instruction .= "✓ Jika produk stok habis, tawarkan alternatif serupa\n";
-        $instruction .= "✓ Untuk pertanyaan kompleks (status pesanan, tracking), arahkan ke halaman profil/pesanan\n\n";
-
-        $instruction .= "FORMAT JAWABAN:\n";
-        $instruction .= "- Jawab dengan 3-6 kalimat yang to-the-point\n";
-        $instruction .= "- Gunakan paragraf pendek untuk readability\n";
-        $instruction .= "- Sertakan emoji untuk kehangatan\n";
-        $instruction .= "- Akhiri dengan pertanyaan follow-up atau call-to-action\n\n";
-
-        $instruction .= "CONTOH PERTANYAAN YANG BISA DIJAWAB:\n";
-        $instruction .= "- 'Ada batik pria formal untuk ke kantor?'\n";
-        $instruction .= "- 'Berapa harga kemeja batik yang ada diskon?'\n";
-        $instruction .= "- 'Rekomendasi batik untuk acara pernikahan dong'\n";
-        $instruction .= "- 'Batik wanita ukuran M ada?'\n";
-        $instruction .= "- 'Gimana cara pesan dan bayarnya?'\n\n";
-
-        $instruction .= "Sekarang, jawab pertanyaan user dengan ramah dan informatif!\n";
+        $instruction .= "Sekarang jawab pertanyaan user dengan informasi yang akurat!";
 
         return $instruction;
     }
 
     /**
-     * Test koneksi ke Gemini API (optional untuk debugging)
+     * Test connection to Gemini API
      */
     public function testConnection()
     {
         try {
-            $response = Http::withOptions([
-                    'verify' => false, // Disable SSL verification
-                ])
+            if (empty($this->apiKey)) {
+                throw new \Exception('API Key tidak dikonfigurasi');
+            }
+
+            $response = Http::withOptions(['verify' => false])
                 ->timeout(10)
                 ->post($this->apiUrl . "?key={$this->apiKey}", [
                     "contents" => [
-                        [
-                            "role" => "user",
-                            "parts" => [["text" => "Test koneksi"]]
-                        ]
+                        ["role" => "user", "parts" => [["text" => "Test koneksi"]]]
                     ]
                 ]);
 
-            return $response->successful();
+            if (!$response->successful()) {
+                throw new \Exception('HTTP ' . $response->status() . ': ' . $response->body());
+            }
+
+            return true;
         } catch (\Exception $e) {
-            Log::error("Gemini Connection Test Failed", ["error" => $e->getMessage()]);
+            Log::error("Gemini Connection Test Failed", [
+                "error" => $e->getMessage(),
+                "model" => $this->model
+            ]);
             return false;
         }
+    }
+
+    /**
+     * Get model name for debugging
+     */
+    public function getModel()
+    {
+        return $this->model;
+    }
+
+    /**
+     * Check if API key is configured
+     */
+    public function isConfigured()
+    {
+        return !empty($this->apiKey);
     }
 }

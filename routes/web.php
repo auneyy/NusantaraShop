@@ -24,6 +24,7 @@ use App\Http\Controllers\HelpController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\AIChatController;
 
 Route::post('/webhook/midtrans', [CheckoutController::class, 'midtransNotification'])
     ->name('webhook.midtrans')
