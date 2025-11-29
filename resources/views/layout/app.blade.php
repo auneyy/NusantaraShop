@@ -16,19 +16,19 @@
   @stack('styles')
   
   <style>
-     body {
+    body {
       font-family: 'Manrope', sans-serif;
       background-color: #fff;
     }
 
-.navbar {
-  background-color: #fff !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  padding: 1rem 0;
-  z-index: 1000;
-  position: sticky;
-  top: 0;
-}
+    .navbar {
+      background-color: #fff !important;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      padding: 1rem 0;
+      z-index: 1000;
+      position: sticky;
+      top: 0;
+    }
 
     .logonusantara {
       height: 50px;
@@ -76,6 +76,7 @@
       font-size: 1.2rem;
       text-decoration: none;
       transition: color 0.3s ease;
+      cursor: pointer;
     }
 
     .navbar-icons a:hover {
@@ -190,6 +191,80 @@
       text-decoration: none;
       color: #8c7b6c;
       font-weight: 600;
+    }
+
+    /* Search Modal Styles */
+    #searchModal .modal-content {
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    #searchModal .modal-header {
+      background: linear-gradient(135deg, #8B4513, #422D1C);
+      color: white;
+      border-radius: 12px 12px 0 0;
+      padding: 1.25rem 1.5rem;
+      border-bottom: none;
+    }
+
+    #searchModal .modal-title {
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+
+    #searchModal .btn-close {
+      filter: brightness(0) invert(1);
+      opacity: 0.8;
+    }
+
+    #searchModal .btn-close:hover {
+      opacity: 1;
+    }
+
+    #searchModal .modal-body {
+      padding: 2rem 1.5rem;
+    }
+
+    #searchModal .form-control {
+      border: 2px solid #e8e9ed;
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    #searchModal .form-control:focus {
+      border-color: #8B4513;
+      box-shadow: 0 0 0 0.25rem rgba(139, 69, 19, 0.1);
+    }
+
+    #searchModal .btn-primary {
+      background-color: #8B4513;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 10px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    #searchModal .btn-primary:hover {
+      background-color: #422D1C;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+    }
+
+    #searchModal .search-icon {
+      position: absolute;
+      right: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      pointer-events: none;
+    }
+
+    #searchModal .input-wrapper {
+      position: relative;
     }
 
     /* Modern Footer Styles */
@@ -331,7 +406,7 @@
       font-size: 18px;
     }
 
-    .dropdown-item a{
+    .dropdown-item a {
       font-size: 15px;
     }
 
@@ -367,20 +442,18 @@
       }
     }
 
-    .btn-primary{
+    .btn-primary {
       background-color: #422D1C;
       border: none;
     }
 
-    .btn-primary:hover{
+    .btn-primary:hover {
       background-color: #8B4513;
     }
-</style>
+  </style>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // ✅ FIXED: Hanya auth check, hapus popstate prevention yang mengganggu
-        
         // Auth check saat page load from cache
         window.addEventListener('pageshow', function(event) {
             if (event.persisted || 
@@ -427,7 +500,9 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container">
-      <a href="{{ auth()->check() ? url('/home') : url('/') }}"><img src="{{ asset('storage/product_images/logobrand.png') }}" alt="logo" class="logonusantara"></a>
+      <a href="{{ auth()->check() ? url('/home') : url('/') }}">
+        <img src="{{ asset('storage/product_images/logobrand.png') }}" alt="logo" class="logonusantara">
+      </a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -516,19 +591,32 @@
     </div>
   </nav>
 
+  <!-- Search Modal -->
   <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="searchModalLabel">Cari Produk</h5>
+          <h5 class="modal-title" id="searchModalLabel">
+            <i class="bi bi-search me-2"></i>Cari Produk
+          </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form>
+          <form action="{{ url('/products') }}" method="GET">
             <div class="mb-3">
-              <input type="text" class="form-control" placeholder="Cari produk batik...">
+              <div class="input-wrapper">
+                <input type="text" 
+                       name="search" 
+                       class="form-control" 
+                       placeholder="Cari produk batik, kemeja, dress..."
+                       autocomplete="off"
+                       required>
+                <i class="bi bi-search search-icon"></i>
+              </div>
             </div>
-            <button type="submit" class="btn btn-primary">Cari</button>
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="bi bi-search me-2"></i>Cari Produk
+            </button>
           </form>
         </div>
       </div>
@@ -601,6 +689,50 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Search Modal Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize search modal
+        const searchModal = new bootstrap.Modal(document.getElementById('searchModal'));
+        const searchTrigger = document.querySelector('.search-trigger');
+        const searchInput = document.querySelector('#searchModal input[name="search"]');
+        
+        // Open modal when search icon is clicked
+        if (searchTrigger) {
+            searchTrigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                searchModal.show();
+            });
+        }
+        
+        // Auto focus on input when modal opens
+        document.getElementById('searchModal').addEventListener('shown.bs.modal', function() {
+            if (searchInput) {
+                searchInput.focus();
+            }
+        });
+        
+        // Clear input when modal closes
+        document.getElementById('searchModal').addEventListener('hidden.bs.modal', function() {
+            if (searchInput) {
+                searchInput.value = '';
+            }
+        });
+        
+        // Handle Enter key in search input
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (this.value.trim() !== '') {
+                        this.form.submit();
+                    }
+                }
+            });
+        }
+    });
+  </script>
 
   @stack('scripts')
 

@@ -362,12 +362,12 @@ html, body {
       <p>Temukan jawaban untuk pertanyaan Anda</p>
     </div>
     
-    <div class="search-container">
+    <!-- <div class="search-container">
       <input type="text" class="search-input" placeholder="Cari artikel bantuan..." id="helpSearch">
       <button class="search-btn" type="button" id="searchBtn">
         <i class="bi bi-search"></i>
       </button>
-    </div>
+    </div> -->
   </div>
 </div>
 

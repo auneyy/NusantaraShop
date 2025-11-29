@@ -10,20 +10,46 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = [
-        'name', 'email', 'password', 'phone', 'birth_date', 
-        'gender', 'role', 'is_active'
-    ];
+  // Di User model, tambahkan:
+protected $fillable = [
+    'name', 'email', 'password', 'phone', 'birth_date', 
+    'gender', 'role', 'is_active', 'profile_image', 'address_data'
+];
 
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
+protected $casts = [
+    'email_verified_at' => 'datetime',
+    'birth_date' => 'date',
+    'is_active' => 'boolean',
+    'address_data' => 'array', // Cast JSON to array
+];
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'birth_date' => 'date',
-        'is_active' => 'boolean',
-    ];
+/**
+ * Get formatted address from address_data
+ */
+public function getFormattedAddress()
+{
+    if (!$this->address_data) {
+        return null;
+    }
+
+    $address = $this->address_data;
+    
+    return implode(', ', array_filter([
+        $address['address'] ?? null,
+        $address['district'] ?? null,
+        $address['city_name'] ?? null,
+        $address['province_name'] ?? null,
+        $address['postal_code'] ?? null
+    ]));
+}
+
+/**
+ * Get address component
+ */
+public function getAddressComponent($key)
+{
+    return $this->address_data[$key] ?? null;
+}
 
     // Relationships
     public function addresses()
@@ -52,11 +78,61 @@ class User extends Authenticatable
     }
 
     /**
+     * Get latest shipping address from orders
+     * METHOD BARU UNTUK PROFILE PAGE
+     */
+    public function getLatestShippingAddress()
+    {
+        $latestOrder = $this->orders()
+            ->whereNotNull('shipping_address')
+            ->latest()
+            ->first();
+
+        if ($latestOrder) {
+            return [
+                'address' => $latestOrder->shipping_address,
+                'city' => $latestOrder->shipping_city,
+                'province' => $latestOrder->shipping_province,
+                'district' => $latestOrder->shipping_district,
+                'postal_code' => $latestOrder->shipping_postal_code
+            ];
+        }
+        return null;
+    }
+
+    /**
+     * Get profile image URL
+     * METHOD BARU UNTUK MENAMPILKAN FOTO PROFIL
+     */
+    public function getProfileImageUrl()
+    {
+        if ($this->profile_image) {
+            return asset('storage/' . $this->profile_image);
+        }
+        return null;
+    }
+
+    /**
+     * Get initials for avatar placeholder
+     * METHOD BARU JIKA TIDAK ADA FOTO PROFIL
+     */
+    public function getInitials()
+    {
+        $names = explode(' ', $this->name);
+        $initials = '';
+        
+        if (count($names) >= 2) {
+            $initials = strtoupper(substr($names[0], 0, 1) . substr($names[1], 0, 1));
+        } else {
+            $initials = strtoupper(substr($this->name, 0, 2));
+        }
+        
+        return $initials;
+    }
+
+    /**
      * Check if user can review a product
      * Updated to support both 'delivered' and 'diterima' status
-     *
-     * @param int $productId
-     * @return bool
      */
     public function canReviewProduct($productId)
     {
@@ -65,7 +141,7 @@ class User extends Authenticatable
             ->whereHas('orderItems', function($query) use ($productId) {
                 $query->where('product_id', $productId);
             })
-            ->whereIn('status', ['delivered', 'diterima']) // Support both statuses
+            ->whereIn('status', ['delivered', 'diterima'])
             ->exists();
 
         if (!$hasPurchased) {
@@ -83,9 +159,6 @@ class User extends Authenticatable
     /**
      * Get order ID for review
      * Updated to support both 'delivered' and 'diterima' status
-     *
-     * @param int $productId
-     * @return int|null
      */
     public function getOrderIdForReview($productId)
     {
@@ -93,7 +166,7 @@ class User extends Authenticatable
             ->whereHas('orderItems', function($query) use ($productId) {
                 $query->where('product_id', $productId);
             })
-            ->whereIn('status', ['delivered', 'diterima']) // Support both statuses
+            ->whereIn('status', ['delivered', 'diterima'])
             ->whereDoesntHave('reviews', function($query) use ($productId) {
                 $query->where('product_id', $productId)
                       ->where('user_id', $this->id);
@@ -106,8 +179,6 @@ class User extends Authenticatable
 
     /**
      * Get all products that can be reviewed by this user
-     *
-     * @return \Illuminate\Support\Collection
      */
     public function getReviewableProducts()
     {
@@ -126,14 +197,39 @@ class User extends Authenticatable
 
     /**
      * Check if user has reviewed a specific product
-     *
-     * @param int $productId
-     * @return bool
      */
     public function hasReviewedProduct($productId)
     {
         return $this->reviews()
             ->where('product_id', $productId)
             ->exists();
+    }
+
+    /**
+     * Get user's order statistics
+     * METHOD BARU UNTUK DASHBOARD PROFILE
+     */
+    public function getOrderStatistics()
+    {
+        return [
+            'total_orders' => $this->orders()->count(),
+            'pending_orders' => $this->orders()->where('status', 'pending')->count(),
+            'processing_orders' => $this->orders()->where('status', 'processing')->count(),
+            'delivered_orders' => $this->orders()->whereIn('status', ['delivered', 'diterima'])->count(),
+            'cancelled_orders' => $this->orders()->where('status', 'cancelled')->count(),
+        ];
+    }
+
+    /**
+     * Get recent orders for profile page
+     * METHOD BARU UNTUK PROFIL PAGE
+     */
+    public function getRecentOrders($limit = 5)
+    {
+        return $this->orders()
+            ->with(['orderItems.product.images'])
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
     }
 }

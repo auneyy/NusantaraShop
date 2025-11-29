@@ -378,8 +378,8 @@
       <div class="carousel-caption">
         <div class="animate__animated animate__fadeInUp">
           @guest
-            <a href="{{ route('register') }}" class="btn btn-primary-custom">Daftar Sekarang</a>
-            <a href="{{ route('login') }}" class="btn btn-outline-custom">Masuk</a>
+            <!-- <a href="{{ route('register') }}" class="btn btn-primary-custom">Daftar Sekarang</a>
+            <a href="{{ route('login') }}" class="btn btn-outline-custom">Masuk</a> -->
           @endguest
           @auth
             <!-- <a href="{{ url('/products') }}" class="btn btn-primary-custom">Beli Sekarang</a> -->

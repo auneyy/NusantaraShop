@@ -103,6 +103,16 @@ Route::middleware(\App\Http\Middleware\PreventBackHistory::class)->group(functio
 
     Route::middleware('auth')->group(function () {
 
+             Route::get('/', [ProfileController::class, 'index'])->name('profile.index');
+            Route::get('/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+            Route::put('/update', [ProfileController::class, 'update'])->name('profile.update');
+            Route::get('/address', [ProfileController::class, 'address'])->name('profile.address');
+            Route::put('/address', [ProfileController::class, 'updateAddress'])->name('profile.address.update');
+            Route::get('/cities/{provinceId}', [ProfileController::class, 'getCities'])->name('profile.cities');
+            Route::get('/orders', [ProfileController::class, 'orders'])->name('profile.orders');
+            Route::get('/password', [ProfileController::class, 'showChangePassword'])->name('profile.password');
+            Route::put('/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
         Route::prefix('orders')->name('orders.')->group(function () {
             Route::get('/', [OrderController::class, 'index'])->name('index');
             Route::get('/{orderNumber}', [OrderController::class, 'show'])->name('show');

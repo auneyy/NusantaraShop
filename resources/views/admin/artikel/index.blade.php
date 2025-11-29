@@ -4,47 +4,32 @@
 
 @section('content')
 <div class="container-fluid">
-    <!-- Header Section -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h2 class="mb-1">Artikel Bantuan</h2>
-                    <p class="text-muted mb-0">Kelola artikel dan panduan untuk pengguna</p>
-                </div>
-                <a href="{{ route('admin.artikel.create') }}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle me-2"></i>Tambah Artikel
-                </a>
-            </div>
-        </div>
-    </div>
 
-    <!-- Alert Success -->
+    {{-- Pesan notifikasi --}}
     @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
+        <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
 
-    <!-- Main Card -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-white border-bottom py-3">
-            <div class="row align-items-center">
-                <div class="col">
-                    <h5 class="mb-0">Daftar Artikel</h5>
-                </div>
-                <div class="col-auto">
-                    <span class="badge bg-light text-dark">
-                        Total: {{ $articles->total() }} artikel
-                    </span>
-                </div>
-            </div>
+    {{-- Header dengan Tombol Tambah --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{{ route('admin.artikel.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Tambah Artikel
+        </a>
+    </div>
+
+    {{-- Main Card - Daftar Artikel --}}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Daftar Artikel</h6>
+            <span class="badge bg-primary">Total: {{ $articles->total() }} artikel</span>
         </div>
-        
+
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0 modern-table">
+                <table class="table table-hover align-middle mb-0 table-bordered">
                     <thead>
                         <tr>
                             <th style="width: 5%;" class="text-center">No</th>
@@ -60,58 +45,65 @@
                         @forelse($articles as $index => $article)
                         <tr>
                             <td class="text-center">
-                                <span class="text-muted fw-medium">{{ $articles->firstItem() + $index }}</span>
+                                {{ $articles->firstItem() + $index }}
                             </td>
                             <td>
                                 <div class="article-title-wrapper">
-                                    <h6 class="article-title mb-1">
+                                    <div class="fw-bold mb-1">
                                         {{ $article->title }}
                                         @if($article->is_featured)
-                                        <i class="bi bi-star-fill text-warning ms-1" title="Featured"></i>
+                                        <i class="fas fa-star text-warning ms-1" title="Featured" data-bs-toggle="tooltip"></i>
                                         @endif
-                                    </h6>
-                                    <p class="article-excerpt text-muted mb-0">
+                                    </div>
+                                    <small class="text-muted article-excerpt">
                                         {{ Str::limit(strip_tags($article->content), 60) }}
-                                    </p>
+                                    </small>
                                 </div>
                             </td>
                             <td class="text-center">
                                 @if($article->category)
-                                <span class="badge-category badge-{{ $article->category }}">
-                                    {{ $article->category_name }}
-                                </span>
+                                    @php
+                                        // Menyesuaikan badge color berdasarkan kategori (contoh, bisa disesuaikan lebih lanjut)
+                                        $categoryClass = match($article->category) {
+                                            'getting-started' => 'bg-info',
+                                            'account-billing' => 'bg-warning text-dark',
+                                            'troubleshooting' => 'bg-danger',
+                                            default => 'bg-secondary',
+                                        };
+                                    @endphp
+                                    <span class="badge {{ $categoryClass }}">
+                                        {{ $article->category_name }}
+                                    </span>
                                 @else
-                                <span class="badge-category badge-uncategorized">
-                                    Tanpa Kategori
-                                </span>
+                                    <span class="badge bg-secondary">
+                                        Tanpa Kategori
+                                    </span>
                                 @endif
                             </td>
                             <td class="text-center">
-                                <span class="order-badge">{{ $article->order }}</span>
+                                <span class="badge bg-light text-dark border">{{ $article->order }}</span>
                             </td>
                             <td class="text-center">
                                 @if($article->is_published)
-                                <span class="status-badge status-active">
-                                    <i class="bi bi-check-circle-fill"></i> Aktif
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle"></i> Aktif
                                 </span>
                                 @else
-                                <span class="status-badge status-inactive">
-                                    <i class="bi bi-x-circle-fill"></i> Draft
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-times-circle"></i> Draft
                                 </span>
                                 @endif
                             </td>
                             <td class="text-center">
-                                <span class="date-text">
-                                    {{ $article->created_at->format('d M Y') }}
-                                </span>
+                                <small class="text-muted">{{ $article->created_at->format('d M Y') }}</small>
                             </td>
                             <td class="text-center">
-                                <div class="action-buttons">
+                                <div class="d-flex justify-content-center">
                                     <a href="{{ route('admin.artikel.edit', $article) }}" 
-                                       class="btn-action btn-action-edit" 
+                                       class="btn btn-sm btn-primary me-1" 
                                        title="Edit"
                                        data-bs-toggle="tooltip">
-                                        <i class="bi bi-pencil-square"></i>
+                                        <i class="fas fa-edit"></i>
                                     </a>
                                     <form action="{{ route('admin.artikel.destroy', $article) }}" 
                                           method="POST" 
@@ -120,10 +112,10 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" 
-                                                class="btn-action btn-action-delete" 
+                                                class="btn btn-sm btn-danger" 
                                                 title="Hapus"
                                                 data-bs-toggle="tooltip">
-                                            <i class="bi bi-trash3"></i>
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
                                 </div>
@@ -133,11 +125,11 @@
                         <tr>
                             <td colspan="7" class="text-center py-5">
                                 <div class="empty-state">
-                                    <i class="bi bi-inbox"></i>
+                                    <i class="fas fa-inbox fa-4x text-muted"></i>
                                     <h5 class="mt-3">Belum ada artikel</h5>
                                     <p class="text-muted mb-3">Mulai dengan membuat artikel bantuan pertama Anda</p>
                                     <a href="{{ route('admin.artikel.create') }}" class="btn btn-primary">
-                                        <i class="bi bi-plus-circle me-2"></i>Tambah Artikel
+                                        <i class="fas fa-plus"></i> Tambah Artikel
                                     </a>
                                 </div>
                             </td>
@@ -148,6 +140,7 @@
             </div>
         </div>
 
+        {{-- Pagination SAMA PERSIS dengan Order/Produk --}}
         @if($articles->hasPages())
         <div class="card-footer bg-white border-top py-3">
             <div class="d-flex justify-content-between align-items-center">
@@ -155,9 +148,84 @@
                     Menampilkan {{ $articles->firstItem() }} - {{ $articles->lastItem() }} 
                     dari {{ $articles->total() }} artikel
                 </div>
-                <div>
-                    {{ $articles->links() }}
-                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        {{-- Previous Page Link --}}
+                        @if ($articles->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link">‹</span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $articles->previousPageUrl() }}" rel="prev">‹</a>
+                            </li>
+                        @endif
+
+                        {{-- Pagination Elements (logic disederhanakan, atau bisa menggunakan yang kompleks seperti contoh Produk) --}}
+                        @php
+                            $currentPage = $articles->currentPage();
+                            $lastPage = $articles->lastPage();
+                            $start = max(1, $currentPage - 2);
+                            $end = min($lastPage, $currentPage + 2);
+                            
+                            if ($currentPage <= 3) {
+                                $end = min(5, $lastPage);
+                            }
+                            
+                            if ($currentPage >= $lastPage - 2) {
+                                $start = max(1, $lastPage - 4);
+                            }
+                        @endphp
+
+                        {{-- First Page Link --}}
+                        @if ($start > 1)
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $articles->url(1) }}">1</a>
+                            </li>
+                            @if ($start > 2)
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            @endif
+                        @endif
+
+                        {{-- Page Numbers --}}
+                        @for ($page = $start; $page <= $end; $page++)
+                            @if ($page == $currentPage)
+                                <li class="page-item active" aria-current="page">
+                                    <span class="page-link">{{ $page }}</span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $articles->url($page) }}">{{ $page }}</a>
+                                </li>
+                            @endif
+                        @endfor
+
+                        {{-- Last Page Link --}}
+                        @if ($end < $lastPage)
+                            @if ($end < $lastPage - 1)
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            @endif
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $articles->url($lastPage) }}">{{ $lastPage }}</a>
+                            </li>
+                        @endif
+
+                        {{-- Next Page Link --}}
+                        @if ($articles->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $articles->nextPageUrl() }}" rel="next">›</a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link">›</span>
+                            </li>
+                        @endif
+                    </ul>
+                </nav>
             </div>
         </div>
         @endif
@@ -165,242 +233,74 @@
 </div>
 
 <style>
-/* Modern Table Styling */
-.modern-table {
-    font-size: 0.95rem;
+/* Styling Tambahan untuk Meniru Tampilan Produk */
+.card-header.py-3 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
 }
 
-.modern-table thead {
-    background: linear-gradient(180deg, #f8f9fa 0%, #f1f3f5 100%);
+.table-bordered {
+    border-color: #e3e6f0 !important;
 }
 
-.modern-table thead th {
-    font-weight: 600;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #495057;
-    padding: 1rem 0.75rem;
-    border-bottom: 2px solid #dee2e6;
+.table th, .table td {
+    padding: 0.75rem; /* Menyesuaikan padding tabel */
+    border-top: 1px solid #e3e6f0;
 }
 
-.modern-table tbody tr {
-    transition: all 0.2s ease;
+.table-hover tbody tr:hover {
+    color: #6e707e;
+    background-color: rgba(0, 0, 0, 0.075);
 }
 
-.modern-table tbody tr:hover {
-    background-color: #f8f9fa;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.modern-table tbody td {
-    padding: 1rem 0.75rem;
-    vertical-align: middle;
-    border-bottom: 1px solid #f1f3f5;
-}
-
-/* Article Title */
-.article-title-wrapper {
-    padding: 0.25rem 0;
-}
-
-.article-title {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #212529;
-    margin-bottom: 0.25rem;
-    line-height: 1.4;
-}
-
-.article-excerpt {
-    font-size: 0.8rem;
-    line-height: 1.4;
-    color: #6c757d;
-}
-
-/* Category Badge */
-.badge-category {
-    display: inline-block;
-    padding: 0.4rem 0.75rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border-radius: 6px;
-    text-transform: capitalize;
-}
-
-.badge-getting-started {
-    background-color: #e7f5ff;
-    color: #1971c2;
-}
-
-.badge-account-billing {
-    background-color: #fff3e0;
-    color: #e65100;
-}
-
-.badge-troubleshooting {
-    background-color: #fce4ec;
-    color: #c2185b;
-}
-
-.badge-uncategorized {
-    background-color: #f1f3f5;
-    color: #868e96;
-}
-
-/* Order Badge */
-.order-badge {
-    display: inline-block;
-    padding: 0.35rem 0.75rem;
-    background-color: #f8f9fa;
-    color: #495057;
-    font-weight: 600;
-    font-size: 0.85rem;
-    border-radius: 6px;
-    border: 1px solid #dee2e6;
-}
-
-/* Status Badge */
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.4rem 0.75rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border-radius: 6px;
-}
-
-.status-active {
-    background-color: #d3f9d8;
-    color: #2b8a3e;
-}
-
-.status-inactive {
-    background-color: #ffe3e3;
-    color: #c92a2a;
-}
-
-.status-badge i {
-    font-size: 0.85rem;
-}
-
-/* Date Text */
-.date-text {
-    font-size: 0.8rem;
-    color: #6c757d;
-    font-weight: 500;
-}
-
-/* Action Buttons */
-.action-buttons {
-    display: flex;
-    gap: 0.35rem;
-    justify-content: center;
-}
-
-.btn-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: none;
-    border-radius: 6px;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.9rem;
-}
-
-.btn-action-edit {
-    color: #f59f00;
-    background-color: #fff9db;
-}
-
-.btn-action-edit a {
-    text-decoration: none;
-}
-
-
-.btn-action-edit:hover {
-    background-color: #f59f00;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(245, 159, 0, 0.3);
-}
-
-.btn-action-delete {
-    color: #e03131;
-    background-color: #ffe3e3;
-}
-
-.btn-action-delete:hover {
-    background-color: #e03131;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(224, 49, 49, 0.3);
-}
-
-/* Empty State */
-.empty-state {
-    padding: 3rem 0;
+.badge {
+    font-size: 0.75em;
+    padding: 0.35em 0.65em;
 }
 
 .empty-state i {
-    font-size: 4rem;
-    color: #dee2e6;
+    color: #d1d3e2 !important; /* Warna ikon AdminLTE */
 }
 
-.empty-state h5 {
-    color: #495057;
-    font-weight: 600;
-    margin-top: 1rem;
+/* Pagination Styling dari contoh Produk */
+.pagination {
+    margin-bottom: 0;
 }
 
-.empty-state p {
-    color: #868e96;
+.page-item .page-link {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
 }
 
-/* Card Styling */
-.card {
-    border-radius: 12px;
-    overflow: hidden;
+.page-item.active .page-link {
+    background-color: #4e73df;
+    border-color: #4e73df;
+    color: white;
 }
 
-.card-header {
-    border-radius: 12px 12px 0 0 !important;
+.page-item:not(.active) .page-link:hover {
+    background-color: #e9ecef;
+    color: #2e59d9;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .modern-table {
-        font-size: 0.85rem;
-    }
-    
-    .modern-table thead th {
-        padding: 0.75rem 0.5rem;
-        font-size: 0.75rem;
-    }
-    
-    .modern-table tbody td {
-        padding: 0.75rem 0.5rem;
-    }
-    
-    .article-title {
-        font-size: 0.85rem;
-    }
-    
-    .article-excerpt {
-        font-size: 0.75rem;
-    }
+.page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #f8f9fa;
 }
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    margin: 0.1rem;
+}
+
 </style>
 
 @push('scripts')
 <script>
-    // Initialize tooltips
+    // Initialize tooltips (membutuhkan Bootstrap JS)
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)

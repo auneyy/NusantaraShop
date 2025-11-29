@@ -51,7 +51,6 @@
                     <div class="col-md-2">
                         <label class="form-label">Periode</label>
                         <select class="form-select" name="periode" id="periode">
-                            <option value="hari_ini" {{ $periode == 'hari_ini' ? 'selected' : '' }}>Hari Ini</option>
                             <option value="minggu_ini" {{ $periode == 'minggu_ini' ? 'selected' : '' }}>Minggu Ini</option>
                             <option value="bulan_ini" {{ $periode == 'bulan_ini' ? 'selected' : '' }}>Bulan Ini</option>
                             <option value="tahun_ini" {{ $periode == 'tahun_ini' ? 'selected' : '' }}>Tahun Ini</option>
@@ -100,33 +99,14 @@
                         </button>
                     </div>
                 </div>
-
-                {{-- Additional Filters --}}
-                <div class="row mt-3">
-                    <div class="col-md-2">
-                        <label class="form-label">Min. Amount</label>
-                        <input type="number" class="form-control" name="min_amount" 
-                               value="{{ request('min_amount') }}" placeholder="0" min="0">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Max. Amount</label>
-                        <input type="number" class="form-control" name="max_amount" 
-                               value="{{ request('max_amount') }}" placeholder="1000000" min="0">
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <a href="{{ route('admin.laporan.pendapatan') }}" class="btn btn-outline-brown w-100">
-                            <i class="fas fa-refresh"></i> Reset
-                        </a>
-                    </div>
-                </div>
             </form>
         </div>
     </div>
 
-    <!-- Summary Cards -->
+    <!-- Summary Cards (3 Cards Only - TANPA DISKON) -->
     <div class="row g-3 mb-4">
         <!-- Total Pendapatan Kotor Card -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="card border shadow-sm h-100">
                 <div class="card-body p-3">
                     <div class="d-flex align-items-center">
@@ -150,7 +130,7 @@
         </div>
 
         <!-- Pendapatan Bersih Card -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="card border shadow-sm h-100">
                 <div class="card-body p-3">
                     <div class="d-flex align-items-center">
@@ -174,7 +154,7 @@
         </div>
 
         <!-- Jumlah Order Card -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="card border shadow-sm h-100">
                 <div class="card-body p-3">
                     <div class="d-flex align-items-center">
@@ -196,33 +176,9 @@
                 </div>
             </div>
         </div>
-
-        <!-- Total Diskon Card -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card border shadow-sm h-100">
-                <div class="card-body p-3">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-brown bg-opacity-10 rounded-2 p-2">
-                                <svg class="text-brown" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <div class="small text-muted fw-medium mb-1">Total Diskon</div>
-                            <div class="h5 mb-1 text-danger fw-semibold">- Rp {{ number_format($totalDiskon, 0, ',', '.') }}</div>
-                            <div class="small text-muted">
-                                <i class="fas fa-tag me-1"></i>Diskon diberikan
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <!-- Detail Breakdown -->
+    <!-- Detail Breakdown (TANPA INFO DISKON) -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card border shadow-sm">
@@ -237,7 +193,7 @@
                         <div class="col-md-6">
                             <table class="table table-borderless table-sm">
                                 <tr>
-                                    <td class="border-0 ps-0"><strong>Pendapatan dari Produk (Setelah Diskon):</strong></td>
+                                    <td class="border-0 ps-0"><strong>Pendapatan dari Produk:</strong></td>
                                     <td class="border-0 text-end text-success fw-semibold">Rp {{ number_format($totalPendapatanProduk, 0, ',', '.') }}</td>
                                 </tr>
                                 <tr>
@@ -248,33 +204,21 @@
                                     <td class="border-0 ps-0"><strong>Total Pendapatan Kotor:</strong></td>
                                     <td class="border-0 text-end text-info fw-semibold">Rp {{ number_format($totalPendapatanKotor, 0, ',', '.') }}</td>
                                 </tr>
-                                <tr>
-                                    <td class="border-0 ps-0"><strong>Pendapatan Bersih (Tanpa Ongkir):</strong></td>
-                                    <td class="border-0 text-end text-success fw-semibold">Rp {{ number_format($totalPendapatanBersih, 0, ',', '.') }}</td>
-                                </tr>
                             </table>
                         </div>
                         <div class="col-md-6">
                             <table class="table table-borderless table-sm">
                                 <tr>
-                                    <td class="border-0 ps-0"><strong>Total Diskon Diberikan:</strong></td>
-                                    <td class="border-0 text-end text-danger fw-semibold">- Rp {{ number_format($totalDiskon, 0, ',', '.') }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="border-0 ps-0"><strong>Pendapatan Produk Asli (Sebelum Diskon):</strong></td>
-                                    <td class="border-0 text-end text-muted">
-                                        <small><s>Rp {{ number_format($totalPendapatanProdukAsli, 0, ',', '.') }}</s></small>
-                                    </td>
+                                    <td class="border-0 ps-0"><strong>Pendapatan Bersih (Tanpa Ongkir):</strong></td>
+                                    <td class="border-0 text-end text-success fw-semibold">Rp {{ number_format($totalPendapatanBersih, 0, ',', '.') }}</td>
                                 </tr>
                                 <tr>
                                     <td class="border-0 ps-0"><strong>Rata-rata per Order:</strong></td>
                                     <td class="border-0 text-end">Rp {{ number_format($rataRataOrder, 0, ',', '.') }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="border-0 ps-0"><strong>Persentase Diskon:</strong></td>
-                                    <td class="border-0 text-end text-danger fw-semibold">
-                                        {{ $totalPendapatanProdukAsli > 0 ? number_format(($totalDiskon / $totalPendapatanProdukAsli) * 100, 1) : 0 }}%
-                                    </td>
+                                    <td class="border-0 ps-0"><strong>Total Transaksi:</strong></td>
+                                    <td class="border-0 text-end fw-semibold">{{ $jumlahOrder }} order</td>
                                 </tr>
                             </table>
                         </div>
@@ -284,7 +228,7 @@
         </div>
     </div>
 
-    <!-- Tabel Rincian -->
+    <!-- Tabel Rincian (TANPA KOLOM DISKON) -->
     <div class="card border shadow-sm">
         <div class="card-header bg-light border-bottom py-3">
             <div class="d-flex align-items-center justify-content-between">
@@ -309,7 +253,6 @@
                             <th class="px-3 py-3 text-muted fw-semibold small text-center border-0">Order ID</th>
                             <th class="px-3 py-3 text-muted fw-semibold small border-0">Customer</th>
                             <th class="px-3 py-3 text-muted fw-semibold small text-end border-0">Subtotal Produk</th>
-                            <th class="px-3 py-3 text-muted fw-semibold small text-end border-0">Diskon</th>
                             <th class="px-3 py-3 text-muted fw-semibold small text-end border-0">Biaya Kirim</th>
                             <th class="px-3 py-3 text-muted fw-semibold small text-end border-0">Total</th>
                             <th class="px-3 py-3 text-muted fw-semibold small text-center border-0">Status</th>
@@ -319,7 +262,6 @@
                         @forelse($orders as $order)
                         @php
                             $orderSubtotal = $order->orderItems->sum('subtotal');
-                            $orderDiscount = $order->orderItems->sum('discount_amount');
                         @endphp
                         <tr class="border-bottom">
                             <td class="px-3 py-3 fw-medium small">{{ $order->order_date->format('d M Y') }}</td>
@@ -331,17 +273,7 @@
                                 <small class="text-muted">{{ $order->orderItems->count() }} item(s)</small>
                             </td>
                             <td class="px-3 py-3 text-end small">
-                                @if($orderDiscount > 0)
-                                    <small class="text-muted"><s>Rp {{ number_format($orderSubtotal + $orderDiscount, 0, ',', '.') }}</s></small><br>
-                                @endif
                                 Rp {{ number_format($orderSubtotal, 0, ',', '.') }}
-                            </td>
-                            <td class="px-3 py-3 text-end small text-danger">
-                                @if($orderDiscount > 0)
-                                    - Rp {{ number_format($orderDiscount, 0, ',', '.') }}
-                                @else
-                                    -
-                                @endif
                             </td>
                             <td class="px-3 py-3 text-end small">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</td>
                             <td class="px-3 py-3 text-end fw-semibold text-success small">Rp {{ number_format($order->grand_total, 0, ',', '.') }}</td>
@@ -351,7 +283,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center py-4 text-muted">
+                            <td colspan="7" class="text-center py-4 text-muted">
                                 <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
                                 Tidak ada data transaksi untuk periode yang dipilih.
                             </td>
@@ -367,9 +299,6 @@
                             <td class="px-3 py-3 text-end fw-bold text-dark small">
                                 Rp {{ number_format($totalPendapatanProduk, 0, ',', '.') }}
                             </td>
-                            <td class="px-3 py-3 text-end fw-bold text-danger small">
-                                - Rp {{ number_format($totalDiskon, 0, ',', '.') }}
-                            </td>
                             <td class="px-3 py-3 text-end fw-bold text-dark small">
                                 Rp {{ number_format($totalShipping, 0, ',', '.') }}
                             </td>
@@ -383,7 +312,7 @@
                 </table>
             </div>
 
-            {{-- Pagination SAMA PERSIS --}}
+            {{-- Pagination --}}
             @if($orders->hasPages())
             <div class="d-flex justify-content-between align-items-center mt-4 p-3">
                 <div class="text-muted">

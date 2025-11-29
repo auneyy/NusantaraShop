@@ -119,7 +119,7 @@
             border-bottom: 1px solid #e2e8f0;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1030;
             padding: 15px 0;
         }
 
@@ -201,6 +201,7 @@
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.2s ease;
+            margin-top: 8px;
         }
 
         .user-dropdown.show {
@@ -240,6 +241,7 @@
             background: none;
             width: 100%;
             text-align: left;
+            cursor: pointer;
         }
 
         .dropdown-item:hover {
@@ -259,21 +261,29 @@
         .sidebar-toggle {
             background: none;
             border: none;
-            padding: 8px;
+            padding: 10px 12px;
             cursor: pointer;
             color: #64748b;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 6px;
             transition: all 0.2s ease;
             margin-right: 10px;
+            position: relative;
+            z-index: 1050;
+            min-width: 44px;
+            min-height: 44px;
         }
 
         .sidebar-toggle:hover {
             background: #f1f5f9;
             color: var(--primary-color);
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95);
         }
 
         .toggle-state {
@@ -284,6 +294,7 @@
             font-size: 0.8rem;
         }
 
+        /* Mobile Specific Fixes */
         @media (max-width: 1024px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -300,6 +311,18 @@
             .search-input {
                 width: 200px;
             }
+
+            .sidebar-toggle {
+                min-width: 48px;
+                min-height: 48px;
+                font-size: 1.4rem;
+                padding: 12px;
+                touch-action: manipulation;
+            }
+
+            .custom-header {
+                z-index: 1035;
+            }
         }
 
         @media (max-width: 768px) {
@@ -313,6 +336,24 @@
             
             .toggle-state {
                 display: none;
+            }
+
+            .page-title {
+                font-size: 1.2rem;
+            }
+
+            .sidebar-toggle {
+                margin-right: 8px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .search-container {
+                display: none;
+            }
+
+            .page-title {
+                font-size: 1rem;
             }
         }
 
@@ -351,14 +392,25 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 1039;
             display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .sidebar-overlay.show {
             display: block;
+            opacity: 1;
         }
         
         .content-area {
             padding: 24px;
+        }
+
+        /* Ensure clickable area for mobile */
+        .header-left {
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 1031;
         }
     </style>
     @stack('styles')
@@ -371,9 +423,9 @@
             <div class="sidebar-header">
                 <div class="logo">
                    <img src="{{ asset('storage/product_images/logobrand.png') }}" 
-     alt="NusantaraShop" 
-     class="logonusantara"
-     style="width:200px; height:auto;">
+                        alt="NusantaraShop" 
+                        class="logonusantara"
+                        style="width:200px; height:auto;">
                 </div>
             </div>
             
@@ -387,7 +439,7 @@
                     </li>
 
                     <li class="nav-item">
-                          <a href="{{ route('admin.orders.index') }}" class="nav-link {{ request()->routeIs('admin.orders.index') ? 'active' : '' }}">
+                        <a href="{{ route('admin.orders.index') }}" class="nav-link {{ request()->routeIs('admin.orders.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-shopping-cart"></i>
                             Pesanan
                         </a>
@@ -415,7 +467,7 @@
                     </li>
 
                     <li class="nav-item">
-                         <a href="{{ route('admin.messages.index') }}" class="nav-link {{ request()->routeIs('admin.messages.index') ? 'active' : '' }}">
+                        <a href="{{ route('admin.messages.index') }}" class="nav-link {{ request()->routeIs('admin.messages.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-inbox"></i>
                             Pesan Masuk
                         </a>
@@ -429,7 +481,7 @@
                     </li>
 
                     <li class="nav-item">
-                       <a href="{{ route('admin.laporan.pendapatan') }}" class="nav-link {{ request()->routeIs('admin.laporan.pendapatan') ? 'active' : '' }}">
+                        <a href="{{ route('admin.laporan.pendapatan') }}" class="nav-link {{ request()->routeIs('admin.laporan.pendapatan') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-chart-line"></i>
                             Laporan Pendapatan
                         </a>
@@ -443,8 +495,8 @@
                 <div class="container-fluid">
                     <div class="row align-items-center">
                         <div class="col-md-6">
-                            <div class="d-flex align-items-center">
-                                <button class="sidebar-toggle" id="sidebarToggle">
+                            <div class="header-left">
+                                <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Toggle Sidebar">
                                     <i class="fas fa-bars"></i>
                                 </button>
                                 <h1 class="page-title">@yield('page-title', 'Dashboard Admin')</h1>
@@ -454,41 +506,31 @@
                         <div class="col-md-6">
                             <div class="d-flex align-items-center justify-content-end gap-3">
                                 <div class="search-container">
-                                    <!-- <i class="search-icon fas fa-search"></i>
-                                    <input type="text" class="search-input form-control" placeholder="Cari produk, pesanan, atau pengguna..."> -->
+                                    <!-- Search input can be added here if needed -->
                                 </div>
                                 
                                 <div class="user-profile" id="userProfile">
                                     <div class="user-avatar">
                                         <i class="fas fa-user"></i>
                                     </div>
-                                   <span>{{ Auth::user()->name }}</span>
+                                    <span>{{ Auth::user()->name }}</span>
                                     <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: #64748b;"></i>
                                     
                                     <!-- Dropdown Menu -->
                                     <div class="user-dropdown" id="userDropdown">
                                         <div class="user-dropdown-header">
-                                           <div class="user-name">{{ Auth::user()->name }}</div>
+                                            <div class="user-name">{{ Auth::user()->name }}</div>
                                             <div class="user-email">{{ Auth::user()->email }}</div>
                                         </div>
                                         <div class="dropdown-menu-custom">
-                                            <!-- <a href="#profile" class="dropdown-item">
-                                                <i class="fas fa-user"></i>
-                                                Profil Saya
+                                            <a href="#" class="dropdown-item logout"
+                                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                                <i class="fas fa-sign-out-alt"></i> Keluar
                                             </a>
-                                            <a href="#settings" class="dropdown-item">
-                                                <i class="fas fa-cog"></i>
-                                                Pengaturan
-                                            </a> -->
-<a href="#" class="dropdown-item"
-   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-   <i class="fas fa-sign-out-alt"></i> Keluar
-</a>
 
-<form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display:none;">
-    @csrf
-</form>
-
+                                            <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display:none;">
+                                                @csrf
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -504,98 +546,145 @@
         </main>
     </div>
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
-        let sidebarVisible = true;
+        // Sidebar Toggle Functionality
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
         const sidebarToggle = document.getElementById('sidebarToggle');
-        const toggleState = document.getElementById('toggleState');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-        function toggleSidebar() {
-            sidebarVisible = !sidebarVisible;
-            
-            if (sidebarVisible) {
-                sidebar.classList.remove('collapsed');
-                mainContent.classList.remove('full-width');
-                sidebarOverlay.classList.remove('show');
-            } else {
-                sidebar.classList.add('collapsed');
-                mainContent.classList.add('full-width');
-            }
-            
-            localStorage.setItem('sidebarVisible', sidebarVisible);
-        }
-
-        sidebarToggle.addEventListener('click', toggleSidebar);
-
-        sidebarOverlay.addEventListener('click', function() {
-            if (window.innerWidth <= 1024) {
-                toggleSidebar();
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedState = localStorage.getItem('sidebarVisible');
-            
-            if (savedState !== null) {
-                sidebarVisible = savedState === 'true';
-                
-                if (!sidebarVisible) {
-                    sidebar.classList.add('collapsed');
-                    mainContent.classList.add('full-width');
-                    toggleState.textContent = 'Sidebar Tersembunyi';
-                }
-            }
-            
-            if (window.innerWidth <= 1024) {
-                sidebarVisible = false;
-                sidebar.classList.add('collapsed');
-                mainContent.classList.add('full-width');
-                toggleState.textContent = 'Sidebar Tersembunyi';
-            }
-        });
-
         const userProfile = document.getElementById('userProfile');
         const userDropdown = document.getElementById('userDropdown');
 
+        let sidebarVisible = window.innerWidth > 1024;
+
+        // Toggle Sidebar Function
+        function toggleSidebar() {
+            if (window.innerWidth <= 1024) {
+                // Mobile behavior
+                sidebar.classList.toggle('show');
+                sidebarOverlay.classList.toggle('show');
+                document.body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+            } else {
+                // Desktop behavior
+                sidebarVisible = !sidebarVisible;
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('full-width');
+                localStorage.setItem('sidebarVisible', sidebarVisible);
+            }
+        }
+
+        // Event Listeners
+        sidebarToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleSidebar();
+        });
+
+        // Close sidebar when clicking overlay
+        sidebarOverlay.addEventListener('click', function() {
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.remove('show');
+                sidebarOverlay.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Close sidebar when clicking a link on mobile
+        if (window.innerWidth <= 1024) {
+            document.querySelectorAll('.nav-menu .nav-link').forEach(link => {
+                link.addEventListener('click', function() {
+                    sidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('show');
+                    document.body.style.overflow = '';
+                });
+            });
+        }
+
+        // User Dropdown Toggle
         userProfile.addEventListener('click', function(e) {
             e.stopPropagation();
             userDropdown.classList.toggle('show');
         });
 
+        // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
             if (!userProfile.contains(e.target)) {
                 userDropdown.classList.remove('show');
             }
         });
 
+        // Close dropdown when clicking a dropdown item
         document.querySelectorAll('.dropdown-item').forEach(item => {
             item.addEventListener('click', function() {
                 userDropdown.classList.remove('show');
             });
         });
 
+        // Handle window resize
         window.addEventListener('resize', function() {
             if (window.innerWidth <= 1024) {
-                if (sidebarVisible) {
-                    toggleSidebar();
-                }
+                // Mobile mode
+                sidebar.classList.remove('collapsed');
+                sidebar.classList.remove('show');
+                mainContent.classList.remove('full-width');
+                sidebarOverlay.classList.remove('show');
+                document.body.style.overflow = '';
             } else {
-                if (!sidebarVisible) {
-                    toggleSidebar();
+                // Desktop mode
+                sidebarOverlay.classList.remove('show');
+                document.body.style.overflow = '';
+                
+                const savedState = localStorage.getItem('sidebarVisible');
+                if (savedState !== null) {
+                    sidebarVisible = savedState === 'true';
+                    if (!sidebarVisible) {
+                        sidebar.classList.add('collapsed');
+                        mainContent.classList.add('full-width');
+                    } else {
+                        sidebar.classList.remove('collapsed');
+                        mainContent.classList.remove('full-width');
+                    }
                 }
             }
         });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.innerWidth > 1024) {
+                const savedState = localStorage.getItem('sidebarVisible');
+                if (savedState !== null) {
+                    sidebarVisible = savedState === 'true';
+                    if (!sidebarVisible) {
+                        sidebar.classList.add('collapsed');
+                        mainContent.classList.add('full-width');
+                    }
+                }
+            }
+        });
+
+        // Prevent scroll on body when sidebar is open on mobile
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'class') {
+                    if (sidebar.classList.contains('show')) {
+                        document.body.style.overflow = 'hidden';
+                    } else if (window.innerWidth <= 1024) {
+                        document.body.style.overflow = '';
+                    }
+                }
+            });
+        });
+
+        observer.observe(sidebar, { attributes: true });
     </script>
     @stack('scripts')
 </body>

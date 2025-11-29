@@ -3,893 +3,885 @@
 @section('title', 'Riwayat Pembelian')
 
 @push('styles')
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-<style>
-    /* Reset dan Base Styles */
-    .orders-container {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-        background-color: #f5f5f5 !important;
-        min-height: 100vh;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-
-    /* Override container default */
-    .orders-container .container {
-        max-width: 1200px !important;
-        margin: 0 auto !important;
-        padding: 20px !important;
-    }
-
-    /* Page Header */
-    .orders-header {
-        text-align: center !important;
-        margin-bottom: 30px !important;
-    }
-
-    .orders-header h1 {
-        color: #333 !important;
-        font-weight: 600 !important;
-        margin: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 12px !important;
-    }
-
-    /* Navigation Tabs */
-    .orders-nav {
-        display: flex !important;
-        justify-content: center !important;
-        gap: 32px !important;
-        margin-bottom: 24px !important;
-        border-bottom: 1px solid #e0e0e0 !important;
-    }
-
-    .orders-nav-link {
-        padding: 12px 0 !important;
-        text-decoration: none !important;
-        color: #666 !important;
-        font-weight: 500 !important;
-        border-bottom: 2px solid transparent !important;
-        transition: all 0.3s !important;
-        display: flex !important;
-        align-items: center !important;
-    }
-
-    .orders-nav-link:hover {
-        color: #8B4513 !important;
-        text-decoration: none !important;
-    }
-
-    .orders-nav-link.active {
-        color: #8B4513 !important;
-        border-bottom-color: #8B4513 !important;
-    }
-
-    /* Filter Card */
-    .orders-filter-card {
-        background: white !important;
-        border-radius: 12px !important;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08) !important;
-        padding: 24px !important;
-        margin-bottom: 24px !important;
-        transition: box-shadow 0.3s ease !important;
-    }
-
-    .orders-filter-card:hover {
-        box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important;
-    }
-
-    .orders-filter-form {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        gap: 16px !important;
-        align-items: end !important;
-    }
-
-    .orders-filter-group {
-        flex: 1 !important;
-        min-width: 200px !important;
-    }
-
-    .orders-filter-label {
-        display: block !important;
-        font-weight: 600 !important;
-        color: #333 !important;
-        margin-bottom: 6px !important;
-    }
-
-    .orders-filter-input,
-    .orders-filter-select {
-        width: 100% !important;
-        padding: 10px 12px !important;
-        border: 1px solid #ddd !important;
-        border-radius: 6px !important;
-        background: white !important;
-        transition: all 0.3s !important;
-        color: #333 !important;
-    }
-
-    .orders-filter-input:focus,
-    .orders-filter-select:focus {
-        outline: none !important;
-        border-color: #8B4513 !important;
-        box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1) !important;
-    }
-
-    /* Buttons */
-.orders-btn {
-    padding: 8px 16px;               /* lebih proporsional */
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 500;
-    text-align: center;
-    cursor: pointer;
-    border: none;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;                        /* jarak icon & text lebih kecil */
-    line-height: 1.4;                /* biar teks lebih rapi */
-}
-
-.orders-btn i, 
-.orders-btn svg {
-    width: 16px;
-    height: 16px;
-}
-
-
-    .orders-btn-primary {
-        background-color: #8B4513 !important;
-        color: white !important;
-    }
-
-    .orders-btn-primary:hover {
-        background-color: #7A3F12 !important;
-        color: white !important;
-        text-decoration: none !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 4px 8px rgba(139, 69, 19, 0.2) !important;
-    }
-
-    .orders-btn-secondary {
-        background-color: #6c757d !important;
-        color: white !important;
-    }
-
-    .orders-btn-secondary:hover {
-        background-color: #5a6268 !important;
-        color: white !important;
-        text-decoration: none !important;
-        transform: translateY(-1px) !important;
-    }
-
-    .orders-btn-outline {
-        background-color: white !important;
-        color: #666 !important;
-        border: 1px solid #ddd !important;
-    }
-
-    .orders-btn-outline:hover {
-        background-color: #f5f5f5 !important;
-        color: #333 !important;
-        text-decoration: none !important;
-        border-color: #ccc !important;
-        transform: translateY(-1px) !important;
-    }
-
-    /* Table Card */
-    .orders-table-card {
-        background: white !important;
-        border-radius: 12px !important;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08) !important;
-        overflow: hidden !important;
-        transition: box-shadow 0.3s ease !important;
-    }
-
-    .orders-table-card:hover {
-        box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important;
-    }
-
-    .orders-table-header {
-        background-color: #f8f9fa !important;
-        padding: 16px 24px !important;
-        border-bottom: 1px solid #e0e0e0 !important;
-    }
-
-    .orders-table-header h3 {
-        font-weight: 600 !important;
-        color: #333 !important;
-        margin: 0 !important;
-    }
-
-    .orders-table-head {
-        background-color: #f8f9fa !important;
-        padding: 12px 24px !important;
-        border-bottom: 1px solid #e0e0e0 !important;
-        display: grid !important;
-        grid-template-columns: 60px 1fr 120px 80px 150px 120px 100px !important;
-        gap: 16px !important;
-        font-weight: 600 !important;
-        color: #555 !important;
-    }
-
-    .orders-table-body {
-        divide-y divide-gray-200 !important;
-    }
-
-    .orders-table-row {
-        padding: 16px 24px !important;
-        border-bottom: 1px solid #f0f0f0 !important;
-    }
-
-    .orders-table-row:last-child {
-        border-bottom: none !important;
-    }
-
-    .orders-table-row:hover {
-        background-color: #fafafa !important;
-    }
-
-    /* Mobile Layout */
-    .orders-mobile-layout {
-        display: block !important;
-    }
-
-    .orders-mobile-header {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: flex-start !important;
-        margin-bottom: 12px !important;
-    }
-
-    .orders-mobile-left h4 {
-        font-weight: 600 !important;
-        color: #333 !important;
-        margin-bottom: 4px !important;
-    }
-
-    .orders-mobile-left p {
-        color: #666 !important;
-        margin-bottom: 2px !important;
-    }
-
-    .orders-mobile-right {
-        text-align: right !important;
-    }
-
-    .orders-mobile-right p {
-        font-weight: 600 !important;
-        color: #333 !important;
-        margin-bottom: 4px !important;
-    }
-
-    .orders-mobile-actions {
-        display: flex !important;
-        gap: 8px !important;
-    }
-
-    .orders-mobile-btn {
-        flex: 1 !important;
-        padding: 8px 16px !important;
-        border-radius: 6px !important;
-        font-weight: 500 !important;
-        border: none !important;
-        cursor: pointer !important;
-        transition: all 0.3s !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 4px !important;
-    }
-
-    .orders-mobile-btn-primary {
-        background-color: rgba(139, 69, 19, 0.1) !important;
-        color: #8B4513 !important;
-    }
-
-    .orders-mobile-btn-primary:hover {
-        background-color: rgba(139, 69, 19, 0.2) !important;
-    }
-
-    .orders-mobile-btn-danger {
-        background-color: rgba(220, 53, 69, 0.1) !important;
-        color: #dc3545 !important;
-    }
-
-    .orders-mobile-btn-danger:hover {
-        background-color: rgba(220, 53, 69, 0.2) !important;
-    }
-
-    /* Desktop Layout */
-    .orders-desktop-layout {
-        display: grid !important;
-        grid-template-columns: 60px 1fr 120px 80px 150px 120px 100px !important;
-        gap: 16px !important;
-        align-items: center !important;
-    }
-
-    .orders-desktop-cell {
-        color: #333 !important;
-    }
-
-    .orders-desktop-cell-secondary {
-        color: #666 !important;
-    }
-
-    .orders-desktop-cell-bold {
-        font-weight: 600 !important;
-        color: #333 !important;
-    }
-
-    .orders-desktop-actions {
-        display: flex !important;
-        gap: 8px !important;
-    }
-
-    /* Status Badges */
-    .orders-badge {
-        display: inline-block !important;
-        padding: 4px 8px !important;
-        font-weight: 500 !important;
-        border-radius: 4px !important;
-    }
-
-    .orders-badge-success {
-        background-color: #d4edda !important;
-        color: #155724 !important;
-    }
-
-    .orders-badge-info {
-        background-color: #d1ecf1 !important;
-        color: #0c5460 !important;
-    }
-
-    .orders-badge-warning {
-        background-color: #fff3cd !important;
-        color: #856404 !important;
-    }
-
-    .orders-badge-secondary {
-        background-color: #f8f9fa !important;
-        color: #6c757d !important;
-    }
-
-    /* Action Buttons */
-    .orders-action-btn {
-        background: none !important;
-        border: none !important;
-        color: #666 !important;
-        cursor: pointer !important;
-        padding: 4px 8px !important;
-        border-radius: 4px !important;
-        transition: all 0.3s !important;
-    }
-
-    .orders-action-btn:hover {
-        background-color: #f5f5f5 !important;
-    }
-
-    .orders-action-btn-primary {
-        color: #8B4513 !important;
-    }
-
-    .orders-action-btn-primary:hover {
-        color: #7A3F12 !important;
-        background-color: rgba(139, 69, 19, 0.1) !important;
-    }
-
-    .orders-action-btn-danger {
-        color: #dc3545 !important;
-    }
-
-    .orders-action-btn-danger:hover {
-        color: #c82333 !important;
-        background-color: rgba(220, 53, 69, 0.1) !important;
-    }
-
-    /* Empty State */
-    .orders-empty {
-        text-align: center !important;
-        padding: 48px 24px !important;
-        color: #666 !important;
-    }
-
-    .orders-empty i {
-        color: #ddd !important;
-        margin-bottom: 16px !important;
-        display: block !important;
-    }
-
-    .orders-empty h4 {
-        color: #555 !important;
-        margin-bottom: 8px !important;
-        font-weight: 600 !important;
-    }
-
-    .orders-empty p {
-        color: #777 !important;
-        margin-bottom: 16px !important;
-        line-height: 1.5 !important;
-    }
-
-    /* Summary Cards */
-    .orders-summary {
-        display: grid !important;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
-        gap: 16px !important;
-        margin-top: 24px !important;
-    }
-
-    .orders-summary-card {
-        padding: 20px !important;
-        border-radius: 12px !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 16px !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
-        transition: transform 0.3s ease !important;
-    }
-
-    .orders-summary-card:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.1) !important;
-    }
-
-    .orders-summary-card-blue {
-        background-color: #e3f2fd !important;
-    }
-
-    .orders-summary-card-green {
-        background-color: #e8f5e8 !important;
-    }
-
-    .orders-summary-card-yellow {
-        background-color: #fff8e1 !important;
-    }
-
-    .orders-summary-card-purple {
-        background-color: #f3e5f5 !important;
-    }
-
-    .orders-summary-icon-blue {
-        color: #1976d2 !important;
-    }
-
-    .orders-summary-icon-green {
-        color: #388e3c !important;
-    }
-
-    .orders-summary-icon-yellow {
-        color: #f57c00 !important;
-    }
-
-    .orders-summary-icon-purple {
-        color: #7b1fa2 !important;
-    }
-
-    .orders-summary-content p:first-child {
-        margin-bottom: 4px !important;
-    }
-
-    .orders-summary-content p:last-child {
-        font-weight: 700 !important;
-        margin: 0 !important;
-    }
-
-    .orders-summary-content-blue p:first-child {
-        color: #1976d2 !important;
-    }
-
-    .orders-summary-content-blue p:last-child {
-        color: #0d47a1 !important;
-    }
-
-    .orders-summary-content-green p:first-child {
-        color: #388e3c !important;
-    }
-
-    .orders-summary-content-green p:last-child {
-        color: #1b5e20 !important;
-    }
-
-    .orders-summary-content-yellow p:first-child {
-        color: #f57c00 !important;
-    }
-
-    .orders-summary-content-yellow p:last-child {
-        color: #e65100 !important;
-    }
-
-    .orders-summary-content-purple p:first-child {
-        color: #7b1fa2 !important;
-    }
-
-    .orders-summary-content-purple p:last-child {
-        color: #4a148c !important;
-    }
-
-    /* Modal Styles */
-    .orders-modal {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        background-color: rgba(0, 0, 0, 0.5) !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        z-index: 1000 !important;
-        padding: 16px !important;
-    }
-
-    .orders-modal.hidden {
-        display: none !important;
-    }
-
-    .orders-modal-content {
-        background: white !important;
-        border-radius: 12px !important;
-        padding: 24px !important;
-        max-width: 400px !important;
-        width: 100% !important;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
-    }
-
-    .orders-modal-header {
-        text-align: center !important;
-        margin-bottom: 24px !important;
-    }
-
-    .orders-modal-icon {
-        margin-bottom: 16px !important;
-        display: block !important;
-    }
-
-    .orders-modal-icon-warning {
-        color: #ff9800 !important;
-    }
-
-    .orders-modal-title {
-        font-weight: 600 !important;
-        color: #333 !important;
-        margin-bottom: 8px !important;
-    }
-
-    .orders-modal-text {
-        color: #666 !important;
-        line-height: 1.5 !important;
-    }
-
-    .orders-modal-actions {
-        display: flex !important;
-        gap: 12px !important;
-    }
-
-    /* Pagination */
-    .orders-pagination {
-        padding: 16px 24px !important;
-        border-top: 1px solid #e0e0e0 !important;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .orders-container .container {
-            padding: 15px !important;
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Reset dan Base Styles */
+        .profile-container {
+            background-color: #f5f6fa;
+            min-height: 100vh;
+            padding: 40px 0;
         }
-        
+
+        .profile-container .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Main Layout Grid */
+        .profile-main-grid {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* Profile Card - Left Side */
+        .profile-main-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 20px;
+        }
+
+        .profile-card-header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e8e9ed;
+        }
+
+        .profile-card-header h3 {
+            color: #1a1d2e;
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.35rem;
+            letter-spacing: -0.02em;
+        }
+
+        /* Profile Avatar */
+        .profile-main-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #8B4513, #D2691E);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+            font-size: 2rem;
+            font-weight: 600;
+            box-shadow: 0 8px 16px rgba(139, 69, 19, 0.12);
+        }
+
+        .profile-main-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Profile Info */
+        .profile-main-info {
+            text-align: left;
+        }
+
+        .profile-main-info h3 {
+            color: #1a1d2e;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 1.25rem;
+            text-align: center;
+            letter-spacing: -0.02em;
+        }
+
+        .profile-main-info p {
+            color: #4a5568;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            line-height: 1.5;
+            padding: 10px 0;
+            font-size: 0.925rem;
+        }
+
+        .profile-main-info p:not(:last-child) {
+            border-bottom: 1px solid #f7f8fa;
+        }
+
+        .profile-main-info i {
+            width: 18px;
+            color: #8B4513;
+            margin-top: 2px;
+            flex-shrink: 0;
+            opacity: 0.85;
+        }
+
+        /* Profile Action Buttons */
+        .profile-main-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 24px;
+            flex-direction: column;
+        }
+
+        .profile-btn {
+            padding: 13px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            font-size: 0.925rem;
+            letter-spacing: -0.01em;
+        }
+
+        .profile-btn-primary {
+            background-color: #8B4513;
+            color: white;
+        }
+
+        .profile-btn-primary:hover {
+            background-color: #7A3F12;
+            color: white;
+            text-decoration: none;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.25);
+        }
+
+        .profile-btn-secondary {
+            background-color: #f7f8fa;
+            color: #4a5568;
+            border: 1px solid #e8e9ed;
+        }
+
+        .profile-btn-secondary:hover {
+            background-color: #edf0f3;
+            color: #1a1d2e;
+            text-decoration: none;
+            border-color: #d4d7dd;
+        }
+
+        /* Content Section - Right Side */
+        .profile-content-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        /* Navigation Tabs */
         .orders-nav {
-            gap: 20px !important;
-        }
-        
-        .orders-filter-card {
-            padding: 20px !important;
-        }
-        
-        .orders-filter-form {
-            flex-direction: column !important;
-            gap: 12px !important;
-        }
-        
-        .orders-filter-group {
-            min-width: auto !important;
-        }
-        
-        .orders-table-head {
-            display: none !important;
-        }
-        
-        .orders-desktop-layout {
-            display: none !important;
-        }
-        
-        .orders-summary {
-            grid-template-columns: 1fr !important;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            background: #fafbfc;
+            padding: 0 32px;
+            border-bottom: 1px solid #e8e9ed;
         }
 
-        .orders-header h1 {
-    
+        .orders-nav-link {
+            padding: 18px 0;
+            text-decoration: none;
+            color: #6b7280;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            font-size: 0.925rem;
+            letter-spacing: -0.01em;
         }
-    }
 
-    @media (min-width: 769px) {
-        .orders-mobile-layout {
-            display: none !important;
+        .orders-nav-link:hover {
+            color: #8B4513;
+            text-decoration: none;
         }
-    }
 
-    /* Override any existing styles */
-    .orders-container * {
-        box-sizing: border-box !important;
-    }
+        .orders-nav-link.active {
+            color: #8B4513;
+            border-bottom-color: #8B4513;
+            font-weight: 600;
+        }
 
-    /* Additional hover effects */
-    .orders-table-row:hover .orders-action-btn {
-        opacity: 1 !important;
-    }
+        /* Tab Content */
+        .orders-table-card {
+            background: white;
+        }
 
-    .orders-action-btn {
-        opacity: 0.7 !important;
-        transition: opacity 0.3s ease !important;
-    }
-</style>
+        .orders-table-header {
+            background-color: #fafbfc;
+            padding: 24px 32px;
+            border-bottom: 1px solid #e8e9ed;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .orders-table-header h4 {
+            font-weight: 600;
+            color: #1a1d2e;
+            margin: 0;
+            font-size: 1.15rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .filter-dropdown {
+            position: relative;
+        }
+
+        .filter-btn {
+            padding: 10px 18px;
+            background: white;
+            border: 1px solid #e8e9ed;
+            border-radius: 8px;
+            color: #4a5568;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: #8B4513;
+            color: #8B4513;
+        }
+
+        .filter-btn.active {
+            background: #8B4513;
+            color: white;
+            border-color: #8B4513;
+        }
+
+        /* Purchase History Table */
+        .profile-table-container {
+            overflow-x: auto;
+            background: white;
+        }
+
+        .profile-purchase-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .profile-purchase-table th {
+            background-color: #fafbfc;
+            padding: 16px 24px;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 1px solid #e8e9ed;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .profile-purchase-table td {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f7f8fa;
+            vertical-align: middle;
+            background: white;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .profile-purchase-table tbody tr {
+            transition: background-color 0.15s ease;
+        }
+
+        .profile-purchase-table tbody tr:hover {
+            background-color: #fafbfc;
+        }
+
+        .profile-purchase-table tbody tr:hover td {
+            background-color: transparent;
+        }
+
+        /* Product Image in Table */
+        .product-image-container {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f7f8fa;
+            flex-shrink: 0;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .product-name {
+            font-weight: 500;
+            color: #1a1d2e;
+            line-height: 1.3;
+        }
+
+        .product-size {
+            color: #9ca3af;
+            font-size: 0.825rem;
+        }
+
+        /* Status Badges */
+        .profile-status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 500;
+            text-transform: capitalize;
+            display: inline-block;
+            font-size: 0.8rem;
+            letter-spacing: -0.01em;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-processing {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-shipped, .status-dikirim {
+            background-color: #ccfbf1;
+            color: #115e59;
+        }
+
+        .status-delivered, .status-diterima {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Empty State */
+        .profile-empty-state {
+            text-align: center;
+            color: #9ca3af;
+            padding: 80px 20px;
+            font-size: 0.95rem;
+        }
+
+        .empty-state-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            opacity: 0.4;
+        }
+
+        /* Order Actions */
+        .order-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .order-action-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.825rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: -0.01em;
+        }
+
+        .order-action-view {
+            background: #8B4513;
+            color: white;
+        }
+
+        .order-action-view:hover {
+            background: #7A3F12;
+            color: white;
+            text-decoration: none;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(139, 69, 19, 0.2);
+        }
+
+        /* Success Messages */
+        .alert-success {
+            background: #d1fae5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.925rem;
+        }
+
+        .alert-success i {
+            font-size: 1.1rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .profile-container {
+                padding: 20px 0;
+            }
+
+            .profile-main-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .profile-main-card {
+                padding: 24px;
+                position: relative;
+                top: 0;
+            }
+
+            .profile-main-avatar {
+                width: 90px;
+                height: 90px;
+                font-size: 1.75rem;
+            }
+
+            .orders-nav {
+                padding: 0 20px;
+                gap: 24px;
+            }
+
+            .orders-nav-link {
+                padding: 14px 0;
+                font-size: 0.875rem;
+            }
+
+            .orders-table-header {
+                padding: 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-section {
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .profile-table-container {
+                display: none;
+            }
+
+            .profile-mobile-orders {
+                display: block !important;
+                padding: 16px;
+            }
+        }
+
+        /* Hide mobile view on desktop */
+        .profile-mobile-orders {
+            display: none;
+        }
+
+        /* Mobile Order Cards */
+        .profile-mobile-order-item {
+            background: #fafbfc;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            border-left: 3px solid #8B4513;
+        }
+
+        .profile-mobile-order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+
+        .profile-mobile-order-product {
+            font-weight: 600;
+            color: #1a1d2e;
+            margin-bottom: 6px;
+            font-size: 0.925rem;
+            line-height: 1.4;
+        }
+
+        .profile-mobile-order-date {
+            color: #6b7280;
+            font-size: 0.825rem;
+        }
+
+        .profile-mobile-order-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .profile-mobile-order-quantity {
+            color: #6b7280;
+            font-size: 0.825rem;
+        }
+
+        .profile-mobile-order-price {
+            font-weight: 600;
+            color: #1a1d2e;
+            font-size: 0.925rem;
+        }
+
+        /* Loading State */
+        .loading-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f4f6;
+            border-top-color: #8B4513;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 @endpush
 
 @section('content')
-<div class="orders-container">
-    <div class="container">
-
-        <!-- Navigation Tabs -->
-        <div class="orders-nav">
-            <a href="{{ route('profile.index') }}" class="orders-nav-link">
-                <i class="fas fa-user" style="margin-right: 8px;"></i>
-                Profil Saya
-            </a>
-            <a href="{{ route('profile.orders') }}" class="orders-nav-link active">
-                <i class="fas fa-shopping-bag" style="margin-right: 8px;"></i>
-                Riwayat pembelian
-            </a>
-        </div>
-
-        <!-- Filter Section -->
-        <div class="orders-filter-card">
-            <form method="GET" action="{{ route('profile.orders') }}" class="orders-filter-form">
-                <div class="orders-filter-group">
-                    <label class="orders-filter-label">
-                        <i class="fas fa-filter" style="margin-right: 6px;"></i>
-                        Status Pesanan
-                    </label>
-                    <select name="status" class="orders-filter-select">
-                        <option value="">Semua Status</option>
-                        <option value="Menunggu" {{ request('status') == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
-                        <option value="Proses" {{ request('status') == 'Proses' ? 'selected' : '' }}>Proses</option>
-                        <option value="Dikirim" {{ request('status') == 'Dikirim' ? 'selected' : '' }}>Dikirim</option>
-                        <option value="Selesai" {{ request('status') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
-                        <option value="Dibatalkan" {{ request('status') == 'Dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
-                    </select>
+    <div class="profile-container">
+        <div class="container">
+            <!-- Success Messages -->
+            @if(session('success'))
+                <div class="alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{{ session('success') }}</span>
                 </div>
-                
-                <div class="orders-filter-group">
-                    <label class="orders-filter-label">
-                        <i class="fas fa-calendar-alt" style="margin-right: 6px;"></i>
-                        Dari Tanggal
-                    </label>
-                    <input type="date" name="date_from" value="{{ request('date_from') }}" class="orders-filter-input">
-                </div>
-                
-                <div class="orders-filter-group">
-                    <label class="orders-filter-label">
-                        <i class="fas fa-calendar-alt" style="margin-right: 6px;"></i>
-                        Sampai Tanggal
-                    </label>
-                    <input type="date" name="date_to" value="{{ request('date_to') }}" class="orders-filter-input">
-                </div>
-                
-                <div>
-                    <button type="submit" class="orders-btn orders-btn-primary">
-                        <i class="fas fa-search"></i>Filter
-                    </button>
-                </div>
-                
-                @if(request()->hasAny(['status', 'date_from', 'date_to']))
-                <div>
-                    <a href="{{ route('profile.orders') }}" class="orders-btn orders-btn-outline">
-                        <i class="fas fa-times"></i>Reset
-                    </a>
-                </div>
-                @endif
-            </form>
-        </div>
-
-        <!-- Orders Table -->
-        <div class="orders-table-card">
-            <div class="orders-table-header">
-                <h3>
-                    <i class="fas fa-list" style="margin-right: 8px; color: #8B4513;"></i>
-                    Daftar Pesanan
-                </h3>
-            </div>
-            
-            <!-- Table Header - Desktop Only -->
-            <div class="orders-table-head">
-                <div>No</div>
-                <div>Produk</div>
-                <div>Tanggal</div>
-                <div>Jumlah</div>
-                <div>Harga</div>
-                <div>Status</div>
-                <div>Aksi</div>
-            </div>
-
-            <!-- Table Body -->
-            <div class="orders-table-body">
-                @forelse($orders as $index => $order)
-                <div class="orders-table-row">
-                    <!-- Mobile Layout -->
-                    <div class="orders-mobile-layout">
-                        <div class="orders-mobile-header">
-                            <div class="orders-mobile-left">
-                                <h4>{{ $order->product_name }}</h4>
-                                <p><i class="fas fa-calendar" style="margin-right: 4px;"></i>{{ $order->created_at->format('d M Y, H:i') }}</p>
-                                <p><i class="fas fa-boxes" style="margin-right: 4px;"></i>Qty: {{ $order->quantity }}</p>
-                            </div>
-                            <div class="orders-mobile-right">
-                                <p>Rp {{ number_format($order->total_price, 0, ',', '.') }}</p>
-                                <span class="orders-badge {{ $order->status == 'Selesai' ? 'orders-badge-success' : ($order->status == 'Dikirim' ? 'orders-badge-info' : ($order->status == 'Proses' ? 'orders-badge-warning' : 'orders-badge-secondary')) }}">
-                                    {{ $order->status }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="orders-mobile-actions">
-                            <button class="orders-mobile-btn orders-mobile-btn-primary">
-                                <i class="fas fa-eye"></i> Detail
-                            </button>
-                            @if(in_array($order->status, ['Menunggu', 'Proses']))
-                            <button onclick="cancelOrder({{ $order->id }})" class="orders-mobile-btn orders-mobile-btn-danger">
-                                <i class="fas fa-times"></i> Batal
-                            </button>
-                            @endif
-                        </div>
-                    </div>
-
-                    <!-- Desktop Layout -->
-                    <div class="orders-desktop-layout">
-                        <div class="orders-desktop-cell-secondary">{{ ($orders->currentPage() - 1) * $orders->perPage() + $index + 1 }}</div>
-                        <div class="orders-desktop-cell-bold">{{ $order->product_name }}</div>
-                        <div class="orders-desktop-cell-secondary">{{ $order->created_at->format('d-m-Y') }}</div>
-                        <div class="orders-desktop-cell-secondary">{{ $order->quantity }}</div>
-                        <div class="orders-desktop-cell-bold">Rp {{ number_format($order->total_price, 0, ',', '.') }}</div>
-                        <div>
-                            <span class="orders-badge {{ $order->status == 'Selesai' ? 'orders-badge-success' : ($order->status == 'Dikirim' ? 'orders-badge-info' : ($order->status == 'Proses' ? 'orders-badge-warning' : 'orders-badge-secondary')) }}">
-                                {{ $order->status }}
-                            </span>
-                        </div>
-                        <div class="orders-desktop-actions">
-                            <button class="orders-action-btn orders-action-btn-primary" title="Lihat Detail">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            @if(in_array($order->status, ['Menunggu', 'Proses']))
-                            <button onclick="cancelOrder({{ $order->id }})" class="orders-action-btn orders-action-btn-danger" title="Batalkan">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                @empty
-                <div class="orders-empty">
-                    <i class="fas fa-shopping-bag"></i>
-                    <h4>Belum ada riwayat pembelian</h4>
-                    <p>Mulai berbelanja sekarang untuk melihat riwayat pesanan Anda di sini</p>
-                    <a href="{{ route('products.index') }}" class="orders-btn orders-btn-primary">
-                        Mulai Belanja
-                    </a>
-                </div>
-                @endforelse
-            </div>
-
-            <!-- Pagination -->
-            @if($orders->hasPages())
-            <div class="orders-pagination">
-                {{ $orders->appends(request()->query())->links() }}
-            </div>
             @endif
-        </div>
 
-        <!-- Summary Cards -->
-        @if($orders->count() > 0)
-        <div class="orders-summary">
-            <div class="orders-summary-card orders-summary-card-blue">
-                <i class="fas fa-shopping-bag orders-summary-icon orders-summary-icon-blue"></i>
-                <div class="orders-summary-content orders-summary-content-blue">
-                    <p>Total Pesanan</p>
-                    <p>{{ $orders->total() }}</p>
+            <div class="profile-main-grid">
+                <!-- Profile Card - Left Side -->
+                <div class="profile-main-card">
+                    <div class="profile-card-header">
+                        <h3>Profil Saya</h3>
+                    </div>
+
+                    <div class="profile-main-avatar">
+                        @if($user->profile_image)
+                            <img src="{{ $user->getProfileImageUrl() }}" alt="Profile">
+                        @else
+                            {{ $user->getInitials() }}
+                        @endif
+                    </div>
+
+                    <div class="profile-main-info">
+                        <h3>{{ $user->name }}</h3>
+                        <p><i class="fas fa-envelope"></i> <span>{{ $user->email }}</span></p>
+                        <p><i class="fas fa-phone"></i> <span>{{ $user->phone ?? 'Belum diatur' }}</span></p>
+                        
+                        @if($user->birth_date)
+                            <p><i class="fas fa-birthday-cake"></i> <span>{{ $user->birth_date->format('d F Y') }}</span></p>
+                        @endif
+                        
+                        @if($user->gender)
+                            <p><i class="fas fa-venus-mars"></i> 
+                                <span>
+                                    @if($user->gender == 'male') Laki-laki
+                                    @elseif($user->gender == 'female') Perempuan
+                                    @else Lainnya
+                                    @endif
+                                </span>
+                            </p>
+                        @endif
+                        
+                        @if($user->address_data && $user->getFormattedAddress())
+                            <p><i class="fas fa-map-marker-alt"></i> <span>{{ $user->getFormattedAddress() }}</span></p>
+                        @else
+                            @php
+                                $latestAddress = $user->getLatestShippingAddress();
+                            @endphp
+                            
+                            @if($latestAddress)
+                                <p><i class="fas fa-map-marker-alt"></i> <span>{{ $latestAddress['address'] }}</span></p>
+                                <p><i class="fas fa-city"></i> 
+                                    <span>
+                                        {{ $latestAddress['district'] }}, 
+                                        {{ $latestAddress['city'] }}, 
+                                        {{ $latestAddress['province'] }} 
+                                        {{ $latestAddress['postal_code'] }}
+                                    </span>
+                                </p>
+                            @else
+                                <p><i class="fas fa-map-marker-alt"></i> <span>Belum ada alamat pengiriman</span></p>
+                            @endif
+                        @endif
+                    </div>
                 </div>
-            </div>
-            
-            <div class="orders-summary-card orders-summary-card-green">
-                <i class="fas fa-check-circle orders-summary-icon orders-summary-icon-green"></i>
-                <div class="orders-summary-content orders-summary-content-green">
-                    <p>Selesai</p>
-                    <p>{{ $orders->where('status', 'Selesai')->count() }}</p>
-                </div>
-            </div>
-            
-            <div class="orders-summary-card orders-summary-card-yellow">
-                <i class="fas fa-clock orders-summary-icon orders-summary-icon-yellow"></i>
-                <div class="orders-summary-content orders-summary-content-yellow">
-                    <p>Proses</p>
-                    <p>{{ $orders->whereIn('status', ['Menunggu', 'Proses', 'Dikirim'])->count() }}</p>
-                </div>
-            </div>
-            
-            <div class="orders-summary-card orders-summary-card-purple">
-                <i class="fas fa-money-bill-wave orders-summary-icon orders-summary-icon-purple"></i>
-                <div class="orders-summary-content orders-summary-content-purple">
-                    <p>Total Belanja</p>
-                    <p>Rp {{ number_format($orders->sum('total_price'), 0, ',', '.') }}</p>
+
+                <!-- Content Section - Right Side -->
+                <div class="profile-content-section">
+                    <!-- Navigation Tabs -->
+                    <div class="orders-nav">
+                        <a href="{{ route('profile.index') }}" class="orders-nav-link">
+                            <i class="fas fa-user" style="margin-right: 8px;"></i>
+                            Profil Saya
+                        </a>
+                        <a href="{{ route('profile.orders') }}" class="orders-nav-link active">
+                            <i class="fas fa-shopping-bag" style="margin-right: 8px;"></i>
+                            Riwayat Pembelian
+                        </a>
+                    </div>
+
+                    <div class="orders-table-card" style="position: relative;">
+                        <div class="loading-overlay">
+                            <div class="spinner"></div>
+                        </div>
+
+                        <div class="orders-table-header">
+                            <h4>
+                                <i class="fas fa-history" style="color: #8B4513;"></i>
+                                Riwayat Pembelian
+                            </h4>
+                            <div class="filter-section">
+                                <button class="filter-btn active" data-status="all">
+                                    <i class="fas fa-list"></i>
+                                    Semua
+                                </button>
+                                <button class="filter-btn" data-status="pending">
+                                    <i class="fas fa-clock"></i>
+                                    Pending
+                                </button>
+                                <button class="filter-btn" data-status="processing">
+                                    <i class="fas fa-sync"></i>
+                                    Diproses
+                                </button>
+                                <button class="filter-btn" data-status="shipped">
+                                    <i class="fas fa-truck"></i>
+                                    Dikirim
+                                </button>
+                                <button class="filter-btn" data-status="delivered">
+                                    <i class="fas fa-check-circle"></i>
+                                    Selesai
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Desktop Table -->
+                        <div class="profile-table-container">
+                            <table class="profile-purchase-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Produk</th>
+                                        <th>Tanggal</th>
+                                        <th>Jumlah</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orders-tbody">
+                                    @forelse ($orders as $index => $order)
+                                        @foreach ($order->orderItems as $itemIndex => $item)
+                                            <tr data-status="{{ $order->status }}">
+                                                <td>{{ $index + 1 }}</td>
+                                                <td>
+                                                    <div class="product-info-wrapper">
+                                                        <div class="product-image-container">
+                                                            <img src="{{ $item->product->images->first()->image_path ?? '/images/placeholder.jpg' }}" 
+                                                                 alt="{{ $item->product->name }}" 
+                                                                 class="product-image"
+                                                                 onerror="this.src='/images/placeholder.jpg'">
+                                                        </div>
+                                                        <div class="product-details">
+                                                            <div class="product-name">{{ $item->product->name }}</div>
+                                                            <small class="product-size">Size: {{ $item->size }}</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>{{ $order->created_at->format('d M Y') }}</td>
+                                                <td>{{ $item->quantity }}</td>
+                                                <td style="font-weight: 500; color: #1a1d2e;">Rp{{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                                                <td>
+                                                    <span class="profile-status-badge status-{{ $order->status }}">
+                                                        {{ $order->getStatusLabelAttribute() }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ route('orders.show', $order->order_number) }}" 
+                                                       class="order-action-btn order-action-view">
+                                                        <i style="margin-right: 4px;"></i>Detail
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @empty
+                                        <tr id="empty-state-row">
+                                            <td colspan="7" class="profile-empty-state">
+                                                <div class="empty-state-icon">📦</div>
+                                                <div>Belum ada riwayat pembelian</div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Mobile Cards -->
+                        <div class="profile-mobile-orders" id="mobile-orders">
+                            @forelse($orders as $order)
+                                @foreach($order->orderItems as $item)
+                                    <div class="profile-mobile-order-item" data-status="{{ $order->status }}">
+                                        <div class="profile-mobile-order-header">
+                                            <div>
+                                                <div class="profile-mobile-order-product">{{ $item->product->name }}</div>
+                                                <div class="profile-mobile-order-date">{{ $order->created_at->format('d M Y') }}</div>
+                                                <small class="product-size">Size: {{ $item->size }}</small>
+                                            </div>
+                                            <span class="profile-status-badge status-{{ $order->status }}">
+                                                {{ $order->getStatusLabelAttribute() }}
+                                            </span>
+                                        </div>
+                                        <div class="profile-mobile-order-details">
+                                            <span class="profile-mobile-order-quantity">Jumlah: {{ $item->quantity }}</span>
+                                            <span class="profile-mobile-order-price">Rp{{ number_format($item->subtotal, 0, ',', '.') }}</span>
+                                        </div>
+                                        <div class="order-actions">
+                                            <a href="{{ route('orders.show', $order->order_number) }}" 
+                                               class="order-action-btn order-action-view">
+                                                <i class="fas fa-eye" style="margin-right: 4px;"></i>Lihat Detail
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @empty
+                                <div class="profile-empty-state" id="mobile-empty-state">
+                                    <div class="empty-state-icon">📦</div>
+                                    <div>Belum ada riwayat pembelian</div>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        @endif
     </div>
-</div>
+@endsection
 
-<!-- Cancel Order Modal -->
-<div id="cancelModal" class="orders-modal hidden">
-    <div class="orders-modal-content">
-        <div class="orders-modal-header">
-            <i class="fas fa-exclamation-triangle orders-modal-icon orders-modal-icon-warning"></i>
-            <h3 class="orders-modal-title">Batalkan Pesanan</h3>
-            <p class="orders-modal-text">Apakah Anda yakin ingin membatalkan pesanan ini? Tindakan ini tidak dapat dibatalkan.</p>
-        </div>
-        
-        <div class="orders-modal-actions">
-            <button onclick="closeCancelModal()" class="orders-btn orders-btn-outline" style="flex: 1;">
-                <i class="fas fa-times"></i>
-                Tidak
-            </button>
-            <form id="cancelForm" method="POST" style="flex: 1;">
-                @csrf
-                @method('PATCH')
-                <button type="submit" class="orders-btn orders-btn-secondary" style="width: 100%;">
-                    <i class="fas fa-check"></i>
-                    Ya, Batalkan
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
-
+@push('scripts')
 <script>
-function cancelOrder(orderId) {
-    document.getElementById('cancelForm').action = /orders/${orderId}/cancel;
-    document.getElementById('cancelModal').classList.remove('hidden');
-}
-
-function closeCancelModal() {
-    document.getElementById('cancelModal').classList.add('hidden');
-}
-
-// Close modal when clicking outside
 document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('cancelModal');
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeCancelModal();
-        }
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const tableRows = document.querySelectorAll('#orders-tbody tr[data-status]');
+    const mobileOrders = document.querySelectorAll('#mobile-orders .profile-mobile-order-item[data-status]');
+    const loadingOverlay = document.querySelector('.loading-overlay');
+
+    // Filter functionality
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const status = this.getAttribute('data-status');
+            
+            // Show loading
+            loadingOverlay.classList.add('active');
+            
+            // Update active button
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Simulate loading delay for smooth UX
+            setTimeout(() => {
+                // Filter desktop table
+                let visibleCount = 0;
+                tableRows.forEach(row => {
+                    if (status === 'all' || row.getAttribute('data-status') === status) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Filter mobile cards
+                let mobileVisibleCount = 0;
+                mobileOrders.forEach(order => {
+                    if (status === 'all' || order.getAttribute('data-status') === status) {
+                        order.style.display = '';
+                        mobileVisibleCount++;
+                    } else {
+                        order.style.display = 'none';
+                    }
+                });
+
+                // Show empty state if no results
+                const emptyStateRow = document.getElementById('empty-state-row');
+                const mobileEmptyState = document.getElementById('mobile-empty-state');
+                
+                if (emptyStateRow) {
+                    emptyStateRow.style.display = visibleCount === 0 ? '' : 'none';
+                }
+                
+                if (mobileEmptyState) {
+                    mobileEmptyState.style.display = mobileVisibleCount === 0 ? 'block' : 'none';
+                }
+
+                // Hide loading
+                loadingOverlay.classList.remove('active');
+            }, 300);
+        });
     });
-    
-    // Close modal with ESC key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-            closeCancelModal();
-        }
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
     });
 });
 </script>
-@endsection
+@endpush

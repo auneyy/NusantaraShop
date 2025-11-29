@@ -71,6 +71,11 @@
         margin-bottom: 8px !important;
     }
 
+    .edit-profile-label-required::after {
+        content: " *" !important;
+        color: #dc3545 !important;
+    }
+
     /* Profile Image Section */
     .edit-profile-image-section {
         display: flex !important;
@@ -149,6 +154,12 @@
         box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1) !important;
     }
 
+    .edit-profile-input:disabled {
+        background-color: #f8f9fa !important;
+        color: #6c757d !important;
+        cursor: not-allowed !important;
+    }
+
     /* Textarea */
     .edit-profile-textarea {
         width: 100% !important;
@@ -170,12 +181,70 @@
         box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1) !important;
     }
 
+    /* Select Input */
+    .edit-profile-select {
+        width: 100% !important;
+        padding: 12px 16px !important;
+        border: 1px solid #ddd !important;
+        border-radius: 6px !important;
+        font-size: 14px !important;
+        background: white !important;
+        transition: all 0.3s !important;
+        color: #333 !important;
+        cursor: pointer !important;
+    }
+
+    .edit-profile-select:focus {
+        outline: none !important;
+        border-color: #8B4513 !important;
+        box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1) !important;
+    }
+
+    .edit-profile-select:disabled {
+        background-color: #f8f9fa !important;
+        color: #6c757d !important;
+        cursor: not-allowed !important;
+    }
+
     /* Error Messages */
     .edit-profile-error {
         color: #dc3545 !important;
         font-size: 12px !important;
         margin-top: 4px !important;
         display: block !important;
+    }
+
+    /* Loading Spinner */
+    .edit-profile-loading {
+        color: #8B4513 !important;
+        font-size: 12px !important;
+        margin-top: 4px !important;
+        display: none !important;
+    }
+
+    /* Address Section */
+    .edit-profile-address-section {
+        background: #f8f9fa !important;
+        border-radius: 8px !important;
+        padding: 20px !important;
+        margin-top: 10px !important;
+        border: 1px solid #e9ecef !important;
+    }
+
+    .edit-profile-address-title {
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: #333 !important;
+        margin-bottom: 16px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    .edit-profile-address-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 16px !important;
     }
 
     /* Action Buttons */
@@ -253,6 +322,10 @@
             text-align: center !important;
         }
 
+        .edit-profile-address-grid {
+            grid-template-columns: 1fr !important;
+        }
+
         .edit-profile-actions {
             flex-direction: column !important;
         }
@@ -267,12 +340,9 @@
     }
 
     /* Form validation styles */
-    .edit-profile-input.error {
-        border-color: #dc3545 !important;
-        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
-    }
-
-    .edit-profile-textarea.error {
+    .edit-profile-input.error,
+    .edit-profile-textarea.error,
+    .edit-profile-select.error {
         border-color: #dc3545 !important;
         box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
     }
@@ -307,7 +377,8 @@
     /* Custom focus styles */
     .edit-profile-input:focus,
     .edit-profile-textarea:focus,
-    .edit-profile-file-input:focus {
+    .edit-profile-file-input:focus,
+    .edit-profile-select:focus {
         outline: none !important;
     }
 
@@ -315,24 +386,6 @@
     .edit-profile-form-container:hover {
         box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
         transition: box-shadow 0.3s ease !important;
-    }
-
-    /* Icon styling for form fields */
-    .edit-profile-input-group {
-        position: relative !important;
-    }
-
-    .edit-profile-input-icon {
-        position: absolute !important;
-        left: 12px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-        color: #666 !important;
-        font-size: 16px !important;
-    }
-
-    .edit-profile-input.with-icon {
-        padding-left: 40px !important;
     }
 </style>
 @endpush
@@ -355,7 +408,7 @@
 
         <!-- Main Form Container -->
         <div class="edit-profile-form-container">
-            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" id="profile-form">
                 @csrf
                 @method('PUT')
 
@@ -370,7 +423,7 @@
                             @if($user->profile_image)
                                 <img src="{{ asset('storage/' . $user->profile_image) }}" alt="Profile" id="preview-image">
                             @else
-                                <span id="avatar-initial">{{ strtoupper(substr($user->name, 0, 2)) }}</span>
+                                <span id="avatar-initial">{{ $user->getInitials() }}</span>
                             @endif
                         </div>
                         <div style="flex: 1;">
@@ -392,7 +445,7 @@
 
                 <!-- Name Field -->
                 <div class="edit-profile-form-group">
-                    <label for="name" class="edit-profile-label">
+                    <label for="name" class="edit-profile-label edit-profile-label-required">
                         <i class="fas fa-user" style="margin-right: 8px;"></i>
                         Nama Lengkap
                     </label>
@@ -418,15 +471,16 @@
                            id="email" 
                            value="{{ old('email', $user->email) }}" 
                            class="edit-profile-input {{ $errors->has('email') ? 'error' : '' }}" 
-                           required>
-                    @error('email')
-                        <span class="edit-profile-error">{{ $message }}</span>
-                    @enderror
+                           disabled
+                           style="background-color: #f8f9fa; color: #6c757d;">
+                    <small style="color: #666; font-size: 12px; display: block; margin-top: 4px;">
+                        Email tidak dapat diubah
+                    </small>
                 </div>
 
                 <!-- Phone Field -->
                 <div class="edit-profile-form-group">
-                    <label for="phone" class="edit-profile-label">
+                    <label for="phone" class="edit-profile-label edit-profile-label-required">
                         <i class="fas fa-phone" style="margin-right: 8px;"></i>
                         Nomor Telepon
                     </label>
@@ -435,26 +489,154 @@
                            id="phone" 
                            value="{{ old('phone', $user->phone) }}" 
                            class="edit-profile-input {{ $errors->has('phone') ? 'error' : '' }}" 
+                           required
                            placeholder="Contoh: 082143399676">
                     @error('phone')
                         <span class="edit-profile-error">{{ $message }}</span>
                     @enderror
                 </div>
 
-                <!-- Address Field -->
+                <!-- Personal Information -->
+                <div class="edit-profile-address-grid">
+                    <!-- Birth Date -->
+                    <div class="edit-profile-form-group">
+                        <label for="birth_date" class="edit-profile-label">
+                            <i class="fas fa-birthday-cake" style="margin-right: 8px;"></i>
+                            Tanggal Lahir
+                        </label>
+                        <input type="date" 
+                               name="birth_date" 
+                               id="birth_date" 
+                               value="{{ old('birth_date', $user->birth_date ? $user->birth_date->format('Y-m-d') : '') }}" 
+                               class="edit-profile-input {{ $errors->has('birth_date') ? 'error' : '' }}">
+                        @error('birth_date')
+                            <span class="edit-profile-error">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="edit-profile-form-group">
+                        <label for="gender" class="edit-profile-label">
+                            <i class="fas fa-venus-mars" style="margin-right: 8px;"></i>
+                            Jenis Kelamin
+                        </label>
+                        <select name="gender" 
+                                id="gender" 
+                                class="edit-profile-select {{ $errors->has('gender') ? 'error' : '' }}">
+                            <option value="">Pilih Jenis Kelamin</option>
+                            <option value="male" {{ old('gender', $user->gender) == 'male' ? 'selected' : '' }}>Laki-laki</option>
+                            <option value="female" {{ old('gender', $user->gender) == 'female' ? 'selected' : '' }}>Perempuan</option>
+                            <option value="other" {{ old('gender', $user->gender) == 'other' ? 'selected' : '' }}>Lainnya</option>
+                        </select>
+                        @error('gender')
+                            <span class="edit-profile-error">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Address Section -->
                 <div class="edit-profile-form-group">
-                    <label for="address" class="edit-profile-label">
-                        <i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i>
-                        Alamat
-                    </label>
-                    <textarea name="address" 
-                              id="address" 
-                              rows="3" 
-                              class="edit-profile-textarea {{ $errors->has('address') ? 'error' : '' }}"
-                              placeholder="Masukkan alamat lengkap Anda">{{ old('address', $user->address) }}</textarea>
-                    @error('address')
-                        <span class="edit-profile-error">{{ $message }}</span>
-                    @enderror
+                    <div class="edit-profile-address-title">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Alamat Lengkap
+                    </div>
+                    <div class="edit-profile-address-section">
+                        
+                        <!-- Province -->
+                        <div class="edit-profile-form-group">
+                            <label for="province_id" class="edit-profile-label edit-profile-label-required">
+                                Provinsi
+                            </label>
+                            <select name="province_id" 
+                                    id="province_id" 
+                                    class="edit-profile-select {{ $errors->has('province_id') ? 'error' : '' }}"
+                                    required
+                                    onchange="loadCities(this.value)">
+                                <option value="">Pilih Provinsi</option>
+                                @foreach($provinces as $province)
+                                    <option value="{{ $province['province_id'] }}" 
+                                            {{ old('province_id', $user->getAddressComponent('province_id')) == $province['province_id'] ? 'selected' : '' }}>
+                                        {{ $province['province'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <span class="edit-profile-loading" id="province-loading">
+                                <i class="fas fa-spinner fa-spin"></i> Memuat kota...
+                            </span>
+                            @error('province_id')
+                                <span class="edit-profile-error">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- City -->
+                        <div class="edit-profile-form-group">
+                            <label for="city_id" class="edit-profile-label edit-profile-label-required">
+                                Kota/Kabupaten
+                            </label>
+                            <select name="city_id" 
+                                    id="city_id" 
+                                    class="edit-profile-select {{ $errors->has('city_id') ? 'error' : '' }}"
+                                    required
+                                    disabled>
+                                <option value="">Pilih Kota/Kabupaten</option>
+                                <!-- Cities will be loaded dynamically -->
+                            </select>
+                            @error('city_id')
+                                <span class="edit-profile-error">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- District -->
+                        <div class="edit-profile-form-group">
+                            <label for="district" class="edit-profile-label edit-profile-label-required">
+                                Kecamatan
+                            </label>
+                            <input type="text" 
+                                   name="district" 
+                                   id="district" 
+                                   value="{{ old('district', $user->getAddressComponent('district')) }}" 
+                                   class="edit-profile-input {{ $errors->has('district') ? 'error' : '' }}" 
+                                   required
+                                   placeholder="Masukkan nama kecamatan">
+                            @error('district')
+                                <span class="edit-profile-error">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Postal Code -->
+                        <div class="edit-profile-form-group">
+                            <label for="postal_code" class="edit-profile-label edit-profile-label-required">
+                                Kode Pos
+                            </label>
+                            <input type="text" 
+                                   name="postal_code" 
+                                   id="postal_code" 
+                                   value="{{ old('postal_code', $user->getAddressComponent('postal_code')) }}" 
+                                   class="edit-profile-input {{ $errors->has('postal_code') ? 'error' : '' }}" 
+                                   required
+                                   placeholder="Contoh: 65145"
+                                   maxlength="5">
+                            @error('postal_code')
+                                <span class="edit-profile-error">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <!-- Address Detail -->
+                        <div class="edit-profile-form-group">
+                            <label for="address" class="edit-profile-label edit-profile-label-required">
+                                Alamat Lengkap
+                            </label>
+                            <textarea name="address" 
+                                      id="address" 
+                                      rows="3" 
+                                      class="edit-profile-textarea {{ $errors->has('address') ? 'error' : '' }}"
+                                      required
+                                      placeholder="Masukkan alamat lengkap (nama jalan, nomor rumah, RT/RW, dll)">{{ old('address', $user->getAddressComponent('address')) }}</textarea>
+                            @error('address')
+                                <span class="edit-profile-error">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Action Buttons -->
@@ -507,9 +689,68 @@ function previewImage(input) {
     }
 }
 
-// Form submission with loading state
+// Load cities based on selected province
+function loadCities(provinceId) {
+    if (!provinceId) {
+        document.getElementById('city_id').innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+        document.getElementById('city_id').disabled = true;
+        return;
+    }
+
+    var citySelect = document.getElementById('city_id');
+    var loadingElement = document.getElementById('province-loading');
+    
+    // Show loading
+    loadingElement.style.display = 'block';
+    citySelect.disabled = true;
+    
+    // Clear current options
+    citySelect.innerHTML = '<option value="">Memuat kota...</option>';
+    
+    // Fetch cities from server
+    fetch(`/profile/cities/${provinceId}`)
+        .then(response => response.json())
+        .then(data => {
+            // Populate city select
+            citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+            
+            data.forEach(city => {
+                var option = document.createElement('option');
+                option.value = city.city_id;
+                option.textContent = city.type + ' ' + city.city_name;
+                citySelect.appendChild(option);
+            });
+            
+            // Enable city select
+            citySelect.disabled = false;
+            
+            // Set selected city if exists
+            var selectedCityId = '{{ old('city_id', $user->getAddressComponent('city_id')) }}';
+            if (selectedCityId) {
+                citySelect.value = selectedCityId;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading cities:', error);
+            citySelect.innerHTML = '<option value="">Gagal memuat kota</option>';
+        })
+        .finally(() => {
+            loadingElement.style.display = 'none';
+        });
+}
+
+// Initialize form on page load
 document.addEventListener('DOMContentLoaded', function() {
-    var form = document.querySelector('form');
+    // Load cities if province is already selected
+    var provinceSelect = document.getElementById('province_id');
+    var selectedProvince = provinceSelect.value;
+    
+    if (selectedProvince) {
+        loadCities(selectedProvince);
+    }
+    
+    // Form submission with loading state
+    var form = document.getElementById('profile-form');
     var submitBtn = document.getElementById('submit-btn');
     var submitText = document.getElementById('submit-text');
     
@@ -528,20 +769,34 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 300);
         }, 5000);
     }
-});
-
-// Input validation feedback
-document.querySelectorAll('.edit-profile-input, .edit-profile-textarea').forEach(function(input) {
-    input.addEventListener('blur', function() {
-        if (this.hasAttribute('required') && !this.value.trim()) {
-            this.classList.add('error');
-        } else {
+    
+    // Input validation feedback
+    document.querySelectorAll('.edit-profile-input, .edit-profile-textarea, .edit-profile-select').forEach(function(input) {
+        input.addEventListener('blur', function() {
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.classList.add('error');
+            } else {
+                this.classList.remove('error');
+            }
+        });
+        
+        input.addEventListener('input', function() {
             this.classList.remove('error');
-        }
+        });
     });
     
-    input.addEventListener('input', function() {
-        this.classList.remove('error');
+    // Format phone number input
+    var phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('input', function(e) {
+        // Remove non-numeric characters
+        this.value = this.value.replace(/[^\d]/g, '');
+    });
+    
+    // Format postal code input
+    var postalInput = document.getElementById('postal_code');
+    postalInput.addEventListener('input', function(e) {
+        // Remove non-numeric characters
+        this.value = this.value.replace(/[^\d]/g, '');
     });
 });
 </script>
